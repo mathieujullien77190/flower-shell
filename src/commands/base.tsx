@@ -1,0 +1,172 @@
+import { BaseCommands, Help } from "../types"
+import { langs, t } from "../i18n/lang"
+import { readHelp } from "../engine/terminalEngine"
+import { colors } from "../theme"
+import { getWelcome } from "../state/registry"
+import { shellActions } from "../state/store"
+import { highlightFlower, plantFlowers } from "./flowers"
+import { title } from "./title"
+
+/** la clef du texte servi par les commandes que le visiteur ne peut pas taper */
+const RESTRICTED = "common.restricted"
+
+/**
+ * L'aide d'une commande. Les descriptions sont des clefs : elles passent
+ * par `t()` ici, a l'execution, quand la langue courante est connue.
+ */
+const buildHelp = (help: Help) => {
+	const patterns = help.patterns
+		.map(item => `\t${item.pattern} : ${t(item.description)}\n`)
+		.join("")
+
+	return `${help.description ? t(help.description) : ""}${
+		help.patterns.length > 0 ? "\n" : ""
+	}${patterns}`
+}
+
+const buildAllHelp = (commands: BaseCommands) =>
+	Object.entries(commands)
+		.filter(
+			([name, command]) =>
+				!command.restricted && command.help && name !== "help"
+		)
+		.sort(([a], [b]) => a.localeCompare(b))
+		.map(
+			([name, command]) =>
+				`+${name}+\n${readHelp(command)
+					.patterns.map(
+						pattern => `\t${pattern.pattern} : ${t(pattern.description)}\n`
+					)
+					.join("")}\n`
+		)
+		.join("")
+
+const commandHelp = (commands: BaseCommands, name: string): Help | null =>
+	commands[name] ? readHelp(commands[name]) || null : null
+
+/**
+ * Les commandes fournies avec le shell, indexees par leur nom. Les deux
+ * dernieres sont restreintes et cherchees par nom par le moteur : les
+ * retirer casserait le rendu d'une commande inconnue.
+ */
+export const baseCommands: BaseCommands = {
+	help: {
+		restricted: false,
+		action: ({ args, commands }) => {
+			if (args.length === 0) return `\n${buildAllHelp(commands)}`
+
+			const select = commandHelp(commands, args[0])
+			if (select) return buildHelp(select)
+
+			return t("help.notFound")
+		},
+		help: {
+			description: "help.desc",
+			patterns: [{ pattern: "help [command]", description: "help.usage" }],
+		},
+	},
+	clear: {
+		restricted: false,
+		action: () => "",
+		// l'historique est vide, mais la banniere est rejouee juste apres
+		effect: () => shellActions().clear(),
+		help: {
+			patterns: [{ pattern: "clear", description: "clear.usage" }],
+		},
+	},
+	hello: {
+		restricted: false,
+		action: ({ args }) =>
+			args.length === 0 ? t("hello.world") : `Hello ${args.join(" ")}`,
+		help: {
+			patterns: [
+				{ pattern: "hello", description: "hello.usage" },
+				{ pattern: "hello [text]", description: "hello.usageArgs" },
+			],
+		},
+	},
+	flowers: {
+		restricted: false,
+		action: () => plantFlowers(),
+		display: {
+			stylePre: {
+				fontSize: "calc(100cqw/60)",
+				color: colors().appColor,
+				transform: "scaleX(-1)",
+				textAlign: "right",
+			},
+			highlight: text => highlightFlower(text, { fontSize: "calc(100cqw/60)" }),
+			reverse: true,
+			stepTime: 1,
+			stepSize: 1,
+		},
+		help: {
+			patterns: [{ pattern: "flowers", description: "flowers.usage" }],
+		},
+	},
+	animation: {
+		restricted: false,
+		testArgs: { authorize: ["on", "off"], empty: false },
+		action: ({ args }) =>
+			args[0] === "on" ? t("animation.enabled") : t("animation.disabled"),
+		effect: ({ args }) => shellActions().setAnimation(args[0] === "on"),
+		help: {
+			patterns: [
+				{ pattern: "animation on", description: "animation.on" },
+				{ pattern: "animation off", description: "animation.off" },
+			],
+		},
+	},
+	lang: {
+		restricted: false,
+		// les langues sont celles du dictionnaire : lues a la frappe, pas ici
+		testArgs: { authorize: langs, empty: false },
+		// l'effet joue apres l'action : la langue demandee est forcee ici
+		action: ({ args }) => t("lang.set", { lang: args[0] }, args[0]),
+		effect: ({ args }) => shellActions().setLang(args[0]),
+		/**
+		 * Une fonction : l'aide liste les langues reellement montees, celles
+		 * du dictionnaire du consommateur. Chacune se decrit par la clef
+		 * `lang.<code>` — a lui de la fournir pour la sienne, sans quoi la
+		 * clef s'affiche telle quelle.
+		 */
+		help: () => ({
+			patterns: langs().map(lang => ({
+				pattern: `lang ${lang}`,
+				description: `lang.${lang}`,
+			})),
+		}),
+	},
+	welcome: {
+		restricted: true,
+		action: () => t(getWelcome()),
+		help: { description: RESTRICTED, patterns: [] },
+		display: {
+			hideCmd: true,
+			style: { color: colors().importantColor },
+		},
+	},
+	title: {
+		restricted: true,
+		action: () => title,
+		help: { description: RESTRICTED, patterns: [] },
+		display: {
+			hideCmd: true,
+			style: { alignItems: "center" },
+			stylePre: { fontSize: "calc(100vw/130)" },
+			highlight: text => highlightFlower(text, { fontSize: "calc(100vw/130)" }),
+		},
+	},
+	unknow: {
+		restricted: true,
+		action: ({ args }) => t("error.unknown", { name: args[0] }),
+		help: { description: RESTRICTED, patterns: [] },
+	},
+	argumenterror: {
+		restricted: true,
+		action: () => t("error.args"),
+		help: { description: RESTRICTED, patterns: [] },
+	},
+}
+
+export { RESTRICTED }
