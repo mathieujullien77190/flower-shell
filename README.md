@@ -1,0 +1,211 @@
+# flower-shell
+
+Un terminal rétro en React : moteur de commandes, historique, autocomplétion,
+rendu ASCII animé, et une fenêtre pour le poser. Aucune mise en page imposée.
+
+```tsx
+import { Shell, baseCommands } from "flower-shell"
+
+const App = () => <Shell commands={baseCommands} />
+```
+
+## Le composant
+
+| prop | rôle |
+| --- | --- |
+| `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres |
+| `showTitle` | affiche le logo ASCII du shell au démarrage |
+| `welcome` | mot d'accueil affiché sous le logo ; une clé du dictionnaire ou le texte lui-même |
+| `banner` | commandes restreintes rejouées derrière le logo, au démarrage et après un `clear` |
+| `theme` | couleurs, invite, polices |
+| `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
+| `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
+| `scrollRef` | élément à faire défiler quand la sortie s'allonge |
+| `onCommand` | appelé à chaque commande jouée, y compris celles du paquet |
+| `window` | pose le terminal dans un cadre ; voir plus bas |
+
+## Les commandes de base
+
+`help`, `clear`, `hello`, `flowers`, `animation`, `lang`, plus trois commandes
+restreintes — que le visiteur ne peut pas taper :
+
+- `title` affiche le logo ASCII du shell et `welcome` le mot d'accueil ; les
+  props `showTitle` et `welcome` les jouent pour vous, sinon le shell démarre
+  nu et vous posez votre propre marque
+- `unknow` et `argumenterror` sont cherchées **par nom** par le moteur, qui
+  rend leur texte quand une commande est inconnue ou mal appelée. Les retirer
+  est permis : le dictionnaire du paquet prend le relais, et `commands={{}}` reste un
+  shell valide, qui ne répond simplement à rien
+
+## Écrire une commande
+
+```tsx
+const ping: BaseCommand = {
+	restricted: false,
+	action: () => t("ping.pong"),
+	effect: () => console.log("joué"),
+	help: {
+		patterns: [{ pattern: "ping", description: "ping.usage" }],
+	},
+}
+
+const commands: BaseCommands = { ...baseCommands, ping }
+```
+
+Le nom qui invoque la commande est sa clé dans l'objet : le champ `name` n'existe
+pas.
+
+Un texte est **toujours une `string`**. Dans une `action`, c'est à vous
+d'appeler `t("clé")` — vous pouvez donc mélanger : `` `${t("ping.pong")} ${nom}` ``.
+Dans les champs statiques (`help.description`, `description` d'un pattern, prop
+`welcome`), vous écrivez **la clé** et le shell la traduit au moment de s'en
+servir. Une clé absente du dictionnaire s'affiche telle quelle, ce qui permet
+d'écrire directement `description: "répond pong"` quand une seule langue suffit.
+
+| champ | rôle |
+| --- | --- |
+| `action` | le texte affiché, déjà traduit |
+| `effect` | l'effet de bord ; la commande attaque votre état elle-même |
+| `JSX` | rendu React sous la sortie, pour une commande qui affiche mieux qu'un texte |
+| `help` | l'aide ; une fonction si elle dépend de l'état, comme celle de `lang` |
+| `testArgs` | arguments acceptés (`authorize`, `empty`) ; `authorize` accepte une fonction |
+| `display` | animation, styles, coloration personnalisée |
+| `restricted` | vraie si le visiteur ne peut pas la taper ; réservée au code |
+
+## La fenêtre
+
+Le shell se pose dans un cadre rétro — barre de titre à glisser, agrandissement,
+fermeture — en lui passant la prop `window`. Elle n'a pas vocation à servir
+seule, d'où son passage par le shell plutôt qu'un composant à part.
+
+```tsx
+const container = useRef<HTMLDivElement>(null)
+
+;<div ref={container} style={{ position: "relative", height: "100vh" }}>
+	<Shell
+		commands={baseCommands}
+		window={{ show: true, title: "flower-shell", container, onClose }}
+	/>
+</div>
+```
+
+| champ de `window` | rôle |
+| --- | --- |
+| `show` | montée ou non ; la fermeture s'anime avant de démonter |
+| `container` | le cadre borne le déplacement à cet élément |
+| `title` | le texte de la barre |
+| `bottomInset` | hauteur réservée en bas, pour une barre des tâches |
+| `compact` | pleine et non redimensionnable |
+| `layer` | étage d'empilement |
+| `rank` | rang dans la cascade, pour ne pas s'ouvrir sur la précédente |
+| `onFocus` / `onClose` | la fenêtre réclame le premier plan, ou se ferme |
+
+`compact` retire le bouton d'agrandissement et le double-clic. Le paquet ne
+fixe aucun seuil : c'est à qui l'affiche de décider quand — petit écran, mode
+lecture, préférence.
+
+## Le balisage du texte
+
+Les réponses passent par une passe de coloration :
+
+| marqueur | effet |
+| --- | --- |
+| `` `texte` `` | commande cliquable, qui se rejoue au clic |
+| `$texte$` | fond vert, texte noir |
+| `§texte§` | couleur d'accent |
+| `+texte+` | couleur d'information |
+
+Un marqueur précédé de `£` s'affiche tel quel.
+
+## Les langues
+
+Le paquet livre ses textes en trois dictionnaires — `dictEn`, `dictFr`,
+`dictEs`, un fichier chacun — mais n'en monte **qu'un seul par défaut :
+l'anglais**. Les langues du shell sont exactement les clés de la prop `dict` :
+
+```tsx
+import { Shell, baseCommands, dictEn, dictFr, dictEs } from "flower-shell"
+
+<Shell commands={baseCommands} />                                            // en
+<Shell commands={baseCommands} lang="fr" dict={{ en: dictEn, fr: dictFr }} />
+<Shell commands={baseCommands} lang="es" dict={{ en: dictEn, es: dictEs }} />
+```
+
+`lang` choisit celle du départ ; la commande `lang` n'accepte que celles qui
+sont montées, et son aide les liste — chacune se décrit par la clé
+`lang.<code>`, à fournir dans votre dictionnaire pour votre langue.
+
+Pour une autre langue, vous écrivez le dictionnaire, sur le modèle de ceux du
+paquet. Chaque langue montée est posée **sur l'anglais** : une clé que votre
+dictionnaire ne couvre pas sort en anglais plutôt qu'en clé nue, et vous pouvez
+n'ajouter qu'un texte sans perdre les autres.
+
+```tsx
+<Shell
+	commands={commands}
+	lang="de"
+	dict={{
+		en: { app: { welcome: "Type `help`" } },   // l'anglais du paquet, plus votre clé
+		de: dictDe,                                 // le vôtre, écrit chez vous
+	}}
+/>
+```
+
+`t("hello.world")` lit la langue courante, retombe sur l'anglais, puis sur la
+clé elle-même. `t("lang.set", { lang: "es" })` remplace les `{nom}` du texte.
+
+**La traduction a lieu quand la commande s'exécute**, et le résultat est stocké
+tel quel. Après un `lang en`, les lignes déjà affichées restent donc dans leur
+langue d'origine ; seules les suivantes changent.
+
+## Le thème
+
+```tsx
+<Shell
+	commands={commands}
+	theme={{
+		colors: { background: "#212E35", importantColor: "#FFCC6A" },
+		prompt: "🌼",
+		fonts: { shell: "monospace", window: "monospace" },
+		window: { titleBar: "#ed612e", content: "#f4ebda" },
+	}}
+/>
+```
+
+Les valeurs absentes gardent celles de `defaultTheme`, y compris à
+l'intérieur d'un groupe : ne donner que `colors.background` laisse les autres
+couleurs en place.
+
+Les deux polices sont séparées — un terminal veut du chasse fixe, un cadre pas
+forcément — et valent `monospace` par défaut. Le cadre pose la sienne
+explicitement : sans elle, il hériterait de la page qui l'accueille.
+
+## Hors composant
+
+L'état vit dans des modules, pas dans un contexte : une commande peut donc être
+jouée depuis n'importe où — une fenêtre qui se ferme, un jeu qui se termine.
+
+```ts
+import { run, runRestricted, shellActions, useLang } from "flower-shell"
+
+run("help")             // comme si le visiteur l'avait tapée
+runRestricted("title")  // une commande que le visiteur ne peut pas taper
+shellActions().setLang("en")
+shellActions().reset()   // historique vide, options par defaut
+```
+
+**Conséquence assumée : un shell par page.** Le registre des commandes et le
+thème sont des modules ; deux terminaux monteraient l'un sur l'autre.
+
+## Développer
+
+```sh
+npm run shell:storybook   # le terminal seul, sans le reste du site
+```
+
+Les stories montrent le shell nu, avec des commandes personnalisées, et avec un
+autre thème.
+
+## Licence
+
+MIT.

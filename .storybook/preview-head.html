@@ -1,0 +1,14 @@
+<style>
+	/*
+		L'iframe de storybook defile par defaut : le shell prend la hauteur
+		de ce qui le contient, et une page qui s'allonge lui en donne trop.
+		On la fige, chaque story borne ensuite sa propre boite.
+	*/
+	html,
+	body,
+	#storybook-root {
+		height: 100%;
+		margin: 0;
+		overflow: hidden;
+	}
+</style>
