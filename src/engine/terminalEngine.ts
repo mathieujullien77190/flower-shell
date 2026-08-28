@@ -1,5 +1,5 @@
-import { BaseCommand, BaseCommands, Command, Args, Help } from "../types"
-import { t } from "../i18n/lang"
+import { BaseCommand, BaseCommands, Command, Args, Help } from "@types"
+import { t } from "@i18n/lang"
 
 const isAuthorizeArgs = (args: string[], testArgs: Args) => {
 	const authorize =

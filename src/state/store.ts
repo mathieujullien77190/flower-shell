@@ -1,7 +1,7 @@
 import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"
 
-import { Command } from "../types"
+import { Command } from "@types"
 import { getBanner } from "./registry"
 
 type Shell = {

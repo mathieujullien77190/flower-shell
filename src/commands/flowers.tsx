@@ -2,7 +2,7 @@ import { CSSProperties, ReactNode } from "react"
 import reactStringReplace from "react-string-replace"
 import uniqid from "uniqid"
 
-import { colors } from "../theme"
+import { colors } from "@theme"
 
 export const highlightFlower = (text: string, baseStyles: CSSProperties) => {
 	let result: string | ReactNode[] = text

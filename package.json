@@ -3,10 +3,19 @@
 	"version": "0.1.0",
 	"description": "Terminal retro en React : moteur de commandes, historique, fenetre, rendu ASCII",
 	"license": "MIT",
-	"main": "src/index.ts",
-	"types": "src/index.ts",
+	"type": "module",
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.cjs"
+		}
+	},
 	"files": [
-		"src"
+		"dist"
 	],
 	"peerDependencies": {
 		"react": ">=19",
@@ -22,7 +31,9 @@
 	"scripts": {
 		"storybook": "storybook dev -p 6006",
 		"storybook:build": "storybook build",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"build": "vite build --config vite.lib.config.ts",
+		"prepublishOnly": "npm run build"
 	},
 	"devDependencies": {
 		"@storybook/react-vite": "^10.5.10",
@@ -35,6 +46,7 @@
 		"styled-components": "6.5",
 		"typescript": "5.9",
 		"vite": "^8.2.2",
+		"vite-plugin-dts": "^4.5.4",
 		"zustand": "^5.0.15"
 	}
 }

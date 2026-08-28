@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { colors, fonts } from "../../theme"
+import { colors, fonts } from "@theme"
 
 export const CustomInput = styled.input<{ $nbsLetters: number }>`
 	background-color: ${colors().background};

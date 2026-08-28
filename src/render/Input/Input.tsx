@@ -8,10 +8,10 @@ import React, {
 import { InputProps } from "./types"
 import { isMobile } from "react-device-detect"
 
-import { theme } from "../../theme"
+import { theme } from "@theme"
 
-import { getCommands } from "../../state/registry"
-import { autocompleteCommand } from "../../engine/terminalEngine"
+import { getCommands } from "@state/registry"
+import { autocompleteCommand } from "@engine/terminalEngine"
 
 import * as S from "./UI"
 import { cleanCommand, hasSelection } from "./helpers"

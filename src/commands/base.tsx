@@ -1,14 +1,11 @@
-import { BaseCommands, Help } from "../types"
-import { langs, t } from "../i18n/lang"
-import { readHelp } from "../engine/terminalEngine"
-import { colors } from "../theme"
-import { getWelcome } from "../state/registry"
-import { shellActions } from "../state/store"
+import { BaseCommands, Help } from "@types"
+import { langs, t } from "@i18n/lang"
+import { readHelp } from "@engine/terminalEngine"
+import { colors } from "@theme"
+import { getWelcome } from "@state/registry"
+import { shellActions } from "@state/store"
 import { highlightFlower, plantFlowers } from "./flowers"
 import { title } from "./title"
-
-/** la clef du texte servi par les commandes que le visiteur ne peut pas taper */
-const RESTRICTED = "common.restricted"
 
 /**
  * L'aide d'une commande. Les descriptions sont des clefs : elles passent
@@ -140,7 +137,7 @@ export const baseCommands: BaseCommands = {
 	welcome: {
 		restricted: true,
 		action: () => t(getWelcome()),
-		help: { description: RESTRICTED, patterns: [] },
+		help: { description: "common.restricted", patterns: [] },
 		display: {
 			hideCmd: true,
 			style: { color: colors().importantColor },
@@ -149,7 +146,7 @@ export const baseCommands: BaseCommands = {
 	title: {
 		restricted: true,
 		action: () => title,
-		help: { description: RESTRICTED, patterns: [] },
+		help: { description: "common.restricted", patterns: [] },
 		display: {
 			hideCmd: true,
 			style: { alignItems: "center" },
@@ -160,13 +157,11 @@ export const baseCommands: BaseCommands = {
 	unknow: {
 		restricted: true,
 		action: ({ args }) => t("error.unknown", { name: args[0] }),
-		help: { description: RESTRICTED, patterns: [] },
+		help: { description: "common.restricted", patterns: [] },
 	},
 	argumenterror: {
 		restricted: true,
 		action: () => t("error.args"),
-		help: { description: RESTRICTED, patterns: [] },
+		help: { description: "common.restricted", patterns: [] },
 	},
 }
-
-export { RESTRICTED }

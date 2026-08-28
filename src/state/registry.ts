@@ -1,4 +1,4 @@
-import { BaseCommands } from "../types"
+import { BaseCommands } from "@types"
 
 /**
  * Les commandes connues du shell. Elles vivent au niveau du module parce

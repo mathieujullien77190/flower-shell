@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
 import { CommandProps } from "./types"
 
-import { theme } from "../../theme"
+import { theme } from "@theme"
 
 import * as S from "./UI"
 import { highlight } from "./helpers"

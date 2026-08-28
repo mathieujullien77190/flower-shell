@@ -1,5 +1,5 @@
-import { Dict, Dictionaries } from "../types"
-import { useShellStore } from "../state/store"
+import { Dict, Dictionaries } from "@types"
+import { useShellStore } from "@state/store"
 import { dictEn } from "./en"
 
 /** langue de repli, quand la clef manque a la langue courante */
