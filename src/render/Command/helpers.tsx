@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react"
 import reactStringReplace from "react-string-replace"
 
-import { colors } from "../../theme"
+import { colors } from "@theme"
 import uniqid from "uniqid"
 
 /**

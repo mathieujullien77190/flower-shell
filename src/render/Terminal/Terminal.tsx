@@ -2,11 +2,11 @@ import React, { useState } from "react"
 
 import { TerminalProps } from "./types"
 
-import Input, { hasSelection } from "../Input"
-import Command from "../Command"
+import Input, { hasSelection } from "@render/Input"
+import Command from "@render/Command"
 
-import { getCommands } from "../../state/registry"
-import { findCommand } from "../../engine/terminalEngine"
+import { getCommands } from "@state/registry"
+import { findCommand } from "@engine/terminalEngine"
 
 import * as S from "./UI"
 

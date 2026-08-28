@@ -1,4 +1,4 @@
-import { BaseCommand, Command } from "../../types"
+import { BaseCommand, Command } from "@types"
 
 export type CommandProps = {
 	command: Command

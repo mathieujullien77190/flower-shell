@@ -1,5 +1,5 @@
-import { getBanner, getCommands } from "../state/registry"
-import { shellActions } from "../state/store"
+import { getBanner, getCommands } from "@state/registry"
+import { shellActions } from "@state/store"
 import { createCommand, findCommand } from "./terminalEngine"
 
 /** prevenu a chaque commande jouee, pose par le consommateur */

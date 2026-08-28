@@ -1,6 +1,6 @@
 import styled from "styled-components"
 import { Mode, Pos } from "./types"
-import { colors, fonts, windowColors } from "../theme"
+import { colors, fonts, windowColors } from "@theme"
 import {
 	FULL,
 	ANIM_TIME,
