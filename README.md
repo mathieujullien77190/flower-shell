@@ -288,8 +288,8 @@ le code qui la produit, imports compris.
 catalogue, on déplace les couleurs, l'aperçu suit, et le bloc du bas est la
 prop `theme` correspondante — à copier telle quelle.
 
-**Markup** documente le balisage, marqueur par marqueur, et le montre rendu
-dans les huit thèmes côte à côte.
+**Markup** documente le balisage, marqueur par marqueur : les couleurs, les
+tags, l'échappement.
 
 ## Licence
 
