@@ -1,0 +1,67 @@
+import { useRef, useState } from "react"
+import type { Decorator } from "@storybook/react-vite"
+
+import { defaultTheme, setTheme } from "../theme"
+import { shellActions } from "../state/store"
+
+/**
+ * The shell state lives in a module: without this, one story's history would
+ * carry into the next. The reset happens while the decorator renders, so
+ * before the shell mounts and plays its banner.
+ */
+export const Fresh = ({ children }: { children: React.ReactNode }) => {
+	useState(() => {
+		shellActions().reset()
+		// the theme lives at module level: without a reset it would leak from
+		// one story to the next. The shell replays its own right after, on mount.
+		setTheme(defaultTheme)
+		return true
+	})
+
+	return children
+}
+
+/**
+ * The box that holds the shell: smaller than the page, bordered, and above
+ * all scrollable. Its ref goes to scrollRef, which lets the shell scroll it
+ * down as the output grows — without it, anything overflowing would stay out
+ * of reach.
+ */
+export const Boxed = ({
+	children,
+}: {
+	children: (box: React.RefObject<HTMLDivElement>) => React.ReactNode
+}) => {
+	const box = useRef<HTMLDivElement>(null)
+
+	return (
+		<Fresh>
+			<div style={{ height: "100vh", boxSizing: "border-box", padding: 32 }}>
+				<div
+					ref={box}
+					style={{
+						height: "100%",
+						overflowY: "auto",
+						border: "solid 2px #000000",
+						borderRadius: 4,
+						boxShadow: "3px 2px 4px #00000041",
+					}}
+				>
+					{children(box)}
+				</div>
+			</div>
+		</Fresh>
+	)
+}
+
+/** the shell in its box, reset before each story, scrolled by its container */
+export const boxed: Decorator = (Story, context) => (
+	<Boxed>{box => <Story args={{ ...context.args, scrollRef: box }} />}</Boxed>
+)
+
+/** the reset alone, for a story that lays out its own frame */
+export const fresh: Decorator = Story => (
+	<Fresh>
+		<Story />
+	</Fresh>
+)
