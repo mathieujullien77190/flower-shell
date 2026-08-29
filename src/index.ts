@@ -22,7 +22,6 @@ export {
 	t,
 } from "./i18n/lang"
 export { dictEn } from "./i18n/en"
-export { dictEs } from "./i18n/es"
 export { dictFr } from "./i18n/fr"
 
 export { highlight } from "./render/Command/helpers"
