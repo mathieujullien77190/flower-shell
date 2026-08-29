@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useMemo, useState } from "react";
+import { RefObject, useCallback, useEffect, useState } from "react";
 
 import Terminal from "./render/Terminal";
 
@@ -28,13 +28,9 @@ export type ShellProps = {
    */
   banner?: string[];
   /**
-   * Ouvre l'ecran avec le logo ascii du shell. Il passe devant la
-   * banniere, et rien ne l'impose : sans ca, le shell demarre nu.
-   */
-  showTitle?: boolean;
-  /**
-   * Mot d'accueil affiche sous le logo, au demarrage comme apres un
-   * clear. Une clef du dictionnaire, ou le texte lui-meme.
+   * Le texte du mot d'accueil : une clef du dictionnaire, ou le texte
+   * lui-meme. Il ne s'affiche pas tout seul — c'est la commande `welcome`
+   * qui le lit, a mettre dans `initialCommands` ou dans `banner`.
    */
   welcome?: string;
   theme?: ShellThemeInput;
@@ -47,8 +43,12 @@ export type ShellProps = {
   lang?: string;
   /**
    * Commandes jouees au demarrage, apres la banniere, dans l'ordre du
-   * tableau. Chacune part comme tapee ; les restreintes (title, welcome...)
-   * sont jouees comme par la banniere. Rejouees une seule fois, ecran vierge.
+   * tableau. Chacune part comme tapee ; les restreintes (`title`,
+   * `welcome`...) sont jouees comme par la banniere. C'est ici que se met
+   * l'ouverture — `["title", "welcome"]` pour le logo puis l'accueil.
+   *
+   * Jouees une seule fois, sur un ecran vierge : un `clear` ne les rejoue
+   * pas. Ce qui doit revenir apres un `clear` va dans `banner`.
    */
   initialCommands?: string[];
   /**
@@ -70,7 +70,6 @@ export type ShellProps = {
 export const Shell = ({
   commands = {},
   banner = [],
-  showTitle = false,
   welcome,
   theme,
   dict,
@@ -79,23 +78,12 @@ export const Shell = ({
   scrollRef,
   onCommand,
 }: ShellProps) => {
-  // le logo et l'accueil sont des commandes de base : les afficher, c'est
-  // les mettre en tete de la banniere
-  const opening = useMemo(() => {
-    const head = [
-      ...(showTitle ? ["title"] : []),
-      ...(welcome ? ["welcome"] : []),
-    ];
-
-    return [...head.filter((name) => !banner.includes(name)), ...banner];
-  }, [showTitle, welcome, banner]);
-
   // pose avant le premier rendu : le terminal lit le registre en se rendant
   const [ready] = useState(() => {
     // le dictionnaire d'abord : une commande jouee traduit en s'executant
     setDict(dict);
     setCommands(commands);
-    setBanner(opening);
+    setBanner(banner);
     setWelcome(welcome || "");
     setTheme(theme);
     return true;
@@ -119,8 +107,8 @@ export const Shell = ({
   }, [commands]);
 
   useEffect(() => {
-    setBanner(opening);
-  }, [opening]);
+    setBanner(banner);
+  }, [banner]);
 
   useEffect(() => {
     setWelcome(welcome || "");
@@ -151,7 +139,7 @@ export const Shell = ({
     );
 
     if (!onScreen) {
-      opening.forEach((name) => runRestricted(name));
+      banner.forEach((name) => runRestricted(name));
       // apres la banniere : les commandes de depart, enchainees dans l'ordre.
       // une restreinte (title...) passe par le canal restreint, sinon comme tapee
       initialCommands.forEach((pattern) => {
