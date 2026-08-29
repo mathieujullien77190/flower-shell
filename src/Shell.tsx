@@ -13,7 +13,7 @@ import { WindowProps } from "./window/types";
 
 import { run, runRestricted, setListener } from "./engine/send";
 import { setDict } from "./i18n/lang";
-import { setBanner, setCommands, setWelcome } from "./state/registry";
+import { getCommands, setBanner, setCommands, setWelcome } from "./state/registry";
 import {
   shellActions,
   useAnimation,
@@ -52,6 +52,12 @@ export type ShellProps = {
   /** langue de depart ; sans elle, le francais */
   lang?: string;
   /**
+   * Commandes jouees au demarrage, apres la banniere, dans l'ordre du
+   * tableau. Chacune part comme tapee ; les restreintes (title, welcome...)
+   * sont jouees comme par la banniere. Rejouees une seule fois, ecran vierge.
+   */
+  initialCommands?: string[];
+  /**
    * Element a faire defiler quand la sortie s'allonge. Avec la prop
    * window, il est inutile : le shell fait descendre le contenu du cadre.
    */
@@ -81,6 +87,7 @@ export const Shell = ({
   theme,
   dict,
   lang,
+  initialCommands = [],
   scrollRef,
   onCommand,
   window: windowProps,
@@ -156,7 +163,16 @@ export const Shell = ({
       (command) => command.visible,
     );
 
-    if (!onScreen) opening.forEach((name) => runRestricted(name));
+    if (!onScreen) {
+      opening.forEach((name) => runRestricted(name));
+      // apres la banniere : les commandes de depart, enchainees dans l'ordre.
+      // une restreinte (title...) passe par le canal restreint, sinon comme tapee
+      initialCommands.forEach((pattern) => {
+        const name = pattern.split(" ")[0];
+        if (getCommands()[name]?.restricted) runRestricted(pattern);
+        else run(pattern);
+      });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
