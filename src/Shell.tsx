@@ -1,15 +1,6 @@
-import {
-  RefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { RefObject, useCallback, useEffect, useMemo, useState } from "react";
 
 import Terminal from "./render/Terminal";
-import Window from "./window";
-import { WindowProps } from "./window/types";
 
 import { run, runRestricted, setListener } from "./engine/send";
 import { setDict } from "./i18n/lang";
@@ -61,18 +52,12 @@ export type ShellProps = {
    */
   initialCommands?: string[];
   /**
-   * Element a faire defiler quand la sortie s'allonge. Avec la prop
-   * window, il est inutile : le shell fait descendre le contenu du cadre.
+   * Element a faire defiler quand la sortie s'allonge. Dans un cadre, c'est
+   * le contenu de la fenetre : <Window> expose le sien par sa ref.
    */
   scrollRef?: RefObject<HTMLElement>;
   /** appele a chaque commande jouee, y compris celles du paquet */
   onCommand?: (name: string, args: string[]) => void;
-  /**
-   * Pose le terminal dans un cadre retro : barre de titre a glisser,
-   * agrandissement, fermeture. Sans cette prop, le shell remplit
-   * simplement ce qui le contient.
-   */
-  window?: Omit<WindowProps, "children">;
 };
 
 /**
@@ -93,7 +78,6 @@ export const Shell = ({
   initialCommands = [],
   scrollRef,
   onCommand,
-  window: windowProps,
 }: ShellProps) => {
   // le logo et l'accueil sont des commandes de base : les afficher, c'est
   // les mettre en tete de la banniere
@@ -179,12 +163,8 @@ export const Shell = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ready]);
 
-  // le contenu du cadre, quand c'est lui qui defile
-  const framedRef = useRef<HTMLDivElement>(null);
-
   const scrollDown = useCallback(() => {
-    const target = scrollRef?.current || framedRef.current;
-    target?.scrollTo(0, 1000000);
+    scrollRef?.current?.scrollTo(0, 1000000);
   }, [scrollRef]);
 
   const handleRendered = useCallback(
@@ -199,7 +179,7 @@ export const Shell = ({
     shellActions().moveCursor(direction);
   }, []);
 
-  const terminal = (
+  return (
     <Terminal
       options={options}
       commands={history}
@@ -211,13 +191,5 @@ export const Shell = ({
       onSendNextCommand={() => moveCursor(1)}
       onRendered={handleRendered}
     />
-  );
-
-  if (!windowProps) return terminal;
-
-  return (
-    <Window {...windowProps} ref={framedRef}>
-      {terminal}
-    </Window>
   );
 };
