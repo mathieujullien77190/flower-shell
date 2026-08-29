@@ -1,7 +1,7 @@
 import { BaseCommands, Help } from "@types"
 import { langs, t } from "@i18n/lang"
 import { readHelp } from "@engine/terminalEngine"
-import { colors } from "@theme"
+import { colors, themeNames } from "@theme"
 import { getWelcome } from "@state/registry"
 import { shellActions } from "@state/store"
 import { highlightFlower, plantFlowers } from "./flowers"
@@ -116,17 +116,22 @@ export const baseCommands: BaseCommands = {
 	},
 	theme: {
 		restricted: false,
-		testArgs: { authorize: ["light", "dark"], empty: false },
+		// les themes sont ceux du catalogue : lus a la frappe, pas ici
+		testArgs: { authorize: themeNames, empty: false },
 		action: ({ args }) => t("theme.set", { mode: args[0] }),
-		// l'effet joue apres l'action : le mode demande est pose ici
-		effect: ({ args }) =>
-			shellActions().setThemeMode(args[0] === "light" ? "light" : "dark"),
-		help: {
-			patterns: [
-				{ pattern: "theme light", description: "theme.light" },
-				{ pattern: "theme dark", description: "theme.dark" },
-			],
-		},
+		// l'effet joue apres l'action : le theme demande est pose ici
+		effect: ({ args }) => shellActions().setThemeName(args[0]),
+		/**
+		 * Une fonction, comme pour `lang` : l'aide liste le catalogue tel
+		 * qu'il est au moment ou elle s'affiche. Chaque theme se decrit par
+		 * la clef `theme.<nom>`.
+		 */
+		help: () => ({
+			patterns: themeNames().map(name => ({
+				pattern: `theme ${name}`,
+				description: `theme.${name}`,
+			})),
+		}),
 	},
 	lang: {
 		restricted: false,

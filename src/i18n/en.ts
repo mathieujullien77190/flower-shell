@@ -27,8 +27,14 @@ export const dictEn: Dict = {
 		disabled: "disabled",
 	},
 	theme: {
-		light: "Switches to the light theme",
-		dark: "Switches to the dark theme",
+		flower: "The package theme: leaf-dark, with a flower for a prompt",
+		dark: "A neutral dark terminal",
+		light: "A neutral light terminal",
+		dracula: "Slate purple ground, saturated accents",
+		nord: "Night blue ground, cool low-saturation accents",
+		gruvbox: "Earthy ground, warm accents",
+		monokai: "Dark olive ground, blunt accents",
+		solarized: "Ivory ground, measured accents",
 		set: "theme: {mode}",
 	},
 	lang: {
