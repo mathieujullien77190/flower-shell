@@ -7,6 +7,10 @@ export const TerminalContainer = styled.div`
 	font-family: ${() => fonts().shell};
 	width: 100%;
 
+	/* le theme pose une marge interieure : elle se prend sur les 100% de
+	   large et de haut, sinon le conteneur deborde de ce qui le contient */
+	box-sizing: border-box;
+
 	/* min-height et non height : le fond doit descendre avec la sortie.
 	   A hauteur fixe, tout ce qui depasse le parent se dessine hors du
 	   fond, sur le blanc de la page. */

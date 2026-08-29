@@ -42,6 +42,14 @@ export type ShellTheme = {
 	prompt: string
 	fonts: ShellFonts
 	window: WindowColors
+	/**
+	 * Le style du conteneur general du terminal, pose en inline sur lui.
+	 * Ouvert a tout CSSProperties et pas au seul padding : la marge
+	 * interieure est le besoin courant, mais un arrondi, une bordure ou une
+	 * ombre se posent au meme endroit. Recouvre le style de base du
+	 * conteneur, propriete par propriete.
+	 */
+	container: CSSProperties
 }
 
 /**
@@ -54,6 +62,15 @@ export type ShellThemeInput = {
 	prompt?: string
 	fonts?: Partial<ShellFonts>
 	window?: Partial<WindowColors>
+	container?: CSSProperties
+}
+
+/**
+ * Le terminal respire : sans cette marge, la sortie et la saisie collent
+ * aux bords de ce qui contient le shell.
+ */
+const baseContainer: CSSProperties = {
+	padding: "16px",
 }
 
 /** memes polices pour les deux themes : un terminal veut du chasse fixe */
@@ -76,6 +93,7 @@ export const darkTheme: ShellTheme = {
 	},
 	prompt: ">",
 	fonts: baseFonts,
+	container: baseContainer,
 	window: {
 		titleBar: "#ed612e",
 		border: "#000000",
@@ -103,6 +121,7 @@ export const lightTheme: ShellTheme = {
 	},
 	prompt: ">",
 	fonts: baseFonts,
+	container: baseContainer,
 	window: {
 		titleBar: "#ed612e",
 		border: "#3A3A3A",
@@ -131,6 +150,7 @@ export const setTheme = (theme?: ShellThemeInput) => {
 		prompt: theme.prompt || current.prompt,
 		fonts: { ...current.fonts, ...theme.fonts },
 		window: { ...current.window, ...theme.window },
+		container: { ...current.container, ...theme.container },
 	}
 }
 
@@ -142,5 +162,8 @@ export const colors = (): ShellColors => current.colors
 export const windowColors = (): WindowColors => current.window
 
 export const fonts = (): ShellFonts => current.fonts
+
+/** le style pose sur le conteneur general du terminal */
+export const container = (): CSSProperties => current.container
 
 export type { CSSProperties }
