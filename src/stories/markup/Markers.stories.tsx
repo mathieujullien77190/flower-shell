@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { highlight } from "../../render/Command/helpers"
-import { darkTheme, setTheme } from "../../theme"
+import { twilightTheme, setTheme } from "../../theme"
 import { renderOnly } from "../source"
 import { MARKERS, Row, Screen, noop } from "./screen"
 
@@ -15,7 +15,7 @@ export default meta
 export const Markers: StoryObj = {
 	parameters: renderOnly,
 	render: () => {
-		setTheme(darkTheme)
+		setTheme(twilightTheme)
 		return (
 			<Screen>
 				{MARKERS.map(s => (

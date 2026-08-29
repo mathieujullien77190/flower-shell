@@ -35,8 +35,8 @@ export const dictFr: Dict = {
 	},
 	theme: {
 		flower: "Le thème du paquet : feuillage sombre, une fleur pour invite",
-		dark: "Un terminal sombre et neutre",
-		light: "Un terminal clair et neutre",
+		twilight: "Un terminal sombre et neutre",
+		parchment: "Un terminal clair et neutre",
 		dracula: "Fond ardoise violette, accents saturés",
 		nord: "Fond bleu nuit, accents froids et bas en saturation",
 		gruvbox: "Fond terreux, accents chauds",

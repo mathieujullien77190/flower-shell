@@ -34,8 +34,8 @@ export const dictEn: Dict = {
 	},
 	theme: {
 		flower: "The package theme: leaf-dark, with a flower for a prompt",
-		dark: "A neutral dark terminal",
-		light: "A neutral light terminal",
+		twilight: "A neutral dark terminal",
+		parchment: "A neutral light terminal",
 		dracula: "Slate purple ground, saturated accents",
 		nord: "Night blue ground, cool low-saturation accents",
 		gruvbox: "Earthy ground, warm accents",
