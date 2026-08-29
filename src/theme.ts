@@ -132,8 +132,42 @@ export const lightTheme: ShellTheme = {
 	},
 }
 
-/** le theme par defaut reste le sombre, comme avant */
-export const defaultTheme: ShellTheme = darkTheme
+/**
+ * Le theme du paquet : la fleur qui lui donne son nom. Fond de feuillage
+ * sombre, et des accents pris au 🌼 lui-meme — jaune de pollen sur ce qui
+ * compte, vert de tige sur les commandes, orange de petale sur ce qui est
+ * refuse. L'invite est la fleur : c'est la marque, elle se voit a chaque
+ * ligne.
+ */
+export const flowerTheme: ShellTheme = {
+	colors: {
+		background: "#1E2A22",
+		textColor: "#DCE6D8",
+		importantColor: "#FFD25F",
+		cmdColor: "#9BD46A",
+		restrictedColor: "#E4674B",
+		infoColor: "#7FC6D9",
+		appColor: "#F2A0C4",
+		invisible: "#1E2A22", // = background
+	},
+	prompt: "🌼",
+	fonts: baseFonts,
+	container: baseContainer,
+	window: {
+		titleBar: "#ed612e",
+		border: "#000000",
+		content: "#f4ebda",
+		text: "#000000",
+		button: "lightGray",
+		buttonHover: "gray",
+	},
+}
+
+/**
+ * Le theme du paquet par defaut. `darkTheme` et `lightTheme` restent la
+ * pour qui veut un terminal neutre, invite `>` comprise.
+ */
+export const defaultTheme: ShellTheme = flowerTheme
 
 /**
  * Le theme vit au niveau du module, comme le registre des commandes : le

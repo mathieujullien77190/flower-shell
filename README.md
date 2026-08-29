@@ -176,6 +176,21 @@ langue d'origine ; seules les suivantes changent.
 
 ## Le thème
 
+Le paquet en livre trois : `flowerTheme`, la fleur qui lui donne son nom —
+feuillage sombre, jaune de pollen, vert de tige, invite 🌼 — et deux terminaux
+neutres, `darkTheme` et `lightTheme`, dont l'invite reste `>`.
+
+**`flowerTheme` est le défaut** : sans prop `theme`, c'est lui que vous voyez.
+
+```tsx
+import { Shell, baseCommands, darkTheme } from "flower-shell"
+
+<Shell commands={baseCommands} />                      // flowerTheme
+<Shell commands={baseCommands} theme={darkTheme} />
+```
+
+Un thème se remplace aussi par morceaux :
+
 ```tsx
 <Shell
 	commands={commands}
