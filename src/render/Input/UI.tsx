@@ -2,13 +2,13 @@ import styled from "styled-components"
 import { colors, fonts } from "@theme"
 
 export const CustomInput = styled.input<{ $nbsLetters: number }>`
-	background-color: ${colors().background};
+	background-color: ${() => colors().background};
 	border: none;
 	outline: none;
-	color: white;
+	color: ${() => colors().textColor};
 	padding: 0;
 	margin: 0;
-	font-family: ${fonts().shell};
+	font-family: ${() => fonts().shell};
 	width: ${({ $nbsLetters }) => $nbsLetters + 1}ch;
 	margin-left: 8px;
 `

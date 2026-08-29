@@ -26,6 +26,11 @@ export const dictEn: Dict = {
 		enabled: "enabled",
 		disabled: "disabled",
 	},
+	theme: {
+		light: "Switches to the light theme",
+		dark: "Switches to the dark theme",
+		set: "theme: {mode}",
+	},
 	lang: {
 		fr: "Shows every text in French (commands stay in English)",
 		en: "Shows every text in English",

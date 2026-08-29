@@ -114,6 +114,20 @@ export const baseCommands: BaseCommands = {
 			],
 		},
 	},
+	theme: {
+		restricted: false,
+		testArgs: { authorize: ["light", "dark"], empty: false },
+		action: ({ args }) => t("theme.set", { mode: args[0] }),
+		// l'effet joue apres l'action : le mode demande est pose ici
+		effect: ({ args }) =>
+			shellActions().setThemeMode(args[0] === "light" ? "light" : "dark"),
+		help: {
+			patterns: [
+				{ pattern: "theme light", description: "theme.light" },
+				{ pattern: "theme dark", description: "theme.dark" },
+			],
+		},
+	},
 	lang: {
 		restricted: false,
 		// les langues sont celles du dictionnaire : lues a la frappe, pas ici

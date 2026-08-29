@@ -11,6 +11,8 @@ export type ShellColors = {
 	restrictedColor: string
 	infoColor: string
 	appColor: string
+	/** la couleur du fond : un texte pose dessus reste invisible */
+	invisible: string
 }
 
 /**
@@ -54,7 +56,14 @@ export type ShellThemeInput = {
 	window?: Partial<WindowColors>
 }
 
-export const defaultTheme: ShellTheme = {
+/** memes polices pour les deux themes : un terminal veut du chasse fixe */
+const baseFonts: ShellFonts = {
+	shell: "monospace",
+	window: "monospace",
+}
+
+/** le theme sombre : fond profond, couleurs vives qui ressortent dessus */
+export const darkTheme: ShellTheme = {
 	colors: {
 		background: "#212E35",
 		textColor: "#CED4DF",
@@ -63,12 +72,10 @@ export const defaultTheme: ShellTheme = {
 		restrictedColor: "#d15f5f",
 		infoColor: "#77CDF1",
 		appColor: "#90be20",
+		invisible: "#212E35", // = background
 	},
 	prompt: ">",
-	fonts: {
-		shell: "monospace",
-		window: "monospace",
-	},
+	fonts: baseFonts,
 	window: {
 		titleBar: "#ed612e",
 		border: "#000000",
@@ -78,6 +85,36 @@ export const defaultTheme: ShellTheme = {
 		buttonHover: "gray",
 	},
 }
+
+/**
+ * Le theme clair : fond parchemin, memes couleurs assombries pour tenir la
+ * lisibilite sur clair (et servir de fond de tag avec un texte blanc).
+ */
+export const lightTheme: ShellTheme = {
+	colors: {
+		background: "#F5F1E6",
+		textColor: "#2A333A",
+		importantColor: "#B26A00",
+		cmdColor: "#3F7A1E",
+		restrictedColor: "#C0392B",
+		infoColor: "#1C7FB8",
+		appColor: "#5E8A12",
+		invisible: "#F5F1E6", // = background
+	},
+	prompt: ">",
+	fonts: baseFonts,
+	window: {
+		titleBar: "#ed612e",
+		border: "#3A3A3A",
+		content: "#ffffff",
+		text: "#000000",
+		button: "#dddddd",
+		buttonHover: "#bbbbbb",
+	},
+}
+
+/** le theme par defaut reste le sombre, comme avant */
+export const defaultTheme: ShellTheme = darkTheme
 
 /**
  * Le theme vit au niveau du module, comme le registre des commandes : le

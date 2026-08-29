@@ -27,8 +27,13 @@ export const dictFr: Dict = {
 		enabled: "activé",
 		disabled: "désactivé",
 	},
+	theme: {
+		light: "Passe au thème clair",
+		dark: "Passe au thème sombre",
+		set: "thème : {mode}",
+	},
 	lang: {
-		fr: "Affiche tout les textes en français (attention les commandes restent en anglais)",
+		fr: "Affiche tout les textes en français",
 		en: "Affiche tout les textes en anglais",
 		es: "Affiche tout les textes en espagnol",
 		set: "langage : {lang}",

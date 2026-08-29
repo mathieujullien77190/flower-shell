@@ -2,9 +2,9 @@ import styled from "styled-components"
 import { colors, fonts } from "@theme"
 
 export const TerminalContainer = styled.div`
-	background: ${colors().background};
-	color: ${colors().textColor};
-	font-family: ${fonts().shell};
+	background: ${() => colors().background};
+	color: ${() => colors().textColor};
+	font-family: ${() => fonts().shell};
 	width: 100%;
 
 	/* min-height et non height : le fond doit descendre avec la sortie.
