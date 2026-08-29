@@ -34,8 +34,14 @@ const dictDe: Dict = {
 		disabled: "ausgeschaltet",
 	},
 	theme: {
-		light: "Wechselt zum hellen Thema",
-		dark: "Wechselt zum dunklen Thema",
+		flower: "Das Thema des Pakets: dunkles Laub, eine Blume als Eingabe",
+		dark: "Ein neutrales dunkles Terminal",
+		light: "Ein neutrales helles Terminal",
+		dracula: "Violetter Schiefer, gesättigte Akzente",
+		nord: "Nachtblau, kühle Akzente",
+		gruvbox: "Erdiger Grund, warme Akzente",
+		monokai: "Dunkles Oliv, klare Akzente",
+		solarized: "Elfenbein, gedämpfte Akzente",
 		set: "Thema: {mode}",
 	},
 	lang: {
@@ -73,7 +79,7 @@ const dictDe: Dict = {
 	hello: { usage: "...", usageArgs: "...", world: "Hallo Welt" },
 	flowers: { usage: "..." },
 	animation: { on: "...", off: "...", enabled: "...", disabled: "..." },
-	theme: { light: "...", dark: "...", set: "Thema: {mode}" },
+	theme: { flower: "...", dark: "...", light: "...", set: "Thema: {mode}" },
 	lang: { de: "...", en: "...", set: "Sprache: {lang}" },
 	error: { unknown: "...", args: "..." },
 }

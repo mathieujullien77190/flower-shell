@@ -73,64 +73,44 @@ const baseContainer: CSSProperties = {
 	padding: "16px",
 }
 
-/** memes polices pour les deux themes : un terminal veut du chasse fixe */
+/** memes polices pour tous les themes : un terminal veut du chasse fixe */
 const baseFonts: ShellFonts = {
 	shell: "monospace",
 	window: "monospace",
 }
 
-/** le theme sombre : fond profond, couleurs vives qui ressortent dessus */
-export const darkTheme: ShellTheme = {
-	colors: {
-		background: "#212E35",
-		textColor: "#CED4DF",
-		importantColor: "#FFCC6A",
-		cmdColor: "#c4e98d",
-		restrictedColor: "#d15f5f",
-		infoColor: "#77CDF1",
-		appColor: "#90be20",
-		invisible: "#212E35", // = background
-	},
-	prompt: ">",
-	fonts: baseFonts,
-	container: baseContainer,
-	window: {
-		titleBar: "#ed612e",
-		border: "#000000",
-		content: "#f4ebda",
-		text: "#000000",
-		button: "lightGray",
-		buttonHover: "gray",
-	},
-}
-
 /**
- * Le theme clair : fond parchemin, memes couleurs assombries pour tenir la
- * lisibilite sur clair (et servir de fond de tag avec un texte blanc).
+ * Un theme se resume a sa palette. Le reste ne varie pas — memes polices,
+ * meme marge — et le cadre de fenetre tient en deux couleurs. Ecrire les
+ * huit themes au complet aurait recopie la meme trentaine de lignes.
  */
-export const lightTheme: ShellTheme = {
-	colors: {
-		background: "#F5F1E6",
-		textColor: "#2A333A",
-		importantColor: "#B26A00",
-		cmdColor: "#3F7A1E",
-		restrictedColor: "#C0392B",
-		infoColor: "#1C7FB8",
-		appColor: "#5E8A12",
-		invisible: "#F5F1E6", // = background
-	},
-	prompt: ">",
+const makeTheme = ({
+	colors,
+	prompt = ">",
+	titleBar,
+	content,
+	border = "#000000",
+	button = "lightGray",
+	buttonHover = "gray",
+}: {
+	/** `invisible` en moins : il vaut toujours le fond */
+	colors: Omit<ShellColors, "invisible">
+	prompt?: string
+	/** la barre de titre du cadre : l'accent du theme */
+	titleBar: string
+	/** le fond derriere le contenu du cadre, visible autour de lui */
+	content: string
+	border?: string
+	button?: string
+	buttonHover?: string
+}): ShellTheme => ({
+	// un texte pose sur `invisible` se fond dans le fond, revele a la selection
+	colors: { ...colors, invisible: colors.background },
+	prompt,
 	fonts: baseFonts,
 	container: baseContainer,
-	window: {
-		titleBar: "#ed612e",
-		border: "#3A3A3A",
-		content: "#ffffff",
-		text: "#000000",
-		button: "#dddddd",
-		buttonHover: "#bbbbbb",
-	},
-}
+	window: { titleBar, border, content, text: "#000000", button, buttonHover },
+})
 
 /**
  * Le theme du paquet : la fleur qui lui donne son nom. Fond de feuillage
@@ -139,7 +119,8 @@ export const lightTheme: ShellTheme = {
  * refuse. L'invite est la fleur : c'est la marque, elle se voit a chaque
  * ligne.
  */
-export const flowerTheme: ShellTheme = {
+export const flowerTheme: ShellTheme = makeTheme({
+	prompt: "🌼",
 	colors: {
 		background: "#1E2A22",
 		textColor: "#DCE6D8",
@@ -148,20 +129,146 @@ export const flowerTheme: ShellTheme = {
 		restrictedColor: "#E4674B",
 		infoColor: "#7FC6D9",
 		appColor: "#F2A0C4",
-		invisible: "#1E2A22", // = background
 	},
-	prompt: "🌼",
-	fonts: baseFonts,
-	container: baseContainer,
-	window: {
-		titleBar: "#ed612e",
-		border: "#000000",
-		content: "#f4ebda",
-		text: "#000000",
-		button: "lightGray",
-		buttonHover: "gray",
+	titleBar: "#ed612e",
+	content: "#f4ebda",
+})
+
+/** le terminal neutre : fond profond, couleurs vives qui ressortent dessus */
+export const darkTheme: ShellTheme = makeTheme({
+	colors: {
+		background: "#212E35",
+		textColor: "#CED4DF",
+		importantColor: "#FFCC6A",
+		cmdColor: "#c4e98d",
+		restrictedColor: "#d15f5f",
+		infoColor: "#77CDF1",
+		appColor: "#90be20",
 	},
+	titleBar: "#ed612e",
+	content: "#f4ebda",
+})
+
+/**
+ * Le terminal neutre sur clair : fond parchemin, memes couleurs assombries
+ * pour tenir la lisibilite (et servir de fond de tag avec un texte blanc).
+ */
+export const lightTheme: ShellTheme = makeTheme({
+	colors: {
+		background: "#F5F1E6",
+		textColor: "#2A333A",
+		importantColor: "#B26A00",
+		cmdColor: "#3F7A1E",
+		restrictedColor: "#C0392B",
+		infoColor: "#1C7FB8",
+		appColor: "#5E8A12",
+	},
+	titleBar: "#ed612e",
+	content: "#ffffff",
+	border: "#3A3A3A",
+	button: "#dddddd",
+	buttonHover: "#bbbbbb",
+})
+
+/** Dracula : fond ardoise violette, accents satures */
+export const draculaTheme: ShellTheme = makeTheme({
+	colors: {
+		background: "#282A36",
+		textColor: "#F8F8F2",
+		importantColor: "#F1FA8C",
+		cmdColor: "#50FA7B",
+		restrictedColor: "#FF5555",
+		infoColor: "#8BE9FD",
+		appColor: "#BD93F9",
+	},
+	titleBar: "#BD93F9",
+	content: "#F8F8F2",
+})
+
+/** Nord : fond bleu nuit, accents froids et bas en saturation */
+export const nordTheme: ShellTheme = makeTheme({
+	colors: {
+		background: "#2E3440",
+		textColor: "#D8DEE9",
+		importantColor: "#EBCB8B",
+		cmdColor: "#A3BE8C",
+		restrictedColor: "#BF616A",
+		infoColor: "#88C0D0",
+		appColor: "#B48EAD",
+	},
+	titleBar: "#5E81AC",
+	content: "#ECEFF4",
+})
+
+/** Gruvbox : fond terreux, accents chauds */
+export const gruvboxTheme: ShellTheme = makeTheme({
+	colors: {
+		background: "#282828",
+		textColor: "#EBDBB2",
+		importantColor: "#FABD2F",
+		cmdColor: "#B8BB26",
+		restrictedColor: "#FB4934",
+		infoColor: "#83A598",
+		appColor: "#D3869B",
+	},
+	titleBar: "#D65D0E",
+	content: "#FBF1C7",
+})
+
+/** Monokai : fond olive sombre, accents francs */
+export const monokaiTheme: ShellTheme = makeTheme({
+	colors: {
+		background: "#272822",
+		textColor: "#F8F8F2",
+		importantColor: "#E6DB74",
+		cmdColor: "#A6E22E",
+		restrictedColor: "#F92672",
+		infoColor: "#66D9EF",
+		appColor: "#AE81FF",
+	},
+	titleBar: "#F92672",
+	content: "#F8F8F2",
+})
+
+/** Solarized, versant clair : fond ivoire, accents mesures */
+export const solarizedTheme: ShellTheme = makeTheme({
+	colors: {
+		background: "#FDF6E3",
+		textColor: "#586E75",
+		importantColor: "#B58900",
+		cmdColor: "#859900",
+		restrictedColor: "#DC322F",
+		infoColor: "#268BD2",
+		appColor: "#6C71C4",
+	},
+	titleBar: "#268BD2",
+	content: "#FFFFFF",
+	border: "#93A1A1",
+	button: "#EEE8D5",
+	buttonHover: "#93A1A1",
+})
+
+/**
+ * Le catalogue, a la maniere d'un editeur. Le consommateur en passe un a la
+ * prop `theme` ; le visiteur en change a la volee par `theme <nom>`. Les
+ * clefs sont exactement ce qu'il tape.
+ */
+export const themes: Record<string, ShellTheme> = {
+	flower: flowerTheme,
+	dark: darkTheme,
+	light: lightTheme,
+	dracula: draculaTheme,
+	nord: nordTheme,
+	gruvbox: gruvboxTheme,
+	monokai: monokaiTheme,
+	solarized: solarizedTheme,
 }
+
+/** les noms du catalogue, dans l'ordre ou ils y sont ecrits */
+export const themeNames = (): string[] => Object.keys(themes)
+
+/** le nom du theme de depart, celui que `reset` retrouve */
+export const DEFAULT_THEME_NAME = "flower"
 
 /**
  * Le theme du paquet par defaut. `darkTheme` et `lightTheme` restent la

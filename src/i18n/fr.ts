@@ -28,8 +28,14 @@ export const dictFr: Dict = {
 		disabled: "désactivé",
 	},
 	theme: {
-		light: "Passe au thème clair",
-		dark: "Passe au thème sombre",
+		flower: "Le thème du paquet : feuillage sombre, une fleur pour invite",
+		dark: "Un terminal sombre et neutre",
+		light: "Un terminal clair et neutre",
+		dracula: "Fond ardoise violette, accents saturés",
+		nord: "Fond bleu nuit, accents froids et bas en saturation",
+		gruvbox: "Fond terreux, accents chauds",
+		monokai: "Fond olive sombre, accents francs",
+		solarized: "Fond ivoire, accents mesurés",
 		set: "thème : {mode}",
 	},
 	lang: {

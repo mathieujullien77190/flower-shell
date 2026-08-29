@@ -52,10 +52,17 @@ export {
 export {
 	darkTheme,
 	defaultTheme,
+	draculaTheme,
 	flowerTheme,
+	gruvboxTheme,
 	lightTheme,
+	monokaiTheme,
+	nordTheme,
 	setTheme,
+	solarizedTheme,
 	theme,
+	themeNames,
+	themes,
 } from "./theme"
 export type {
 	ShellColors,

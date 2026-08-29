@@ -3,9 +3,10 @@ import { useShallow } from "zustand/react/shallow"
 
 import { Command } from "@types"
 import { getBanner } from "./registry"
-import { darkTheme, lightTheme, setTheme } from "@theme"
+import { DEFAULT_THEME_NAME, setTheme, themes } from "@theme"
 
-type ThemeMode = "light" | "dark"
+/** le nom d'un theme du catalogue : ce que le visiteur tape */
+type ThemeName = string
 
 type Shell = {
 	/** langue de rendu des textes */
@@ -14,8 +15,8 @@ type Shell = {
 	animation: boolean
 	/** la saisie reprend le focus des qu'elle le perd */
 	keyboardOnFocus: boolean
-	/** le theme livre avec le paquet, sombre ou clair */
-	themeMode: ThemeMode
+	/** le theme courant, par son nom dans le catalogue */
+	themeName: ThemeName
 
 	commands: Command[]
 	restrictedCommands: Command[]
@@ -27,7 +28,7 @@ type Shell = {
 	setLang: (lang: string) => void
 	setAnimation: (animation: boolean) => void
 	setKeyboardOnFocus: (keyboardOnFocus: boolean) => void
-	setThemeMode: (mode: ThemeMode) => void
+	setThemeName: (name: ThemeName) => void
 
 	addCommand: (command: Command) => void
 	setIsRendered: (id: string) => void
@@ -44,7 +45,7 @@ const INITIAL = {
 	lang: "en",
 	animation: true,
 	keyboardOnFocus: true,
-	themeMode: "dark" as ThemeMode,
+	themeName: DEFAULT_THEME_NAME as ThemeName,
 
 	commands: [] as Command[],
 	restrictedCommands: [] as Command[],
@@ -60,11 +61,15 @@ export const useShellStore = create<Shell>(set => ({
 	setAnimation: animation => set({ animation }),
 	setKeyboardOnFocus: keyboardOnFocus => set({ keyboardOnFocus }),
 
-	// pose le theme module (colors() suivra) puis note le mode : le second
-	// declenche le rendu, le premier fournit les couleurs qu'il relira
-	setThemeMode: mode => {
-		setTheme(mode === "light" ? lightTheme : darkTheme)
-		set({ themeMode: mode })
+	// pose le theme module (colors() suivra) puis note son nom : le second
+	// declenche le rendu, le premier fournit les couleurs qu'il relira.
+	// Un nom inconnu ne fait rien : la commande ne laisse pas passer.
+	setThemeName: name => {
+		const next = themes[name]
+		if (!next) return
+
+		setTheme(next)
+		set({ themeName: name })
 	},
 
 	addCommand: command =>
@@ -163,7 +168,7 @@ export const useLang = () => useShellStore(state => state.lang)
 
 export const useAnimation = () => useShellStore(state => state.animation)
 
-export const useThemeMode = () => useShellStore(state => state.themeMode)
+export const useThemeName = () => useShellStore(state => state.themeName)
 
 export const useKeyboardOnFocus = () =>
 	useShellStore(state => state.keyboardOnFocus)

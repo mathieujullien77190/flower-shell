@@ -6,7 +6,7 @@ import Input, { hasSelection } from "@render/Input"
 import Command from "@render/Command"
 
 import { getCommands } from "@state/registry"
-import { useThemeMode } from "@state/store"
+import { useThemeName } from "@state/store"
 import { container } from "@theme"
 import { findCommand } from "@engine/terminalEngine"
 
@@ -26,11 +26,11 @@ export const Terminal = ({
 	const [forceFocus, setForceFocus] = useState<number>(0)
 
 	// abonnement au theme : au changement, le conteneur relit colors()
-	const themeMode = useThemeMode()
+	const themeName = useThemeName()
 
 	return (
 		<S.TerminalContainer
-			data-theme={themeMode}
+			data-theme={themeName}
 			// le style du conteneur vient du theme : pose en inline, il
 			// recouvre le style de base sans que le consommateur ait a
 			// batailler avec la specificite

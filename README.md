@@ -195,18 +195,33 @@ langue d'origine ; seules les suivantes changent.
 
 ## Le thème
 
-Le paquet en livre trois : `flowerTheme`, la fleur qui lui donne son nom —
-feuillage sombre, jaune de pollen, vert de tige, invite 🌼 — et deux terminaux
-neutres, `darkTheme` et `lightTheme`, dont l'invite reste `>`.
+Le paquet en livre huit, à la manière d'un éditeur :
 
-**`flowerTheme` est le défaut** : sans prop `theme`, c'est lui que vous voyez.
+| nom | |
+| --- | --- |
+| `flower` | **le défaut** — feuillage sombre, une fleur pour invite |
+| `dark` | un terminal sombre et neutre, invite `>` |
+| `light` | un terminal clair et neutre |
+| `dracula` | fond ardoise violette, accents saturés |
+| `nord` | fond bleu nuit, accents froids |
+| `gruvbox` | fond terreux, accents chauds |
+| `monokai` | fond olive sombre, accents francs |
+| `solarized` | fond ivoire, accents mesurés |
+
+Chacun s'exporte sous son nom — `flowerTheme`, `nordTheme`, `gruvboxTheme`… —
+et `themes` les rassemble sous les clés du tableau :
 
 ```tsx
-import { Shell, baseCommands, darkTheme } from "flower-shell"
+import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 
-<Shell commands={baseCommands} />                      // flowerTheme
-<Shell commands={baseCommands} theme={darkTheme} />
+<Shell commands={baseCommands} />                        // flowerTheme
+<Shell commands={baseCommands} theme={nordTheme} />
+<Shell commands={baseCommands} theme={themes.gruvbox} />
 ```
+
+Le visiteur, lui, en change à la volée : la commande `theme <nom>` accepte
+exactement les clés de `themes`, et `help theme` les liste — chacune décrite
+par la clé de dictionnaire `theme.<nom>`.
 
 Un thème se remplace aussi par morceaux :
 
