@@ -26,8 +26,11 @@ import { setTheme, ShellThemeInput } from "./theme";
 import { BaseCommand, BaseCommands, Dictionaries } from "./types";
 
 export type ShellProps = {
-  /** les commandes connues : celles du paquet, plus les votres */
-  commands: BaseCommands & { [name: string]: BaseCommand };
+  /**
+   * Les commandes connues : celles du paquet, plus les votres. Sans elle,
+   * le shell se monte nu — il affiche l'invite et ne repond a rien.
+   */
+  commands?: BaseCommands & { [name: string]: BaseCommand };
   /**
    * Commandes restreintes rejouees au demarrage et apres un clear. C'est
    * la que se met la marque : le shell, lui, n'en connait aucune.
@@ -80,7 +83,7 @@ export type ShellProps = {
  * Corollaire assume : un shell par page.
  */
 export const Shell = ({
-  commands,
+  commands = {},
   banner = [],
   showTitle = false,
   welcome,
