@@ -17,7 +17,21 @@ export const source = (code: string) => ({
 /**
  * No code at all under the story: the render is the whole point, and the
  * lines that produced it are already spelled out on the left of each row.
+ *
+ * These stories also render inline, against the global `inline: false`. A
+ * shell bounds itself on the window height and needs a frame of its own to
+ * be bounded by; a plain render does not, and inside a fixed-height frame it
+ * cannot even scroll — the canvas freeze in `preview-head` applies there
+ * too. Inline, it takes the height it needs and the docs page scrolls.
+ *
+ * And they take the padded layout, against the global `fullscreen`: a shell
+ * is meant to fill what holds it, a panel of samples is not, and inline it
+ * would otherwise sit flush against the edge of the docs canvas.
  */
 export const renderOnly = {
-	docs: { canvas: { sourceState: "none" } },
+	layout: "padded",
+	docs: {
+		canvas: { sourceState: "none" },
+		story: { inline: true },
+	},
 }

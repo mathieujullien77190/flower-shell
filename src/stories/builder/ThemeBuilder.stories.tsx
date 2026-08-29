@@ -22,10 +22,6 @@ export default meta
 
 export const ThemeBuilderStory: StoryObj<typeof ThemeBuilder> = {
 	name: "Theme builder",
-	parameters: {
-		...renderOnly,
-		// il lui faut de la hauteur : deux colonnes, et le code en dessous
-		docs: { ...renderOnly.docs, story: { inline: false, height: "820px" } },
-	},
+	parameters: renderOnly,
 	render: () => <ThemeBuilder />,
 }
