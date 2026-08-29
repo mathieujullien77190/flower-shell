@@ -42,6 +42,46 @@ const commandHelp = (commands: BaseCommands, name: string): Help | null =>
 	commands[name] ? readHelp(commands[name]) || null : null
 
 /**
+ * Le banc d'essai du balisage. Une commande, et tout ce que `highlight`
+ * sait faire s'affiche d'un coup : de quoi verifier une palette, ou voir
+ * la syntaxe sans ouvrir la documentation.
+ *
+ * Chaque ligne se lit en deux colonnes — ce qu'on ecrit a gauche, echappe
+ * pour rester lisible, ce que ca donne a droite. L'echappement disparait
+ * au rendu, la colonne se cale donc sur la largeur affichee et non sur
+ * celle de la chaine.
+ */
+const MARKS: { separator: string; label: string }[] = [
+	{ separator: "§", label: "important" },
+	{ separator: "+", label: "info" },
+	{ separator: "`", label: "command" },
+	{ separator: "!", label: "restricted" },
+	{ separator: "$", label: "brand" },
+	{ separator: "_", label: "invisible" },
+]
+
+/** les deux antislashs de l'echappement ne comptent pas dans la largeur */
+const ESCAPED_WIDTH = Math.max(...MARKS.map(m => m.label.length)) + 2
+
+const column = (source: string, shown: number) =>
+	source + " ".repeat(Math.max(0, ESCAPED_WIDTH + 4 - shown))
+
+/** `\§important\§   §important§` : la source, puis son rendu */
+const markLine = ({ separator, label }: (typeof MARKS)[number]) => {
+	const source = `\\${separator}${label}\\${separator}`
+	const rendered = `${separator}${label}${separator}`
+
+	return `  ${column(source, rendered.length)}${rendered}`
+}
+
+const tagLine = ({ separator, label }: (typeof MARKS)[number]) => {
+	const source = `[\\${separator}${label}\\${separator}]`
+	const rendered = `[${separator}${label}${separator}]`
+
+	return `  ${column(source, rendered.length)}${rendered}`
+}
+
+/**
  * Les commandes fournies avec le shell, indexees par leur nom. Les deux
  * dernieres sont restreintes et cherchees par nom par le moteur : les
  * retirer casserait le rendu d'une commande inconnue.
@@ -132,6 +172,22 @@ export const baseCommands: BaseCommands = {
 				description: `theme.${name}`,
 			})),
 		}),
+	},
+	test: {
+		restricted: false,
+		action: () =>
+			[
+				`§${t("test.colors")}§`,
+				...MARKS.map(markLine),
+				`  ${t("test.invisible")}`,
+				"",
+				`§${t("test.tags")}§`,
+				// `_` n'a pas de tag : un fond de la couleur du fond ne montre rien
+				...MARKS.filter(mark => mark.separator !== "_").map(tagLine),
+			].join("\n"),
+		help: {
+			patterns: [{ pattern: "test", description: "test.usage" }],
+		},
 	},
 	lang: {
 		restricted: false,
