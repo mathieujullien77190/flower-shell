@@ -35,7 +35,6 @@ export const dictFr: Dict = {
 	lang: {
 		fr: "Affiche tout les textes en français",
 		en: "Affiche tout les textes en anglais",
-		es: "Affiche tout les textes en espagnol",
 		set: "langage : {lang}",
 	},
 	error: {
