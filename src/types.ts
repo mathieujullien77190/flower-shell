@@ -80,6 +80,7 @@ export type BaseCommands = {
   hello?: BaseCommand;
   flowers?: BaseCommand;
   animation?: BaseCommand;
+  theme?: BaseCommand;
   lang?: BaseCommand;
   /** le mot d'accueil et le logo : restreints, joues par la banniere */
   welcome?: BaseCommand;

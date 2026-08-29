@@ -3,6 +3,9 @@ import { useShallow } from "zustand/react/shallow"
 
 import { Command } from "@types"
 import { getBanner } from "./registry"
+import { darkTheme, lightTheme, setTheme } from "@theme"
+
+type ThemeMode = "light" | "dark"
 
 type Shell = {
 	/** langue de rendu des textes */
@@ -11,6 +14,8 @@ type Shell = {
 	animation: boolean
 	/** la saisie reprend le focus des qu'elle le perd */
 	keyboardOnFocus: boolean
+	/** le theme livre avec le paquet, sombre ou clair */
+	themeMode: ThemeMode
 
 	commands: Command[]
 	restrictedCommands: Command[]
@@ -22,6 +27,7 @@ type Shell = {
 	setLang: (lang: string) => void
 	setAnimation: (animation: boolean) => void
 	setKeyboardOnFocus: (keyboardOnFocus: boolean) => void
+	setThemeMode: (mode: ThemeMode) => void
 
 	addCommand: (command: Command) => void
 	setIsRendered: (id: string) => void
@@ -38,6 +44,7 @@ const INITIAL = {
 	lang: "en",
 	animation: true,
 	keyboardOnFocus: true,
+	themeMode: "dark" as ThemeMode,
 
 	commands: [] as Command[],
 	restrictedCommands: [] as Command[],
@@ -52,6 +59,13 @@ export const useShellStore = create<Shell>(set => ({
 	setLang: lang => set({ lang }),
 	setAnimation: animation => set({ animation }),
 	setKeyboardOnFocus: keyboardOnFocus => set({ keyboardOnFocus }),
+
+	// pose le theme module (colors() suivra) puis note le mode : le second
+	// declenche le rendu, le premier fournit les couleurs qu'il relira
+	setThemeMode: mode => {
+		setTheme(mode === "light" ? lightTheme : darkTheme)
+		set({ themeMode: mode })
+	},
 
 	addCommand: command =>
 		set(state =>
@@ -148,6 +162,8 @@ export const useGetLastCommand = () =>
 export const useLang = () => useShellStore(state => state.lang)
 
 export const useAnimation = () => useShellStore(state => state.animation)
+
+export const useThemeMode = () => useShellStore(state => state.themeMode)
 
 export const useKeyboardOnFocus = () =>
 	useShellStore(state => state.keyboardOnFocus)

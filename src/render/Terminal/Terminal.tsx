@@ -6,6 +6,7 @@ import Input, { hasSelection } from "@render/Input"
 import Command from "@render/Command"
 
 import { getCommands } from "@state/registry"
+import { useThemeMode } from "@state/store"
 import { findCommand } from "@engine/terminalEngine"
 
 import * as S from "./UI"
@@ -23,8 +24,12 @@ export const Terminal = ({
 }: TerminalProps) => {
 	const [forceFocus, setForceFocus] = useState<number>(0)
 
+	// abonnement au theme : au changement, le conteneur relit colors()
+	const themeMode = useThemeMode()
+
 	return (
 		<S.TerminalContainer
+			data-theme={themeMode}
 			onClick={() => {
 				// un clic qui vient de selectionner du texte ne rend pas la main
 				// a la saisie : le focus effacerait la selection

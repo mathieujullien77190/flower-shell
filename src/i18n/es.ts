@@ -26,6 +26,11 @@ export const dictEs: Dict = {
 		enabled: "activado",
 		disabled: "desactivado",
 	},
+	theme: {
+		light: "Cambia al tema claro",
+		dark: "Cambia al tema oscuro",
+		set: "tema: {mode}",
+	},
 	lang: {
 		fr: "Muestra todos los textos en francés",
 		en: "Muestra todos los textos en inglés",

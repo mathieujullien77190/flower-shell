@@ -50,7 +50,7 @@ export {
 	TOP_LAYER,
 } from "./window/constants"
 
-export { defaultTheme, setTheme, theme } from "./theme"
+export { darkTheme, defaultTheme, lightTheme, setTheme, theme } from "./theme"
 export type {
 	ShellColors,
 	ShellFonts,
