@@ -7,6 +7,7 @@ import Command from "@render/Command"
 
 import { getCommands } from "@state/registry"
 import { useThemeMode } from "@state/store"
+import { container } from "@theme"
 import { findCommand } from "@engine/terminalEngine"
 
 import * as S from "./UI"
@@ -30,6 +31,10 @@ export const Terminal = ({
 	return (
 		<S.TerminalContainer
 			data-theme={themeMode}
+			// le style du conteneur vient du theme : pose en inline, il
+			// recouvre le style de base sans que le consommateur ait a
+			// batailler avec la specificite
+			style={container()}
 			onClick={() => {
 				// un clic qui vient de selectionner du texte ne rend pas la main
 				// a la saisie : le focus effacerait la selection
