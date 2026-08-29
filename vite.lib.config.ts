@@ -8,7 +8,7 @@ import { alias } from "./alias.ts"
 // restent externes : c'est le consommateur qui les installe.
 export default defineConfig({
 	resolve: { alias },
-	plugins: [dts({ include: ["src"], exclude: ["src/**/*.stories.*"] })],
+	plugins: [dts({ include: ["src"], exclude: ["src/stories/**"] })],
 	build: {
 		lib: {
 			entry: path.resolve(process.cwd(), "src/index.ts"),

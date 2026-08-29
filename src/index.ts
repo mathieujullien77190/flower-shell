@@ -22,7 +22,6 @@ export {
 	t,
 } from "./i18n/lang"
 export { dictEn } from "./i18n/en"
-export { dictEs } from "./i18n/es"
 export { dictFr } from "./i18n/fr"
 
 export { highlight } from "./render/Command/helpers"
@@ -50,7 +49,21 @@ export {
 	TOP_LAYER,
 } from "./window/constants"
 
-export { darkTheme, defaultTheme, lightTheme, setTheme, theme } from "./theme"
+export {
+	defaultTheme,
+	draculaTheme,
+	flowerTheme,
+	gruvboxTheme,
+	monokaiTheme,
+	nordTheme,
+	parchmentTheme,
+	setTheme,
+	solarizedTheme,
+	theme,
+	themeNames,
+	themes,
+	twilightTheme,
+} from "./theme"
 export type {
 	ShellColors,
 	ShellFonts,

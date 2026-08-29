@@ -1,7 +1,7 @@
 import { BaseCommands, Help } from "@types"
 import { langs, t } from "@i18n/lang"
 import { readHelp } from "@engine/terminalEngine"
-import { colors } from "@theme"
+import { colors, themeNames } from "@theme"
 import { getWelcome } from "@state/registry"
 import { shellActions } from "@state/store"
 import { highlightFlower, plantFlowers } from "./flowers"
@@ -40,6 +40,46 @@ const buildAllHelp = (commands: BaseCommands) =>
 
 const commandHelp = (commands: BaseCommands, name: string): Help | null =>
 	commands[name] ? readHelp(commands[name]) || null : null
+
+/**
+ * Le banc d'essai du balisage. Une commande, et tout ce que `highlight`
+ * sait faire s'affiche d'un coup : de quoi verifier une palette, ou voir
+ * la syntaxe sans ouvrir la documentation.
+ *
+ * Chaque ligne se lit en deux colonnes — ce qu'on ecrit a gauche, echappe
+ * pour rester lisible, ce que ca donne a droite. L'echappement disparait
+ * au rendu, la colonne se cale donc sur la largeur affichee et non sur
+ * celle de la chaine.
+ */
+const MARKS: { separator: string; label: string }[] = [
+	{ separator: "§", label: "important" },
+	{ separator: "+", label: "info" },
+	{ separator: "`", label: "command" },
+	{ separator: "!", label: "restricted" },
+	{ separator: "$", label: "brand" },
+	{ separator: "_", label: "invisible" },
+]
+
+/** les deux antislashs de l'echappement ne comptent pas dans la largeur */
+const ESCAPED_WIDTH = Math.max(...MARKS.map(m => m.label.length)) + 2
+
+const column = (source: string, shown: number) =>
+	source + " ".repeat(Math.max(0, ESCAPED_WIDTH + 4 - shown))
+
+/** `\§important\§   §important§` : la source, puis son rendu */
+const markLine = ({ separator, label }: (typeof MARKS)[number]) => {
+	const source = `\\${separator}${label}\\${separator}`
+	const rendered = `${separator}${label}${separator}`
+
+	return `  ${column(source, rendered.length)}${rendered}`
+}
+
+const tagLine = ({ separator, label }: (typeof MARKS)[number]) => {
+	const source = `[\\${separator}${label}\\${separator}]`
+	const rendered = `[${separator}${label}${separator}]`
+
+	return `  ${column(source, rendered.length)}${rendered}`
+}
 
 /**
  * Les commandes fournies avec le shell, indexees par leur nom. Les deux
@@ -116,16 +156,37 @@ export const baseCommands: BaseCommands = {
 	},
 	theme: {
 		restricted: false,
-		testArgs: { authorize: ["light", "dark"], empty: false },
+		// les themes sont ceux du catalogue : lus a la frappe, pas ici
+		testArgs: { authorize: themeNames, empty: false },
 		action: ({ args }) => t("theme.set", { mode: args[0] }),
-		// l'effet joue apres l'action : le mode demande est pose ici
-		effect: ({ args }) =>
-			shellActions().setThemeMode(args[0] === "light" ? "light" : "dark"),
+		// l'effet joue apres l'action : le theme demande est pose ici
+		effect: ({ args }) => shellActions().setThemeName(args[0]),
+		/**
+		 * Une fonction, comme pour `lang` : l'aide liste le catalogue tel
+		 * qu'il est au moment ou elle s'affiche. Chaque theme se decrit par
+		 * la clef `theme.<nom>`.
+		 */
+		help: () => ({
+			patterns: themeNames().map(name => ({
+				pattern: `theme ${name}`,
+				description: `theme.${name}`,
+			})),
+		}),
+	},
+	test: {
+		restricted: false,
+		action: () =>
+			[
+				`§${t("test.colors")}§`,
+				...MARKS.map(markLine),
+				`  ${t("test.invisible")}`,
+				"",
+				`§${t("test.tags")}§`,
+				// `_` n'a pas de tag : un fond de la couleur du fond ne montre rien
+				...MARKS.filter(mark => mark.separator !== "_").map(tagLine),
+			].join("\n"),
 		help: {
-			patterns: [
-				{ pattern: "theme light", description: "theme.light" },
-				{ pattern: "theme dark", description: "theme.dark" },
-			],
+			patterns: [{ pattern: "test", description: "test.usage" }],
 		},
 	},
 	lang: {

@@ -12,16 +12,15 @@
 		"isolatedModules": true,
 		"jsx": "react-jsx",
 		"forceConsistentCasingInFileNames": true,
-		"baseUrl": ".",
 		"paths": {
-			"@commands/*": ["src/commands/*"],
-			"@engine/*": ["src/engine/*"],
-			"@i18n/*": ["src/i18n/*"],
-			"@render/*": ["src/render/*"],
-			"@state/*": ["src/state/*"],
-			"@window/*": ["src/window/*"],
-			"@theme": ["src/theme"],
-			"@types": ["src/types"]
+			"@commands/*": ["./src/commands/*"],
+			"@engine/*": ["./src/engine/*"],
+			"@i18n/*": ["./src/i18n/*"],
+			"@render/*": ["./src/render/*"],
+			"@state/*": ["./src/state/*"],
+			"@window/*": ["./src/window/*"],
+			"@theme": ["./src/theme"],
+			"@types": ["./src/types"]
 		}
 	},
 	"include": ["src/**/*.ts", "src/**/*.tsx", ".storybook/**/*.ts"],

@@ -53,13 +53,15 @@ const Command = ({
 						</S.CmdLine>
 					)}
 
-					<S.CmdResult style={baseCommand?.display?.stylePre || {}}>
-						{baseCommand?.display?.highlight
-							? baseCommand?.display?.highlight(displayResult.txt)
-							: highlight(displayResult.txt, (name, args) => {
-									onClickCommand(name, args)
-								})}
-					</S.CmdResult>
+					{displayResult.txt !== "" && (
+						<S.CmdResult style={baseCommand?.display?.stylePre || {}}>
+							{baseCommand?.display?.highlight
+								? baseCommand?.display?.highlight(displayResult.txt)
+								: highlight(displayResult.txt, (name, args) => {
+										onClickCommand(name, args)
+									})}
+						</S.CmdResult>
+					)}
 
 					{baseCommand?.JSX && baseCommand.JSX({ args: command.args })}
 				</S.CmdContainer>

@@ -1,14 +1,23 @@
 <style>
-	/*
-		L'iframe de storybook defile par defaut : le shell prend la hauteur
-		de ce qui le contient, et une page qui s'allonge lui en donne trop.
-		On la fige, chaque story borne ensuite sa propre boite.
-	*/
+	/* no browser margin around the content, canvas and docs alike */
 	html,
-	body,
+	body {
+		margin: 0;
+	}
+
+	/*
+		The storybook iframe scrolls by default: the shell takes the height
+		of what holds it, and a page that grows hands it too much. We freeze
+		it, and each story then bounds its own box.
+
+		The rule only targets the canvas: the docs page lives in the same
+		iframe, and frozen it would no longer scroll. `#storybook-docs` stays
+		empty until a docs page renders, which is what tells them apart.
+	*/
+	html:has(#storybook-docs:empty),
+	body:has(#storybook-docs:empty),
 	#storybook-root {
 		height: 100%;
-		margin: 0;
 		overflow: hidden;
 	}
 </style>
