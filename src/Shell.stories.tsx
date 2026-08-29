@@ -3,7 +3,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 
 import { Shell } from "./Shell";
 import { baseCommands } from "./commands/base";
+import { defaultTheme, lightTheme, setTheme } from "./theme";
 import { shellActions } from "./state/store";
+import { run } from "./engine/send";
 import { t } from "./i18n/lang";
 import { dictEn } from "./i18n/en";
 import { dictEs } from "./i18n/es";
@@ -11,13 +13,16 @@ import { dictFr } from "./i18n/fr";
 import { BaseCommand, Dict } from "./types";
 
 /**
- * L'etat du shell vit dans un module : sans ca, l'historique d'une story
- * suivrait dans la suivante. Le vidage se fait pendant le rendu du
- * decorateur, donc avant que le shell ne monte et ne joue sa banniere.
+ * The shell state lives in a module: without this, one story's history would
+ * carry into the next. The reset happens while the decorator renders, so
+ * before the shell mounts and plays its banner.
  */
 const Fresh = ({ children }: { children: React.ReactNode }) => {
   useState(() => {
     shellActions().reset();
+    // the theme lives at module level: without a reset it would leak from
+    // one story to the next. The shell replays its own right after, on mount.
+    setTheme(defaultTheme);
     return true;
   });
 
@@ -25,10 +30,10 @@ const Fresh = ({ children }: { children: React.ReactNode }) => {
 };
 
 /**
- * La boite qui accueille le shell : plus petite que la page, bordee, et
- * surtout defilante. Sa ref part en scrollRef, ce qui permet au shell de
- * la faire descendre quand la sortie s'allonge — sans elle, tout ce qui
- * depasse resterait hors d'atteinte.
+ * The box that holds the shell: smaller than the page, bordered, and above
+ * all scrollable. Its ref goes to scrollRef, which lets the shell scroll it
+ * down as the output grows — without it, anything overflowing would stay out
+ * of reach.
  */
 const Boxed = ({
   children,
@@ -57,7 +62,7 @@ const Boxed = ({
   );
 };
 
-/** Le terminal seul, remis a neuf a chaque story par le decorateur Fresh. */
+/** The terminal on its own, reset for each story by the Fresh decorator. */
 const meta: Meta<typeof Shell> = {
   title: "Shell",
   component: Shell,
@@ -75,8 +80,8 @@ export default meta;
 type Story = StoryObj<typeof Shell>;
 
 /**
- * Les commandes livrees avec le paquet, rien de plus : sans prop `dict`, le
- * shell ne parle que l'anglais.
+ * The commands shipped with the package, nothing more: without a `dict` prop,
+ * the shell only speaks English.
  */
 export const Default: Story = {
   args: {
@@ -85,9 +90,9 @@ export const Default: Story = {
 };
 
 /**
- * Un objet vide tient debout : le moteur cherche ses commandes d'erreur
- * par leur nom, et se rabat sur le dictionnaire du paquet quand elles
- * manquent. Rien ne repond, mais rien ne casse.
+ * An empty object stands on its own: the engine looks up its error commands
+ * by name, and falls back to the package dictionary when they are missing.
+ * Nothing answers, but nothing breaks.
  */
 export const NoCommands: Story = {
   args: {
@@ -96,15 +101,15 @@ export const NoCommands: Story = {
 };
 
 /**
- * L'ouverture : le logo du paquet, puis le mot d'accueil du consommateur.
- * Le `welcome` est une clef du dictionnaire, resolue quand la commande joue.
+ * The opening: the package logo, then the consumer's welcome message. The
+ * `welcome` is a dictionary key, resolved when the command plays.
  */
 export const WithOpening: Story = {
   args: {
     commands: baseCommands,
     showTitle: true,
     welcome: "app.welcome",
-    // une clef ajoutee a l'anglais du paquet : le reste des textes tient
+    // a key added to the package English: the rest of the texts still hold
     dict: {
       en: { app: { welcome: "Type `help` to list the commands" } },
     },
@@ -112,19 +117,19 @@ export const WithOpening: Story = {
 };
 
 /**
- * Une commande maison : le texte traduit passe par `t()`, le reste s'ecrit
- * en clair. Sa description d'aide est une clef, lue a l'affichage du `help`.
+ * A custom command: the translated text goes through `t()`, the rest is
+ * written plainly. Its help description is a key, read when `help` is shown.
  */
 const ping: BaseCommand = {
   restricted: false,
   action: ({ args }) =>
     args.length === 0 ? t("ping.pong") : `pong ${args.join(" ")}`,
   help: {
-    patterns: [{ pattern: "ping [texte]", description: "ping.usage" }],
+    patterns: [{ pattern: "ping [text]", description: "ping.usage" }],
   },
 };
 
-/** une commande maison s'ajoute a l'objet, le reste ne bouge pas */
+/** a custom command is added to the object, the rest stays put */
 export const CustomCommands: Story = {
   args: {
     commands: { ...baseCommands, ping },
@@ -135,9 +140,9 @@ export const CustomCommands: Story = {
 };
 
 /**
- * Le francais et l'espagnol : le paquet les livre, il suffit de les monter.
- * Les langues du shell sont les clefs de `dict` — ici les trois, donc
- * `lang fr`, `lang es` et `lang en` repondent toutes.
+ * French and Spanish: the package ships them, you only need to mount them.
+ * The shell's languages are the keys of `dict` — here all three, so
+ * `lang fr`, `lang es` and `lang en` all respond.
  */
 export const InFrenchAndSpanish: Story = {
   args: {
@@ -148,9 +153,9 @@ export const InFrenchAndSpanish: Story = {
 };
 
 /**
- * Une langue que le paquet ne connait pas : rien ne vit dessous, le
- * dictionnaire doit donc couvrir les commandes de base lui-meme. C'est le
- * modele a suivre pour n'importe quelle autre langue.
+ * A language the package does not know: nothing lives underneath, so the
+ * dictionary must cover the base commands itself. This is the pattern to
+ * follow for any other language.
  */
 const dictDe: Dict = {
   common: {
@@ -174,6 +179,11 @@ const dictDe: Dict = {
     enabled: "eingeschaltet",
     disabled: "ausgeschaltet",
   },
+  theme: {
+    light: "Wechselt zum hellen Thema",
+    dark: "Wechselt zum dunklen Thema",
+    set: "Thema: {mode}",
+  },
   lang: {
     de: "Zeigt alle Texte auf Deutsch",
     en: "Zeigt alle Texte auf Englisch",
@@ -191,15 +201,15 @@ export const InGerman: Story = {
     commands: baseCommands,
     lang: "de",
     dict: {
-      // l'anglais du paquet ne connait pas l'allemand : `lang.de` s'ajoute ici,
-      // sinon l'aide de `lang` sort la clef nue une fois passe en anglais
+      // the package English does not know German: `lang.de` is added here,
+      // otherwise the `lang` help shows the bare key once switched to English
       en: { lang: { de: "Shows every text in German" } },
       de: dictDe,
     },
   },
 };
 
-/** couleurs et invite : tout se remplace, le reste garde ses defauts */
+/** colours and prompt: everything can be replaced, the rest keeps its defaults */
 export const CustomTheme: Story = {
   args: {
     commands: baseCommands,
@@ -218,22 +228,111 @@ export const CustomTheme: Story = {
   },
 };
 
+/** the light theme shipped with the package: parchment background, darkened colours */
+export const LightTheme: Story = {
+  args: {
+    commands: baseCommands,
+    theme: lightTheme,
+  },
+};
+
 /**
- * Le meme shell, pose dans son cadre : barre de titre a glisser, bouton
- * d'agrandissement, croix. Le conteneur borne le deplacement.
+ * A clickable link in the output that runs a command. The `#label ~ cmd args#`
+ * marker shows `label` and, on click, dispatches `actionmap cmd args`. So a
+ * custom `actionmap` command routes the click by running that command line.
  */
+const menu: BaseCommand = {
+  restricted: true,
+  action: () => "Try it → #click to say hello ~ hello#",
+  display: { hideCmd: true },
+};
+
+/** the router: a click sends `actionmap <cmd>`, its effect runs `<cmd>` */
+const actionmap: BaseCommand = {
+  restricted: true,
+  action: () => "",
+  effect: ({ args = [] }) => run(args.join(" ")),
+  display: { hideCmd: true },
+};
+
+export const ClickableCommand: Story = {
+  args: {
+    commands: { ...baseCommands, menu, actionmap },
+    // the banner plays `menu` at startup, so the link shows right away
+    banner: ["menu"],
+  },
+};
+
+/**
+ * The same shell, placed in its frame: a draggable title bar, a maximise
+ * button, a close cross. The container bounds the movement.
+ *
+ * It also carries an `exit` command that closes the window, and chains
+ * `title` then `help exit` at startup through the `initialCommands` prop.
+ */
+
+// the window `show` is React state in Framed; the command reaches it through
+// this module handle, set on each render
+let closeWindow = () => {};
+
+const exit: BaseCommand = {
+  restricted: false,
+  action: () => "bye 🌼",
+  effect: () => closeWindow(),
+  help: {
+    patterns: [{ pattern: "exit", description: "closes the window" }],
+  },
+};
+
 const Framed = () => {
   const container = useRef<HTMLDivElement>(null);
+  const [show, setShow] = useState(true);
+  closeWindow = () => setShow(false);
 
   return (
     <div
       ref={container}
       style={{ position: "relative", height: "100%", background: "#84787A" }}
     >
+      {/* dock icon: toggles the window, lit when open, dimmed when closed */}
+      <div
+        onClick={() => setShow((open) => !open)}
+        title={show ? "close window" : "open window"}
+        style={{
+          position: "absolute",
+          top: 12,
+          left: 12,
+          zIndex: 20,
+          cursor: "pointer",
+          userSelect: "none",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: 4,
+          padding: "8px 12px",
+          borderRadius: 8,
+          background: show ? "rgba(255,255,255,0.18)" : "transparent",
+          boxShadow: show ? "0 0 0 1px rgba(255,255,255,0.55)" : "none",
+          opacity: show ? 1 : 0.4,
+          filter: show ? "none" : "grayscale(1)",
+          transition: "all 150ms ease",
+        }}
+      >
+        <span style={{ fontSize: 30, lineHeight: 1 }}>🌼</span>
+        <span style={{ fontSize: 12, fontWeight: "bold", color: "#fff" }}>
+          flower Shell
+        </span>
+      </div>
+
       <Shell
-        commands={baseCommands}
-        showTitle
-        window={{ show: true, title: "flower-shell", container }}
+        commands={{ ...baseCommands, exit }}
+        initialCommands={["title", "help exit"]}
+        window={{
+          show,
+          title: "flower-shell",
+          container,
+          onClose: () => setShow(false),
+        }}
       />
     </div>
   );
