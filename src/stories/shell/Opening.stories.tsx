@@ -6,11 +6,12 @@ import { boxed } from "../decorators"
 import { source } from "../source"
 
 /**
- * The opening: the package logo, then the consumer's welcome message. The
- * `welcome` is a dictionary key, resolved when the command plays.
+ * The same opening, put in `banner` instead of `initialCommands`. That is
+ * the whole difference between the two: the banner is replayed after a
+ * `clear`, so the logo and the welcome come back. Type `clear` and see.
  */
 const meta: Meta<typeof Shell> = {
-	title: "Shell/Opening",
+	title: "Shell/Opening after clear",
 	component: Shell,
 	decorators: [boxed],
 }
@@ -18,22 +19,23 @@ const meta: Meta<typeof Shell> = {
 export default meta
 
 export const Opening: StoryObj<typeof Shell> = {
+	name: "Opening after clear",
 	parameters: source(`
 import { Shell, baseCommands } from "flower-shell"
 
+// banner instead of initialCommands: played at startup, and again
+// after every clear
 <Shell
 	commands={baseCommands}
-	showTitle
 	welcome="app.welcome"
-	// a key added to the package English: the rest of the texts still hold
+	banner={["title", "welcome"]}
 	dict={{ en: { app: { welcome: "Type \`help\` to list the commands" } } }}
 />
 `),
 	args: {
 		commands: baseCommands,
-		showTitle: true,
 		welcome: "app.welcome",
-		// a key added to the package English: the rest of the texts still hold
+		banner: ["title", "welcome"],
 		dict: {
 			en: { app: { welcome: "Type `help` to list the commands" } },
 		},

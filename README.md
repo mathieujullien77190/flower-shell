@@ -14,9 +14,9 @@ const App = () => <Shell commands={baseCommands} />
 | prop | rôle |
 | --- | --- |
 | `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
-| `showTitle` | affiche le logo ASCII du shell au démarrage |
-| `welcome` | mot d'accueil affiché sous le logo ; une clé du dictionnaire ou le texte lui-même |
-| `banner` | commandes restreintes rejouées derrière le logo, au démarrage et après un `clear` |
+| `welcome` | le texte du mot d'accueil ; une clé du dictionnaire ou le texte lui-même |
+| `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
+| `banner` | commandes rejouées au démarrage **et après chaque `clear`** |
 | `theme` | couleurs, invite, polices |
 | `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
 | `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
@@ -33,13 +33,32 @@ inconnue redevient une erreur.
 `help`, `clear`, `hello`, `flowers`, `animation`, `lang`, plus trois commandes
 restreintes — que le visiteur ne peut pas taper :
 
-- `title` affiche le logo ASCII du shell et `welcome` le mot d'accueil ; les
-  props `showTitle` et `welcome` les jouent pour vous, sinon le shell démarre
-  nu et vous posez votre propre marque
+- `title` affiche le logo ASCII du shell et `welcome` le mot d'accueil de la
+  prop du même nom. Ce sont des commandes comme les autres : vous les jouez en
+  les mettant dans `initialCommands`, ou dans `banner` pour qu'elles reviennent
+  après un `clear`. Sans ça le shell démarre nu, et vous posez votre marque
 - `unknow` et `argumenterror` sont cherchées **par nom** par le moteur, qui
   rend leur texte quand une commande est inconnue ou mal appelée. Les retirer
   est permis : le dictionnaire du paquet prend le relais, et `commands={{}}` reste un
   shell valide, qui ne répond simplement à rien
+
+## L'ouverture
+
+Le shell démarre nu. Le logo et le mot d'accueil sont deux commandes, jouées
+comme les autres :
+
+```tsx
+<Shell
+	commands={baseCommands}
+	welcome="app.welcome"
+	initialCommands={["title", "welcome"]}
+	dict={{ en: { app: { welcome: "Type `help` to list the commands" } } }}
+/>
+```
+
+`initialCommands` ne joue qu'une fois, sur un écran vierge : un `clear` ne les
+rejoue pas. Ce qui doit revenir après un `clear` va dans `banner`, à la même
+syntaxe près.
 
 ## Écrire une commande
 
