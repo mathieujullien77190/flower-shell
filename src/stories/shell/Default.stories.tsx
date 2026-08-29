@@ -7,7 +7,8 @@ import { source } from "../source"
 
 /**
  * The commands shipped with the package, nothing more: without a `dict` prop,
- * the shell only speaks English.
+ * the shell only speaks English, and it wears `flowerTheme` — the package
+ * default, flower on the prompt included.
  */
 const meta: Meta<typeof Shell> = {
 	title: "Shell/Default",
