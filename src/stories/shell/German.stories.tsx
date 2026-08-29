@@ -41,8 +41,8 @@ const dictDe: Dict = {
 	},
 	theme: {
 		flower: "Das Thema des Pakets: dunkles Laub, eine Blume als Eingabe",
-		dark: "Ein neutrales dunkles Terminal",
-		light: "Ein neutrales helles Terminal",
+		twilight: "Ein neutrales dunkles Terminal",
+		parchment: "Ein neutrales helles Terminal",
 		dracula: "Violetter Schiefer, gesättigte Akzente",
 		nord: "Nachtblau, kühle Akzente",
 		gruvbox: "Erdiger Grund, warme Akzente",
@@ -85,7 +85,7 @@ const dictDe: Dict = {
 	hello: { usage: "...", usageArgs: "...", world: "Hallo Welt" },
 	flowers: { usage: "..." },
 	animation: { on: "...", off: "...", enabled: "...", disabled: "..." },
-	theme: { flower: "...", dark: "...", light: "...", set: "Thema: {mode}" },
+	theme: { flower: "...", twilight: "...", parchment: "...", set: "Thema: {mode}" },
 	lang: { de: "...", en: "...", set: "Sprache: {lang}" },
 	error: { unknown: "...", args: "..." },
 }

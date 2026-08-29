@@ -50,19 +50,19 @@ export {
 } from "./window/constants"
 
 export {
-	darkTheme,
 	defaultTheme,
 	draculaTheme,
 	flowerTheme,
 	gruvboxTheme,
-	lightTheme,
 	monokaiTheme,
 	nordTheme,
+	parchmentTheme,
 	setTheme,
 	solarizedTheme,
 	theme,
 	themeNames,
 	themes,
+	twilightTheme,
 } from "./theme"
 export type {
 	ShellColors,

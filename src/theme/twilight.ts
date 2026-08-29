@@ -1,8 +1,8 @@
 import { makeTheme } from "./base"
 import type { ShellTheme } from "./types"
 
-/** le terminal neutre : fond profond, couleurs vives qui ressortent dessus */
-export const darkTheme: ShellTheme = makeTheme({
+/** Twilight : le terminal neutre, fond profond, couleurs vives dessus */
+export const twilightTheme: ShellTheme = makeTheme({
 	colors: {
 		background: "#212E35",
 		textColor: "#CED4DF",

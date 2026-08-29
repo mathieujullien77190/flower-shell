@@ -2,10 +2,11 @@ import { makeTheme } from "./base"
 import type { ShellTheme } from "./types"
 
 /**
- * Le terminal neutre sur clair : fond parchemin, memes couleurs assombries
- * pour tenir la lisibilite (et servir de fond de tag avec un texte blanc).
+ * Parchment : le terminal neutre sur clair. Fond parchemin, memes couleurs
+ * assombries pour tenir la lisibilite (et servir de fond de tag sous un
+ * texte blanc).
  */
-export const lightTheme: ShellTheme = makeTheme({
+export const parchmentTheme: ShellTheme = makeTheme({
 	colors: {
 		background: "#F5F1E6",
 		textColor: "#2A333A",

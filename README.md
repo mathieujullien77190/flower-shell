@@ -205,15 +205,15 @@ Le paquet en livre huit, à la manière d'un éditeur :
 | nom | |
 | --- | --- |
 | `flower` | **le défaut** — feuillage sombre, une fleur pour invite |
-| `dark` | un terminal sombre et neutre, invite `>` |
-| `light` | un terminal clair et neutre |
+| `twilight` | un terminal sombre et neutre, invite `>` |
+| `parchment` | un terminal clair et neutre |
 | `dracula` | fond ardoise violette, accents saturés |
 | `nord` | fond bleu nuit, accents froids |
 | `gruvbox` | fond terreux, accents chauds |
 | `monokai` | fond olive sombre, accents francs |
 | `solarized` | fond ivoire, accents mesurés |
 
-Chacun s'exporte sous son nom — `flowerTheme`, `nordTheme`, `gruvboxTheme`… —
+Chacun s'exporte sous son nom — `flowerTheme`, `twilightTheme`, `nordTheme`… —
 et `themes` les rassemble sous les clés du tableau :
 
 ```tsx
@@ -277,11 +277,19 @@ thème sont des modules ; deux terminaux monteraient l'un sur l'autre.
 ## Développer
 
 ```sh
-npm run shell:storybook   # le terminal seul, sans le reste du site
+npm run storybook   # le terminal seul, sans le reste du site
 ```
 
-Les stories montrent le shell nu, avec des commandes personnalisées, et avec un
-autre thème.
+Les stories sont sous `src/stories`, une par cas : le shell nu, avec des
+commandes personnalisées, dans une fenêtre, dans chaque langue. Chacune montre
+le code qui la produit, imports compris.
+
+**Shell / Theme builder** est un créateur de thème : on part d'un thème du
+catalogue, on déplace les couleurs, l'aperçu suit, et le bloc du bas est la
+prop `theme` correspondante — à copier telle quelle.
+
+**Markup** documente le balisage, marqueur par marqueur, et le montre rendu
+dans les huit thèmes côte à côte.
 
 ## Licence
 

@@ -1,10 +1,10 @@
 import { CSSProperties } from "react"
 
-import { darkTheme } from "./dark"
+import { twilightTheme } from "./twilight"
 import { draculaTheme } from "./dracula"
 import { flowerTheme } from "./flower"
 import { gruvboxTheme } from "./gruvbox"
-import { lightTheme } from "./light"
+import { parchmentTheme } from "./parchment"
 import { monokaiTheme } from "./monokai"
 import { nordTheme } from "./nord"
 import { solarizedTheme } from "./solarized"
@@ -24,11 +24,11 @@ export type {
 	WindowColors,
 } from "./types"
 
-export { darkTheme } from "./dark"
+export { twilightTheme } from "./twilight"
 export { draculaTheme } from "./dracula"
 export { flowerTheme } from "./flower"
 export { gruvboxTheme } from "./gruvbox"
-export { lightTheme } from "./light"
+export { parchmentTheme } from "./parchment"
 export { monokaiTheme } from "./monokai"
 export { nordTheme } from "./nord"
 export { solarizedTheme } from "./solarized"
@@ -40,8 +40,8 @@ export { solarizedTheme } from "./solarized"
  */
 export const themes: Record<string, ShellTheme> = {
 	flower: flowerTheme,
-	dark: darkTheme,
-	light: lightTheme,
+	twilight: twilightTheme,
+	parchment: parchmentTheme,
 	dracula: draculaTheme,
 	nord: nordTheme,
 	gruvbox: gruvboxTheme,
@@ -56,8 +56,8 @@ export const themeNames = (): string[] => Object.keys(themes)
 export const DEFAULT_THEME_NAME = "flower"
 
 /**
- * Le theme du paquet par defaut. `darkTheme` et `lightTheme` restent la
- * pour qui veut un terminal neutre, invite `>` comprise.
+ * Le theme du paquet par defaut. `twilightTheme` et `parchmentTheme` restent
+ * la pour qui veut un terminal neutre, invite `>` comprise.
  */
 export const defaultTheme: ShellTheme = flowerTheme
 

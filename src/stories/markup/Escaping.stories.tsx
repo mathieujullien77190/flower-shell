@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { highlight } from "../../render/Command/helpers"
-import { darkTheme, setTheme } from "../../theme"
+import { twilightTheme, setTheme } from "../../theme"
 import { renderOnly } from "../source"
 import { Row, Screen, noop } from "./screen"
 
@@ -18,7 +18,7 @@ export default meta
 export const Escaping: StoryObj = {
 	parameters: renderOnly,
 	render: () => {
-		setTheme(darkTheme)
+		setTheme(twilightTheme)
 		const lines = [
 			"Coloured: +this+ — escaped: \+this\+",
 			"Raw markers: \§ \+ \` \! \$",
