@@ -33,6 +33,12 @@ const dictDe: Dict = {
 		enabled: "eingeschaltet",
 		disabled: "ausgeschaltet",
 	},
+	test: {
+		usage: "Zeigt alle Farben des Themas, geschrieben und gerendert",
+		colors: "Farben",
+		tags: "Tags",
+		invisible: "die Zeile darüber endet mit einem unsichtbaren Wort — markiere es",
+	},
 	theme: {
 		flower: "Das Thema des Pakets: dunkles Laub, eine Blume als Eingabe",
 		dark: "Ein neutrales dunkles Terminal",

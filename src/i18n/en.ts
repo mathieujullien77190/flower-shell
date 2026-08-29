@@ -26,6 +26,12 @@ export const dictEn: Dict = {
 		enabled: "enabled",
 		disabled: "disabled",
 	},
+	test: {
+		usage: "Shows every colour of the theme, written and rendered",
+		colors: "colours",
+		tags: "tags",
+		invisible: "the line above ends with an invisible word — select it",
+	},
 	theme: {
 		flower: "The package theme: leaf-dark, with a flower for a prompt",
 		dark: "A neutral dark terminal",

@@ -27,6 +27,12 @@ export const dictFr: Dict = {
 		enabled: "activé",
 		disabled: "désactivé",
 	},
+	test: {
+		usage: "Affiche toutes les couleurs du thème, écrites et rendues",
+		colors: "couleurs",
+		tags: "tags",
+		invisible: "la ligne au-dessus finit par un mot invisible — sélectionnez-le",
+	},
 	theme: {
 		flower: "Le thème du paquet : feuillage sombre, une fleur pour invite",
 		dark: "Un terminal sombre et neutre",

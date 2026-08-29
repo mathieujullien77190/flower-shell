@@ -82,6 +82,8 @@ export type BaseCommands = {
   animation?: BaseCommand;
   theme?: BaseCommand;
   lang?: BaseCommand;
+  /** le banc d'essai du balisage : une commande, tout le rendu */
+  test?: BaseCommand;
   /** le mot d'accueil et le logo : restreints, joues par la banniere */
   welcome?: BaseCommand;
   title?: BaseCommand;

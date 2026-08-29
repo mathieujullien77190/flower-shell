@@ -30,8 +30,13 @@ inconnue redevient une erreur.
 
 ## Les commandes de base
 
-`help`, `clear`, `hello`, `flowers`, `animation`, `lang`, plus trois commandes
-restreintes — que le visiteur ne peut pas taper :
+`help`, `clear`, `hello`, `flowers`, `animation`, `lang`, `theme` et `test`.
+
+`test` affiche toutes les couleurs du thème, la source à gauche et son rendu à
+droite : de quoi juger une palette, ou retrouver la syntaxe du balisage sans
+ouvrir cette page.
+
+Plus trois commandes restreintes — que le visiteur ne peut pas taper :
 
 - `title` affiche le logo ASCII du shell et `welcome` le mot d'accueil de la
   prop du même nom. Ce sont des commandes comme les autres : vous les jouez en
