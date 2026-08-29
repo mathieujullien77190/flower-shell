@@ -79,12 +79,23 @@ export const createCommand = ({
 		}
 	} else {
 		const error = findCommand({ commands, name: "unknow", restricted: true })
+
+		/**
+		 * Un shell sans aucune commande n'a rien a redire : le registre vide
+		 * est un choix du consommateur, pas une faute du visiteur. La ligne
+		 * passe, et la suivante s'ouvre. Des qu'une commande existe, une
+		 * commande inconnue redevient une erreur.
+		 */
+		const bare = Object.keys(commands).length === 0
+
 		return {
 			restricted,
 			pattern: commandPattern,
 			name,
 			args,
-			result: error
+			result: bare
+				? ""
+				: error
 				? executeCommand({
 						commands,
 						name: "unknow",
