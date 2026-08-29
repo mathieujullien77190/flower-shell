@@ -64,7 +64,10 @@ export const highlight = (
 	const parse = (raw: string) => {
 		if (raw.indexOf("~") === -1) return { label: raw, args: [] as string[] }
 		const [label, rest] = raw.split("~")
-		return { label, args: rest.trim().split(/\s+/) }
+		// `#libelle ~ commande#` s'ecrit avec des espaces autour du `~` : sans
+		// ce trim ils partiraient dans le libelle, et le soulignement du lien
+		// depasserait le dernier mot
+		return { label: label.trim(), args: rest.trim().split(/\s+/) }
 	}
 
 	const mark = (
