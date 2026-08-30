@@ -8,10 +8,13 @@ import { ThemeBuilder } from "./ThemeBuilder"
  * once as a shell, once as the code that produces it. The block at the
  * bottom is a real `theme` prop — copy it into your own `<Shell />`.
  *
- * The preview is a stand-in, not a live terminal: the shell keeps its theme
- * at module level and there is one per page, so a real one here would fight
- * the other stories for it. `highlight` is the same function either way, so
- * the colours you see are the colours you get.
+ * The preview is the real thing: a `Shell` in a `Window`, wearing the
+ * draft, opening on `test` — the command that prints every colour of the
+ * theme. Both palettes are live, the terminal one and the window frame one.
+ *
+ * It remounts at every touch of a picker: a shell already mounted would not
+ * replay its opening, and the theme lives at module level. Animation is off
+ * here alone, so the palette lands with the colour and not a second later.
  */
 const meta: Meta<typeof ThemeBuilder> = {
 	title: "Shell/Theme builder",

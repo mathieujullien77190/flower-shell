@@ -1,21 +1,41 @@
-import { useMemo, useState } from "react"
+import { useState } from "react"
 
-import { highlight } from "../../render/Command/helpers"
-import { setTheme, themes } from "../../theme"
+import { Shell } from "../../Shell"
+import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
+import { shellActions } from "../../state/store"
+import { themes } from "../../theme"
 import type { ShellColors, ShellTheme, WindowColors } from "../../theme"
 
-const noop = () => {}
+/**
+ * The preview: a real shell, in a real window, wearing the draft. It opens
+ * on `test`, which prints every colour of the theme — the palette being
+ * edited, rendered by the code that will render it for real.
+ *
+ * It remounts on every touch of a picker, through the `key` its parent
+ * gives it. The registry and the history live at module level, so the
+ * remount has to start from an empty screen: without the reset, the shell
+ * would find the previous lines on screen and skip `initialCommands`.
+ *
+ * Animation off, and only here: replaying `test` letter by letter at every
+ * keystroke would show the palette a second after the colour changed.
+ */
+const Preview = ({ draft }: { draft: ShellTheme }) => {
+	useState(() => {
+		shellActions().reset()
+		shellActions().setAnimation(false)
+		return true
+	})
 
-/** the sample the preview renders, one line per colour of the palette */
-const SAMPLE = [
-	"§important§",
-	"+info+",
-	"`command`",
-	"!restricted!",
-	"$brand$",
-	"_invisible (select me)_",
-	"[§important§] [+info+] [`cmd`] [!restricted!] [$brand$]",
-]
+	return (
+		<Shell
+			commands={{ ...baseCommands, test }}
+			theme={draft}
+			initialCommands={["test"]}
+			window={{ title: "flower-shell", canClose: false }}
+		/>
+	)
+}
 
 /** what a picker edits: the label people read, the key the theme uses */
 const SHELL_FIELDS: { key: keyof ShellColors; label: string }[] = [
@@ -170,14 +190,12 @@ export const ThemeBuilder = () => {
 		}))
 
 	/**
-	 * `highlight` lit les couleurs du module a l'appel, pas des props : on
-	 * pose donc le brouillon juste avant de calculer le rendu. C'est ce qui
-	 * fait suivre l'apercu a la moindre touche du picker.
+	 * La signature du brouillon, donnee en `key` a l'apercu : elle change des
+	 * qu'une couleur bouge, et React remonte alors le shell. Un shell deja
+	 * monte ne rejouerait pas son ouverture, et le theme vit au niveau du
+	 * module — le remontage est ce qui fait suivre l'apercu.
 	 */
-	const preview = useMemo(() => {
-		setTheme(draft)
-		return SAMPLE.map(line => ({ line, nodes: highlight(line, noop) }))
-	}, [draft])
+	const signature = JSON.stringify(draft)
 
 	return (
 		<div
@@ -248,46 +266,12 @@ export const ThemeBuilder = () => {
 
 			<div style={{ display: "grid", gap: 20 }}>
 				<Group title="preview">
-					<div
-						style={{
-							border: `2px solid ${draft.window.border}`,
-							borderRadius: 6,
-							overflow: "hidden",
-						}}
-					>
-						<div
-							style={{
-								background: draft.window.titleBar,
-								color: draft.window.text,
-								font: "bold 13px/1 ui-monospace, monospace",
-								padding: "8px 10px",
-								display: "flex",
-								justifyContent: "space-between",
-							}}
-						>
-							<span>flower-shell</span>
-							<span style={{ color: draft.window.button }}>+ x</span>
-						</div>
-
-						<div style={{ background: draft.window.content, padding: 12 }}>
-							<div
-								style={{
-									background: draft.colors.background,
-									color: draft.colors.textColor,
-									font: "14px/2 ui-monospace, monospace",
-									padding: 16,
-									whiteSpace: "pre-wrap",
-								}}
-							>
-								{preview.map(({ line, nodes }) => (
-									<div key={line}>{nodes}</div>
-								))}
-								<div>
-									<strong>{draft.prompt}</strong>{" "}
-									<span style={{ color: draft.colors.cmdColor }}>help</span>
-								</div>
-							</div>
-						</div>
+					{/* La fenetre se place en pourcentage de ce cadre : il lui faut
+					    une hauteur, le paquet n'en impose aucune. Assez haute pour
+					    que `test` tienne : le shell descend sur sa derniere ligne,
+					    et c'est la liste des couleurs qui passerait au-dessus. */}
+					<div style={{ height: 700, background: "#84787A", borderRadius: 6 }}>
+						<Preview key={signature} draft={draft} />
 					</div>
 				</Group>
 
