@@ -54,7 +54,20 @@ export type ShellWindowProps = {
   onClose?: () => void;
 };
 
-export type ShellProps = {
+/** un catalogue de themes, indexes par le nom que le visiteur tape */
+export type ShellThemes = Record<string, ShellThemeInput>;
+
+/**
+ * Le meme catalogue, mais vide interdit. `keyof {}` vaut `never`, ce qui
+ * fait tomber le type sur `never` et rend `themes={{}}` impossible a
+ * ecrire — un shell dont le visiteur n'a aucun theme a prendre n'a pas de
+ * sens, et le dire au type evite de le decouvrir a l'execution.
+ */
+export type NonEmptyThemes<T extends ShellThemes> = keyof T extends never
+  ? never
+  : T;
+
+export type ShellProps<T extends ShellThemes = ShellThemes> = {
   /**
    * Les commandes connues : celles du paquet, plus les votres. Sans elle,
    * le shell se monte nu — il affiche l'invite et ne repond a rien.
@@ -65,12 +78,16 @@ export type ShellProps = {
   /**
    * Les themes que le visiteur peut prendre, indexes par le nom qu'il tape.
    * Ce sont exactement ceux que `theme <nom>` accepte et que `help theme`
-   * liste. Sans elle, le catalogue du paquet en entier.
+   * liste — rien de plus.
+   *
+   * Obligatoire, et au moins un : le shell ne choisit pas a votre place ce
+   * que le visiteur a le droit de prendre. Pour tout le catalogue du
+   * paquet d'un coup, `themes={themes}`.
    *
    * Chacun se decrit par la clef `theme.<nom>` : a fournir dans votre
    * dictionnaire pour les votres, sans quoi la clef s'affiche telle quelle.
    */
-  themes?: Record<string, ShellThemeInput>;
+  themes: NonEmptyThemes<T>;
   /**
    * Vos textes, par langue. Ils recouvrent ceux du paquet clef par clef, et
    * une langue absente du paquet devient utilisable par `lang <code>`.
@@ -142,7 +159,7 @@ export type ShellProps = {
  * aussi hors React, une fenetre qui se ferme peut jouer une commande.
  * Corollaire assume : un shell par page.
  */
-export const Shell = ({
+export const Shell = <T extends ShellThemes,>({
   commands = {},
   theme,
   themes,
@@ -157,7 +174,7 @@ export const Shell = ({
   onCommandDone,
   onCommandRendered,
   onCommandError,
-}: ShellProps) => {
+}: ShellProps<T>) => {
   /**
    * Le cadre, quand la prop `window` est donnee. `area` borne le
    * deplacement de la fenetre, `content` est ce qui defile — c'est la ref

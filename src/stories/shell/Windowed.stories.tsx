@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
+import { themes } from "../../theme"
 import { fresh } from "../decorators"
 import { prose } from "../i18n"
 import { source } from "../source"
@@ -66,11 +67,12 @@ export const Windowed: StoryObj<typeof Shell> = {
 	parameters: {
 		layout: "fullscreen",
 		...source(`
-import { Shell, baseCommands, test } from "flower-shell"
+import { Shell, baseCommands, test, themes } from "flower-shell"
 
 // the object is the whole frame: nothing else to wire, no ref to pass
 <Shell
 	commands={{ ...baseCommands, test }}
+	themes={themes}
 	initialCommands={["title", "welcome"]}
 	window={{
 		title: "flower-shell",
@@ -87,6 +89,7 @@ import { Shell, baseCommands, test } from "flower-shell"
 	},
 	args: {
 		commands: { ...baseCommands, test },
+		themes,
 		initialCommands: ["title", "welcome"],
 		window: {
 			title: "flower-shell",
@@ -116,6 +119,7 @@ export const Fixed: StoryObj<typeof Shell> = {
 		...source(`
 <Shell
 	commands={{ ...baseCommands, test }}
+	themes={themes}
 	initialCommands={["title", "welcome"]}
 	window={{
 		title: "flower-shell",
@@ -129,6 +133,7 @@ export const Fixed: StoryObj<typeof Shell> = {
 	},
 	args: {
 		commands: { ...baseCommands, test },
+		themes,
 		initialCommands: ["title", "welcome"],
 		window: {
 			title: "flower-shell",

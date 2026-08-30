@@ -93,8 +93,12 @@ let mounted: Record<string, ShellTheme> = themes
 
 /**
  * Les themes du shell sont exactement les clefs de ce qu'on donne ici —
- * rien de plus. `themes={{ flower: flowerTheme, mine }}` en monte deux ;
- * sans prop, le catalogue du paquet en entier.
+ * rien de plus. `themes={{ flower: flowerTheme, mine }}` en monte deux,
+ * `themes={themes}` monte le catalogue du paquet en entier.
+ *
+ * L'appel sans argument rend le catalogue du paquet. Il ne sert pas au
+ * shell, dont la prop est obligatoire : c'est le reset des stories, qui
+ * repartent d'un module propre.
  */
 export const setThemes = (custom?: Record<string, ShellThemeInput>) => {
 	if (!custom) {

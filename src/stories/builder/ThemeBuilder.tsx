@@ -38,6 +38,9 @@ const Preview = ({ draft }: { draft: ShellTheme }) => {
 		<Shell
 			commands={{ ...baseCommands, test }}
 			theme={draft}
+			// le brouillon est le seul theme atteignable : l'apercu montre ce
+			// qu'on est en train d'ecrire, pas le catalogue du paquet
+			themes={{ draft }}
 			initialCommands={["test"]}
 			// pleine : l'apercu sert a lire une palette, chaque pixel rendu au
 			// terminal en est un de moins a faire defiler. La marge tient au

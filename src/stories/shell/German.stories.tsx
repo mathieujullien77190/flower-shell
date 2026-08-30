@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
+import { themes } from "../../theme"
 import { Dict } from "../../types"
 import { boxed } from "../decorators"
 import { prose } from "../i18n"
@@ -93,7 +94,7 @@ export default meta
 
 export const German: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands, test } from "flower-shell"
+import { Shell, baseCommands, test, themes } from "flower-shell"
 import type { Dict } from "flower-shell"
 
 // the package does not know German: nothing lives underneath, so the
@@ -114,6 +115,7 @@ const dictDe: Dict = {
 // help lang opens the shell on the list of what is mounted: de and en
 <Shell
 	commands={{ ...baseCommands, test }}
+	themes={themes}
 	lang="de"
 	dict={{
 		// the package English does not know German: lang.de is added here,
@@ -126,6 +128,7 @@ const dictDe: Dict = {
 `),
 	args: {
 		commands: { ...baseCommands, test },
+		themes,
 		lang: "de",
 		dict: {
 			// the package English does not know German: `lang.de` is added here,

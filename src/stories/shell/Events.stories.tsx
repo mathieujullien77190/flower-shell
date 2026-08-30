@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
+import { themes } from "../../theme"
 import type { BaseCommand } from "../../types"
 import type { CommandErrorEvent, CommandEvent } from "../../engine/send"
 import { fresh } from "../decorators"
@@ -98,6 +99,7 @@ const Watcher = () => {
 			>
 				<Shell
 					commands={{ ...baseCommands, test, boom }}
+					themes={themes}
 					initialCommands={["title", "welcome"]}
 					scrollRef={box}
 					onCommandStart={start}
@@ -246,7 +248,7 @@ export default meta
 export const Events: StoryObj<typeof Shell> = {
 	parameters: source(`
 import { useCallback, useRef, useState } from "react"
-import { Shell, baseCommands, test } from "flower-shell"
+import { Shell, baseCommands, test, themes } from "flower-shell"
 
 // a command that fails on purpose, to reach the third reason
 const boom = {
@@ -287,6 +289,7 @@ const Watcher = () => {
 			<div ref={box} style={{ flex: 1, overflowY: "auto" }}>
 				<Shell
 					commands={{ ...baseCommands, test, boom }}
+					themes={themes}
 					initialCommands={["title", "welcome"]}
 					scrollRef={box}
 					onCommandStart={start}

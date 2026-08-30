@@ -6,9 +6,9 @@ Un terminal rétro en React : moteur de commandes, historique, autocomplétion,
 rendu ASCII animé, et une fenêtre pour le poser. Aucune mise en page imposée.
 
 ```tsx
-import { Shell, baseCommands } from "flower-shell"
+import { Shell, baseCommands, themes } from "flower-shell"
 
-const App = () => <Shell commands={baseCommands} />
+const App = () => <Shell commands={baseCommands} themes={themes} />
 ```
 
 ## Le composant
@@ -18,7 +18,7 @@ const App = () => <Shell commands={baseCommands} />
 | `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
 | `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
 | `theme` | le thème porté au démarrage ; couleurs, invite, polices |
-| `themes` | les thèmes que le visiteur peut prendre, un par nom ; sans elle, le catalogue du paquet |
+| `themes` | **obligatoire** — les thèmes que le visiteur peut prendre, un par nom, au moins un ; `themes={themes}` pour tout le catalogue |
 | `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
 | `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
 | `window` | pose le shell dans un cadre ; l'objet porte tout ce que le cadre sait faire |
@@ -28,10 +28,14 @@ const App = () => <Shell commands={baseCommands} />
 | `onCommandRendered` | le texte a fini de s'écrire |
 | `onCommandError` | la commande n'a pas joué ; `reason` dit pourquoi |
 
-Toutes les props sont facultatives : `<Shell />` se monte nu. Le registre
-vide, il affiche l'invite et ne répond à rien — une ligne tapée passe à la
-suivante, sans message d'erreur. Dès qu'une commande existe, une commande
-inconnue redevient une erreur.
+`themes` est la seule prop que le shell réclame. Tout le reste est facultatif :
+`<Shell themes={{ flower: flowerTheme }} />` se monte nu, et le registre vide,
+il affiche l'invite et ne répond à rien — une ligne tapée passe à la suivante,
+sans message d'erreur. Dès qu'une commande existe, une commande inconnue
+redevient une erreur.
+
+Les extraits plus bas laissent `themes` de côté, pour que chacun reste sur la
+prop dont il parle. Remettez-la dans ce que vous copiez.
 
 ## Les commandes de base
 
@@ -343,15 +347,24 @@ peut atteindre :
 ```tsx
 import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 
-<Shell commands={baseCommands} />                        // flowerTheme, all eight
-<Shell commands={baseCommands} theme={nordTheme} />      // starts on nord
-<Shell commands={baseCommands} themes={{ nord: nordTheme }} />  // and nothing else
+// the whole catalogue: all eight, and the visitor can reach all eight
+<Shell commands={baseCommands} themes={themes} />
+
+// one of them, and nothing else to switch to
+<Shell commands={baseCommands} themes={{ nord: nordTheme }} />
+
+// the catalogue to reach, and the one it starts on
+<Shell commands={baseCommands} themes={themes} theme={nordTheme} />
 ```
 
 **Les thèmes du shell sont exactement les clés de `themes`** — rien de plus.
 `theme <nom>` n'accepte que ceux-là, et `help theme` les liste, chacun décrit
-par la clé de dictionnaire `theme.<nom>`. Sans la prop, le catalogue du paquet
-en entier.
+par la clé de dictionnaire `theme.<nom>`.
+
+La prop est obligatoire, et un thème est le minimum : un shell dont le
+visiteur n'a rien à prendre est refusé par le type, pas découvert à
+l'exécution. Le shell ne choisit pas à votre place ce que le visiteur a le
+droit d'atteindre — passez `themes` pour les huit.
 
 Donc un shell à vous, avec un thème du paquet, un des vôtres, et aucune sortie
 hors des deux :

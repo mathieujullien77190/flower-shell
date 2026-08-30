@@ -1,5 +1,10 @@
 export { Shell } from "./Shell"
-export type { ShellProps, ShellWindowProps } from "./Shell"
+export type {
+	NonEmptyThemes,
+	ShellProps,
+	ShellThemes,
+	ShellWindowProps,
+} from "./Shell"
 
 export { baseCommands } from "./commands/base"
 export { highlightFlower, plantFlowers } from "./commands/flowers"
