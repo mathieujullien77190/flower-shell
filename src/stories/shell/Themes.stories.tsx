@@ -86,7 +86,7 @@ const neon: ShellThemeInput = {
 <Shell
 	commands={{ ...baseCommands, test }}
 	themes={{ flower: flowerTheme, nord: nordTheme, neon }}
-	theme="flower"
+	theme="nord"
 	initialCommands={["title", "help theme"]}
 	dict={{ en: { theme: { neon: "Written from scratch, in the story file" } } }}
 />
@@ -97,7 +97,7 @@ const neon: ShellThemeInput = {
 	args: {
 		commands: { ...baseCommands, test },
 		themes: { flower: flowerTheme, nord: nordTheme, neon },
-		theme: "flower",
+		theme: "nord",
 		initialCommands: ["title", "help theme"],
 		dict: {
 			en: { theme: { neon: "Written from scratch, in the story file" } },
