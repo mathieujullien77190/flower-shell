@@ -135,6 +135,7 @@ frame content, so `scrollRef` has nothing left to say:
 	window={{
 		title: "flower-shell",
 		start: "right-top",
+		margin: "24px",
 		move: true,
 		canExpand: true,
 		canClose: true,
@@ -148,12 +149,18 @@ frame content, so `scrollRef` has nothing left to say:
 | `title` | the text of the title bar |
 | `move` | dragged by its bar; `true` by default |
 | `start` | the corner it opens in; `center-center` by default |
+| `margin` | how far it is held off the edges `start` sent it to; zero by default |
 | `canExpand` | the maximise button, and the double-click on the bar |
 | `canClose` | the closing cross |
 | `onClose` | called once the closing is animated, after the frame is gone |
 
 `start` reads horizontal first, then vertical, out of `left | center | right`
 and `top | center | bottom` — `right-top`, `left-bottom`, `center-center`.
+
+`margin` is a CSS length — `"24px"`, `"2rem"`, `"3%"` — and it only pushes
+against the edges the frame was sent to: an axis opened on `center` is already
+between two edges and stays where it is. Without it, the frame sits flush in
+its corner.
 
 The shell only takes the size of what holds it: give that a height, the
 package imposes none.
@@ -188,7 +195,7 @@ const container = useRef<HTMLDivElement>(null)
 | `title` | the text of the bar |
 | `bottomInset` | height reserved at the bottom, for a taskbar |
 | `compact` | full and not resizable |
-| `move` / `start` / `canExpand` / `canClose` | the same four as above |
+| `move` / `start` / `margin` / `canExpand` / `canClose` | the same five as above |
 | `layer` | stacking floor |
 | `rank` | rank in the cascade, so as not to open on top of the previous one |
 | `onFocus` / `onClose` | the window asks for the front, or closes |

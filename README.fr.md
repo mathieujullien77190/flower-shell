@@ -134,6 +134,7 @@ cadre : `scrollRef` n'a plus rien à dire.
 	window={{
 		title: "flower-shell",
 		start: "right-top",
+		margin: "24px",
 		move: true,
 		canExpand: true,
 		canClose: true,
@@ -147,6 +148,7 @@ cadre : `scrollRef` n'a plus rien à dire.
 | `title` | le texte de la barre de titre |
 | `move` | se déplace par sa barre ; `true` par défaut |
 | `start` | le coin où elle s'ouvre ; `center-center` par défaut |
+| `margin` | de combien elle est écartée des bords où `start` l'a envoyée ; zéro par défaut |
 | `canExpand` | le bouton d'agrandissement, et le double-clic sur la barre |
 | `canClose` | la croix de fermeture |
 | `onClose` | appelé une fois la fermeture animée, après que le cadre a disparu |
@@ -154,6 +156,11 @@ cadre : `scrollRef` n'a plus rien à dire.
 `start` se lit horizontale d'abord, puis verticale, parmi
 `left | center | right` et `top | center | bottom` — `right-top`,
 `left-bottom`, `center-center`.
+
+`margin` est une longueur CSS — `"24px"`, `"2rem"`, `"3%"` — et elle ne pousse
+que contre les bords où le cadre a été envoyé : un axe ouvert sur `center` est
+déjà entre deux bords et ne bouge pas. Sans elle, le cadre se colle dans son
+coin.
 
 Le shell ne prend que la taille de ce qui le tient : donnez-lui une hauteur,
 le paquet n'en impose aucune.
@@ -189,7 +196,7 @@ const container = useRef<HTMLDivElement>(null)
 | `title` | le texte de la barre |
 | `bottomInset` | hauteur réservée en bas, pour une barre des tâches |
 | `compact` | pleine et non redimensionnable |
-| `move` / `start` / `canExpand` / `canClose` | les quatre mêmes que ci-dessus |
+| `move` / `start` / `margin` / `canExpand` / `canClose` | les cinq mêmes que ci-dessus |
 | `layer` | étage d'empilement |
 | `rank` | rang dans la cascade, pour ne pas s'ouvrir sur la précédente |
 | `onFocus` / `onClose` | la fenêtre réclame le premier plan, ou se ferme |

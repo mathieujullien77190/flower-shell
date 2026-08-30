@@ -18,6 +18,8 @@ type ContainerProps = {
 	$layer: number
 	/** le coin du bureau ou la fenetre s'ouvre */
 	$start: WindowStart
+	/** la distance au bord, en CSS */
+	$margin: string
 	/**
 	 * Hauteur reservee en bas du conteneur, en CSS. Le bureau y met sa
 	 * barre des taches ; sans elle, la fenetre passerait dessous.
@@ -52,7 +54,18 @@ const ANCHOR = {
 	bottom: 100 - MEDIUM_SIZE,
 } as const
 
-const place = ({ $mode, $rank, $drag, $start }: ContainerProps) => {
+/**
+ * La distance au bord, appliquee du cote ou la fenetre est posee : elle
+ * l'ecarte du bord dont `start` la rapproche. Un axe centre n'a pas de bord
+ * a fuir, elle n'y veut rien dire.
+ */
+const offset = (word: keyof typeof ANCHOR, $margin: string) => {
+	if (word === "center") return ""
+
+	return ` ${word === "left" || word === "top" ? "+" : "-"} ${$margin}`
+}
+
+const place = ({ $mode, $rank, $drag, $start, $margin }: ContainerProps) => {
 	if ($mode === "full") return { top: 0, left: 0 }
 	if ($mode === "close") return { top: "50%", left: "50%" }
 
@@ -63,8 +76,8 @@ const place = ({ $mode, $rank, $drag, $start }: ContainerProps) => {
 	]
 
 	return {
-		top: `calc(${ANCHOR[y]}% + ${shift + $drag.y}px)`,
-		left: `calc(${ANCHOR[x]}% + ${shift + $drag.x}px)`,
+		top: `calc(${ANCHOR[y]}%${offset(y, $margin)} + ${shift + $drag.y}px)`,
+		left: `calc(${ANCHOR[x]}%${offset(x, $margin)} + ${shift + $drag.x}px)`,
 	}
 }
 

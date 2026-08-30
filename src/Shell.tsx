@@ -33,6 +33,12 @@ export type ShellWindowProps = {
   move?: boolean;
   /** le coin ou elle s'ouvre ; `center-center` par defaut */
   start?: WindowStart;
+  /**
+   * La distance au bord, en CSS : `"24px"`, `"2rem"`, `"3%"`. Elle ecarte
+   * la fenetre du bord dont `start` la rapproche, et ne s'applique donc pas
+   * aux axes centres. Zero par defaut.
+   */
+  margin?: string;
   /** le bouton d'agrandissement, et le double-clic sur la barre */
   canExpand?: boolean;
   /** la croix de fermeture */
@@ -241,6 +247,7 @@ export const Shell = ({
         title={frame.title}
         move={frame.move}
         start={frame.start}
+        margin={frame.margin}
         canExpand={frame.canExpand}
         canClose={frame.canClose}
         // la croix anime la fermeture puis previent : la fenetre part d'ici,

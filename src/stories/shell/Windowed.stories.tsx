@@ -17,7 +17,9 @@ import { source } from "../source"
  *
  * `start` is where it opens: the horizontal first, then the vertical, out of
  * `left | center | right` and `top | center | bottom`. `center-center` is
- * the default, and the place the frame has always taken.
+ * the default, and the place the frame has always taken. `margin` then holds
+ * it off the edges it was sent to — a CSS length, zero by default, and
+ * nothing at all on an axis that is centred.
  *
  * The shell only sizes itself on what holds it — the story gives the page a
  * height and a background, the package imposes neither.
@@ -50,7 +52,9 @@ import { Shell, baseCommands, test } from "flower-shell"
 	initialCommands={["title", "welcome"]}
 	window={{
 		title: "flower-shell",
+		// the top right corner, kept 24px off both edges
 		start: "right-top",
+		margin: "24px",
 		move: true,
 		canExpand: true,
 		canClose: true,
@@ -65,6 +69,7 @@ import { Shell, baseCommands, test } from "flower-shell"
 		window: {
 			title: "flower-shell",
 			start: "right-top",
+			margin: "24px",
 			move: true,
 			canExpand: true,
 			canClose: true,
@@ -78,6 +83,9 @@ import { Shell, baseCommands, test } from "flower-shell"
  * The same frame with everything taken away: it cannot be moved, cannot be
  * expanded, cannot be closed. The title bar loses its cursor with the
  * dragging, and the actions are empty — a fixed panel, opened bottom left.
+ *
+ * And no `margin`, which is the default: flush into the corner. Compare with
+ * the 24px of the story above.
  */
 export const Fixed: StoryObj<typeof Shell> = {
 	name: "In a fixed window",

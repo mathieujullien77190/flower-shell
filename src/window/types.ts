@@ -47,6 +47,12 @@ export type WindowProps = {
 	/** le coin ou elle s'ouvre ; `center-center` par defaut */
 	start?: WindowStart
 	/**
+	 * La distance au bord, en CSS : `"24px"`, `"2rem"`, `"3%"`. Elle ecarte
+	 * la fenetre du bord dont `start` la rapproche, et ne s'applique donc
+	 * pas aux axes centres, ni a la fenetre pleine. Zero par defaut.
+	 */
+	margin?: string
+	/**
 	 * Le bouton d'agrandissement, et le double-clic sur la barre. Faux le
 	 * retire et la fenetre garde son gabarit. `compact` l'emporte : pleine,
 	 * elle n'a plus rien a agrandir.

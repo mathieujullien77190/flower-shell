@@ -20,6 +20,7 @@ const BaseWindow = (
 		compact = false,
 		move = true,
 		start = "center-center",
+		margin = "0px",
 		canExpand = true,
 		canClose = true,
 		onFocus = () => {},
@@ -122,6 +123,7 @@ const BaseWindow = (
 					$layer={layer}
 					$bottomInset={bottomInset}
 					$start={start}
+					$margin={margin}
 					onMouseDown={onFocus}
 				>
 					<S.topBar
