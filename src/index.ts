@@ -7,7 +7,13 @@ export { test } from "./commands/test"
 export { title } from "./commands/title"
 
 export { run, runRestricted } from "./engine/send"
-export type { CommandListener } from "./engine/send"
+export type {
+	CommandErrorEvent,
+	CommandErrorListener,
+	CommandErrorReason,
+	CommandEvent,
+	CommandListener,
+} from "./engine/send"
 export {
 	autocompleteCommand,
 	createCommand,

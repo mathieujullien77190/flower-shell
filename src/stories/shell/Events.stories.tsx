@@ -4,6 +4,8 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
+import type { BaseCommand } from "../../types"
+import type { CommandErrorEvent, CommandEvent } from "../../engine/send"
 import { fresh } from "../decorators"
 import { source } from "../source"
 
@@ -12,20 +14,22 @@ import { source } from "../source"
  * is written from the four event props alone, one row per command with a
  * tick under each moment it has reached.
  *
- * `onCommandStart` fires before anything runs, off the line as it was sent
- * — so it fires for a command that does not exist too, which the others
- * never do. `onCommandDone` fires once the action has returned its text and
- * the effect has played: the command is over, but nothing is on screen yet.
+ * **Open the browser console.** Every event is logged there in full, which
+ * is where you see what the panel cannot show: each one carries the name,
+ * the arguments, and `pattern` — the whole line as it was sent.
+ *
+ * `onCommandStart` fires before anything runs, off that line — so it fires
+ * for a command that does not exist too, which the others never do.
+ * `onCommandDone` fires once the action has returned its text and the
+ * effect has played: the command is over, but nothing is on screen yet.
  * `onCommandRendered` fires when the text has finished being written, which
  * on a long output is a good while later.
  *
- * `onRestrictedCommand` is not a moment but a kind: it marks the commands
- * the visitor cannot type, played by the code — the opening here. It fires
- * alongside `onCommandDone`, which does not tell the two apart.
- *
- * Type `hello`, then `title` — the logo takes its time, and the gap between
- * the last two ticks is the animation. Then type something that does not
- * exist: only the first tick lands.
+ * `onCommandError` fires instead of `onCommandDone` when the command did not
+ * play, and says why through `reason`. Three lines to try, one for each:
+ * `nope` is `unknown`, `theme nope` is `args` — the command exists, the
+ * argument does not — and `boom` throws on purpose, which is `thrown` and
+ * carries the error itself.
  */
 
 type Watched = {
@@ -33,7 +37,16 @@ type Watched = {
 	args: string[]
 	done: boolean
 	rendered: boolean
-	restricted: boolean
+	error: string | null
+}
+
+/** a command that fails on purpose, to reach the third reason */
+const boom: BaseCommand = {
+	restricted: false,
+	action: () => {
+		throw new Error("boom, as advertised")
+	},
+	help: { patterns: [{ pattern: "boom", description: "throws on purpose" }] },
 }
 
 const Watcher = () => {
@@ -41,10 +54,12 @@ const Watcher = () => {
 	const [seen, setSeen] = useState<Watched[]>([])
 
 	// useCallback, or the listeners would be reset on every render
-	const start = useCallback((name: string, args: string[]) => {
+	const start = useCallback((event: CommandEvent) => {
+		// eslint-disable-next-line no-console
+		console.log("[onCommandStart]", event)
 		setSeen(list => [
 			...list,
-			{ name, args, done: false, rendered: false, restricted: false },
+			{ ...event, done: false, rendered: false, error: null },
 		])
 	}, [])
 
@@ -52,17 +67,36 @@ const Watcher = () => {
 	 * The mark lands on the last row still waiting for it: a name can be
 	 * played twice, and the rows are in the order the commands started.
 	 */
-	const mark = (key: "done" | "rendered" | "restricted") => (name: string) =>
+	const mark = (key: "done" | "rendered") => (event: CommandEvent) => {
+		// eslint-disable-next-line no-console
+		console.log(`[onCommand${key === "done" ? "Done" : "Rendered"}]`, event)
 		setSeen(list => {
-			const index = list.findLastIndex(row => row.name === name && !row[key])
+			const index = list.findLastIndex(
+				row => row.name === event.name && !row[key]
+			)
 			if (index === -1) return list
 
 			return list.map((row, i) => (i === index ? { ...row, [key]: true } : row))
 		})
+	}
 
 	const done = useCallback(mark("done"), [])
 	const rendered = useCallback(mark("rendered"), [])
-	const restricted = useCallback(mark("restricted"), [])
+
+	const failed = useCallback((event: CommandErrorEvent) => {
+		// eslint-disable-next-line no-console
+		console.error("[onCommandError]", event)
+		setSeen(list => {
+			const index = list.findLastIndex(
+				row => row.name === event.name && !row.error
+			)
+			if (index === -1) return list
+
+			return list.map((row, i) =>
+				i === index ? { ...row, error: event.reason } : row
+			)
+		})
+	}, [])
 
 	return (
 		<div
@@ -85,13 +119,13 @@ const Watcher = () => {
 				}}
 			>
 				<Shell
-					commands={{ ...baseCommands, test }}
+					commands={{ ...baseCommands, test, boom }}
 					initialCommands={["title", "welcome"]}
 					scrollRef={box}
 					onCommandStart={start}
 					onCommandDone={done}
 					onCommandRendered={rendered}
-					onRestrictedCommand={restricted}
+					onCommandError={failed}
 				/>
 			</div>
 
@@ -107,6 +141,11 @@ const Watcher = () => {
 					background: "#f7f7f5",
 				}}
 			>
+				<p style={{ margin: "0 0 12px", opacity: 0.75 }}>
+					Every event is logged in full to the browser console — open it to
+					read the arguments and the whole line.
+				</p>
+
 				<div
 					style={{
 						display: "grid",
@@ -148,21 +187,20 @@ const Row = ({ row }: { row: Watched }) => (
 		>
 			<strong>{row.name}</strong>{" "}
 			<span style={{ opacity: 0.6 }}>{row.args.join(" ")}</span>
-			{/* onRestrictedCommand : une sorte, pas un moment — elle tient donc
-			    au nom et non a une colonne de plus */}
-			{row.restricted && (
+			{/* la raison, pas un moment de plus : elle tient donc au nom */}
+			{row.error && (
 				<span
-					title="onRestrictedCommand"
+					title="onCommandError"
 					style={{
 						marginLeft: 6,
 						padding: "1px 5px",
 						borderRadius: 3,
 						fontSize: 11,
-						background: "#00000012",
-						opacity: 0.7,
+						background: "#c0392b",
+						color: "#ffffff",
 					}}
 				>
-					restricted
+					{row.error}
 				</span>
 			)}
 		</span>
@@ -185,43 +223,51 @@ export const Events: StoryObj<typeof Shell> = {
 import { useCallback, useRef, useState } from "react"
 import { Shell, baseCommands, test } from "flower-shell"
 
+// a command that fails on purpose, to reach the third reason
+const boom = {
+	restricted: false,
+	action: () => {
+		throw new Error("boom, as advertised")
+	},
+	help: { patterns: [{ pattern: "boom", description: "throws on purpose" }] },
+}
+
 const Watcher = () => {
-	const box = useRef<HTMLDivElement>(null)
+	const box = useRef(null)
 	const [seen, setSeen] = useState([])
 
-	// useCallback, or the listeners would be reset on every render
-	const start = useCallback((name, args) => {
-		setSeen(list => [
-			...list,
-			{ name, args, done: false, rendered: false, restricted: false },
-		])
+	// every event carries { name, args, pattern }: the whole line as sent
+	const start = useCallback(event => {
+		console.log("[onCommandStart]", event)
+		setSeen(list => [...list, { ...event, done: false, rendered: false, error: null }])
 	}, [])
 
 	// the mark lands on the last row still waiting for it: a name can be
 	// played twice, and the rows are in the order the commands started
-	const mark = key => name =>
+	const mark = key => event =>
 		setSeen(list => {
-			const index = list.findLastIndex(row => row.name === name && !row[key])
+			const index = list.findLastIndex(row => row.name === event.name && !row[key])
 			if (index === -1) return list
 
 			return list.map((row, i) => (i === index ? { ...row, [key]: true } : row))
 		})
 
+	// reason is "unknown", "args" or "thrown" — the last one carries error
+	const failed = useCallback(event => {
+		console.error("[onCommandError]", event)
+	}, [])
+
 	return (
 		<div style={{ display: "flex", gap: 16, height: "100vh" }}>
 			<div ref={box} style={{ flex: 1, overflowY: "auto" }}>
 				<Shell
-					commands={{ ...baseCommands, test }}
+					commands={{ ...baseCommands, test, boom }}
 					initialCommands={["title", "welcome"]}
 					scrollRef={box}
-					// before anything runs — fires for an unknown command too
 					onCommandStart={start}
-					// the action returned its text, nothing is on screen yet
 					onCommandDone={useCallback(mark("done"), [])}
-					// the text has finished being written
 					onCommandRendered={useCallback(mark("rendered"), [])}
-					// played by the code, not typed — alongside onCommandDone
-					onRestrictedCommand={useCallback(mark("restricted"), [])}
+					onCommandError={failed}
 				/>
 			</div>
 

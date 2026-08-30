@@ -5,7 +5,7 @@ import Window from "./window";
 import type { WindowStart } from "./window/types";
 
 import { run, runRestricted, setListeners } from "./engine/send";
-import type { CommandListener } from "./engine/send";
+import type { CommandErrorListener, CommandListener } from "./engine/send";
 import { setDict } from "./i18n/lang";
 import { getCommands, setCommands } from "./state/registry";
 import {
@@ -124,12 +124,15 @@ export type ShellProps = {
    */
   onCommandRendered?: CommandListener;
   /**
-   * Une commande restreinte a joue : une que le visiteur ne peut pas taper,
-   * lancee par le code — l'ouverture, un clic sur un marqueur, un appel a
-   * `runRestricted`. Elle part en plus de `onCommandDone`, qui ne fait pas
-   * la difference entre une commande tapee et une jouee par le code.
+   * La commande n'a pas joue. `reason` dit pourquoi : `unknown` quand
+   * aucune commande ne porte ce nom, `args` quand elle existe mais que ses
+   * arguments ne passent pas, `thrown` quand son action ou son effet a
+   * leve — et l'erreur est alors dans `error`.
+   *
+   * Un shell au registre vide n'a rien a redire : il laisse passer ce
+   * qu'on lui tape, et ne signale donc aucune erreur.
    */
-  onRestrictedCommand?: CommandListener;
+  onCommandError?: CommandErrorListener;
 };
 
 /**
@@ -153,7 +156,7 @@ export const Shell = ({
   onCommandStart,
   onCommandDone,
   onCommandRendered,
-  onRestrictedCommand,
+  onCommandError,
 }: ShellProps) => {
   /**
    * Le cadre, quand la prop `window` est donnee. `area` borne le
@@ -200,9 +203,9 @@ export const Shell = ({
     setListeners({
       start: onCommandStart,
       done: onCommandDone,
-      restricted: onRestrictedCommand,
+      error: onCommandError,
     });
-  }, [onCommandStart, onCommandDone, onRestrictedCommand]);
+  }, [onCommandStart, onCommandDone, onCommandError]);
 
   // apres le montage, jamais pendant le rendu : la langue du navigateur
   // n'existe pas au prerendu, l'appliquer plus tot ferait diverger le HTML
@@ -259,7 +262,13 @@ export const Shell = ({
       shellActions().setIsRendered(id);
       scrollDown();
 
-      if (first && done.canExecute) onCommandRendered?.(done.name, done.args);
+      if (first && done.canExecute) {
+        onCommandRendered?.({
+          name: done.name,
+          args: done.args,
+          pattern: done.pattern,
+        });
+      }
     },
     [scrollDown, onCommandRendered],
   );

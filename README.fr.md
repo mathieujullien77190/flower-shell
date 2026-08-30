@@ -26,7 +26,7 @@ const App = () => <Shell commands={baseCommands} />
 | `onCommandStart` | avant que la commande ne joue ; part aussi pour une commande inconnue |
 | `onCommandDone` | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran |
 | `onCommandRendered` | le texte a fini de s'écrire |
-| `onRestrictedCommand` | une commande que le visiteur ne peut pas taper a joué ; en plus de `onCommandDone` |
+| `onCommandError` | la commande n'a pas joué ; `reason` dit pourquoi |
 
 Toutes les props sont facultatives : `<Shell />` se monte nu. Le registre
 vide, il affiche l'invite et ne répond à rien — une ligne tapée passe à la
@@ -93,24 +93,29 @@ chose après lui est à vous de l'écrire, depuis `onCommandDone` et
 
 ## Suivre les commandes
 
-Trois moments de la vie d'une commande, et une sorte. Les quatre reçoivent le
-nom et les arguments :
+Quatre props, quatre moments. Chacune reçoit un objet, de la même forme d'un
+bout à l'autre :
 
 ```tsx
 <Shell
 	commands={baseCommands}
-	onCommandStart={(name, args) => console.log("about to run", name, args)}
-	onCommandDone={(name) => console.log("ran", name)}
-	onCommandRendered={(name) => console.log("written out", name)}
-	onRestrictedCommand={(name) => console.log("played by the code", name)}
+	onCommandStart={event => console.log("about to run", event.pattern)}
+	onCommandDone={event => console.log("ran", event.name, event.args)}
+	onCommandRendered={event => console.log("written out", event.name)}
+	onCommandError={event => console.error(event.reason, event.pattern)}
 />
 ```
 
-`onCommandStart` part avant que quoi que ce soit ne joue, lu sur la ligne
-telle qu'elle a été envoyée. À ce moment le shell ne sait pas encore s'il
-connaît une commande de ce nom, donc celle-ci **part aussi pour une ligne
-qu'il refusera** — c'est ce qui en fait l'endroit où voir tout ce qui est
-tapé. Les autres ne partent jamais pour une commande qui n'a pas pu jouer.
+| champ | |
+| --- | --- |
+| `name` | le premier mot de la ligne |
+| `args` | le reste, mot à mot |
+| `pattern` | la ligne entière, telle qu'elle a été envoyée |
+
+`onCommandStart` part avant que quoi que ce soit ne joue, lu sur cette ligne.
+À ce moment le shell ne sait pas encore s'il connaît une commande de ce nom,
+donc celle-ci **part aussi pour une ligne qu'il refusera** — c'est ce qui en
+fait l'endroit où voir tout ce qui est tapé.
 
 `onCommandDone` part une fois que l'action a rendu son texte et que l'effet a
 joué. La commande est faite ; rien n'est encore à l'écran.
@@ -119,10 +124,17 @@ joué. La commande est faite ; rien n'est encore à l'écran.
 longue, c'est bien après `onCommandDone` — l'animation l'écrit lettre par
 lettre. Il part une fois par commande, au passage.
 
-`onRestrictedCommand` n'est pas un moment mais une sorte. Il marque les
-commandes que le visiteur ne peut pas taper — l'ouverture, un clic sur un
-marqueur, tout appel à `runRestricted` — et part en plus de `onCommandDone`,
-qui ne distingue pas une commande tapée d'une commande jouée par le code.
+`onCommandError` part **à la place de** `onCommandDone` quand la commande n'a
+pas joué, et ajoute `reason` à l'objet :
+
+| `reason` | |
+| --- | --- |
+| `unknown` | aucune commande de ce nom dans le registre |
+| `args` | la commande existe, ses arguments ne passent pas |
+| `thrown` | son action ou son effet a levé ; ce qui a été levé est dans `error` |
+
+Un shell au registre vide n'a rien à redire — il laisse passer ce qu'on lui
+tape, exprès — et ne signale donc aucune erreur.
 
 ## Écrire une commande
 
@@ -411,10 +423,13 @@ Les stories sont sous `src/stories`, une par cas : le shell nu, avec des
 commandes personnalisées, dans une fenêtre, dans chaque langue. Chacune montre
 le code qui la produit, imports compris.
 
-**Shell / Events** pose un panneau à côté du terminal et le remplit avec
-les seules quatre props d'évènement : une ligne par commande, une coche sous
-chaque moment qu'elle a atteint. Tapez `title` et regardez l'écart entre les
-deux dernières coches — c'est l'animation.
+**Shell / Events** pose un panneau à côté du terminal et le remplit avec les
+seules quatre props d'évènement : une ligne par commande, une coche sous
+chaque moment qu'elle a atteint. Chaque évènement part aussi en entier dans
+la console du navigateur — ouvrez-la, c'est là que sont les arguments et la
+ligne complète. Tapez `title` et regardez l'écart entre les deux dernières
+coches, c'est l'animation ; puis `nope`, `theme nope` et `boom`, un pour
+chaque raison que porte une erreur.
 
 **Shell / Theme builder** est un créateur de thème : on part d'un thème du
 catalogue, on déplace les couleurs, l'aperçu suit, et le bloc du bas est la

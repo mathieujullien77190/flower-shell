@@ -26,7 +26,7 @@ const App = () => <Shell commands={baseCommands} />
 | `onCommandStart` | before the command runs; fires for an unknown one too |
 | `onCommandDone` | the action returned its text and the effect played; nothing on screen yet |
 | `onCommandRendered` | the text has finished being written |
-| `onRestrictedCommand` | a command the visitor cannot type has played; alongside `onCommandDone` |
+| `onCommandError` | the command did not play; `reason` says why |
 
 Every prop is optional: `<Shell />` mounts bare. With an empty registry it
 shows the prompt and answers nothing — a typed line moves on to the next, with
@@ -93,24 +93,29 @@ something back after it is yours to write, from `onCommandDone` and
 
 ## Watching the commands
 
-Three moments in the life of a command, and one kind. All four are handed the
-name and the arguments:
+Four props, four moments. Each is handed one object, the same shape
+throughout:
 
 ```tsx
 <Shell
 	commands={baseCommands}
-	onCommandStart={(name, args) => console.log("about to run", name, args)}
-	onCommandDone={(name) => console.log("ran", name)}
-	onCommandRendered={(name) => console.log("written out", name)}
-	onRestrictedCommand={(name) => console.log("played by the code", name)}
+	onCommandStart={event => console.log("about to run", event.pattern)}
+	onCommandDone={event => console.log("ran", event.name, event.args)}
+	onCommandRendered={event => console.log("written out", event.name)}
+	onCommandError={event => console.error(event.reason, event.pattern)}
 />
 ```
 
-`onCommandStart` fires before anything runs, off the line as it was sent. At
-that point the shell does not yet know whether it has a command of that name,
-so this one **also fires for a line it will refuse** — which is what makes it
-the place to watch everything typed. The other two never fire for a command
-that could not run.
+| field | |
+| --- | --- |
+| `name` | the first word of the line |
+| `args` | the rest of it, word by word |
+| `pattern` | the whole line, as it was sent |
+
+`onCommandStart` fires before anything runs, off that line. At that point the
+shell does not yet know whether it has a command of that name, so this one
+**also fires for a line it will refuse** — which is what makes it the place to
+watch everything typed.
 
 `onCommandDone` fires once the action has returned its text and the effect has
 played. The command is over; nothing is on screen yet.
@@ -119,10 +124,17 @@ played. The command is over; nothing is on screen yet.
 output that is a good while after `onCommandDone` — the animation writes it
 letter by letter. It fires once per command, on the crossing.
 
-`onRestrictedCommand` is not a moment but a kind. It marks the commands the
-visitor cannot type — the opening, a click on a marker, any `runRestricted`
-call — and fires alongside `onCommandDone`, which does not tell a typed
-command from one played by the code.
+`onCommandError` fires **instead of** `onCommandDone` when the command did not
+play, and adds `reason` to the object:
+
+| `reason` | |
+| --- | --- |
+| `unknown` | no command of that name in the registry |
+| `args` | the command exists, its arguments do not pass |
+| `thrown` | its action or its effect threw; the throw itself is in `error` |
+
+A shell with an empty registry has nothing to object to — it lets a typed line
+through on purpose — so it reports no error at all.
 
 ## Writing a command
 
@@ -408,8 +420,10 @@ imports included.
 
 **Shell / Events** puts a panel beside the terminal and fills it from the four
 event props alone: one row per command, a tick under each moment it has
-reached. Type `title` and watch the gap between the last two ticks — that is
-the animation.
+reached. Every event is also logged in full to the browser console — open it,
+that is where the arguments and the whole line are. Type `title` and watch the
+gap between the last two ticks, that is the animation; then `nope`,
+`theme nope` and `boom`, one for each reason an error carries.
 
 **Shell / Theme builder** is a theme maker: you start from a theme of the
 catalogue, move the colours, the preview follows, and the block at the bottom

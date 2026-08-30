@@ -2,28 +2,53 @@ import { getCommands } from "@state/registry"
 import { shellActions } from "@state/store"
 import { createCommand, findCommand } from "./terminalEngine"
 
-/** ce que recoit un temoin : le nom de la commande, et ses arguments */
-export type CommandListener = (name: string, args: string[]) => void
+/** ce que recoit un temoin : la ligne envoyee, entiere et decoupee */
+export type CommandEvent = {
+	/** le nom : le premier mot de la ligne */
+	name: string
+	/** les arguments : le reste de la ligne, mot a mot */
+	args: string[]
+	/** la ligne entiere, telle qu'elle a ete envoyee */
+	pattern: string
+}
 
-const NO_LISTENER: CommandListener = () => {}
+/** pourquoi la commande n'a pas joue */
+export type CommandErrorReason =
+	/** aucune commande de ce nom dans le registre */
+	| "unknown"
+	/** la commande existe, ses arguments ne passent pas */
+	| "args"
+	/** son action ou son effet a leve */
+	| "thrown"
+
+export type CommandErrorEvent = CommandEvent & {
+	reason: CommandErrorReason
+	/** ce qui a ete leve, pour la seule raison `thrown` */
+	error?: unknown
+}
+
+export type CommandListener = (event: CommandEvent) => void
+export type CommandErrorListener = (event: CommandErrorEvent) => void
+
+const NO_LISTENER = () => {}
 
 /**
- * Les deux temoins que ce module peut prevenir, poses par le consommateur.
- * Le troisieme — la commande a fini de s'ecrire — appartient au rendu et
- * vit dans le shell : ici, rien ne sait ce qui est a l'ecran.
+ * Les temoins que ce module peut prevenir, poses par le consommateur. Celui
+ * de la fin d'ecriture appartient au rendu et vit dans le shell : ici, rien
+ * ne sait ce qui est a l'ecran.
  */
 let onStart: CommandListener = NO_LISTENER
 let onDone: CommandListener = NO_LISTENER
-let onRestricted: CommandListener = NO_LISTENER
+let onError: CommandErrorListener = NO_LISTENER
 
 export const setListeners = (listeners: {
 	start?: CommandListener
 	done?: CommandListener
-	restricted?: CommandListener
+	error?: CommandErrorListener
 }) => {
 	onStart = listeners.start || NO_LISTENER
 	onDone = listeners.done || NO_LISTENER
-	onRestricted = listeners.restricted || NO_LISTENER
+	onError = listeners.error || NO_LISTENER
 }
 
 /**
@@ -41,27 +66,54 @@ const send = (commandPattern: string, restricted: boolean) => {
 	 * — a ce moment le shell ne sait pas encore s'il en connait une.
 	 */
 	const split = commandPattern.split(" ")
-	onStart(split[0], split.slice(1))
+	const event: CommandEvent = {
+		name: split[0],
+		args: split.slice(1),
+		pattern: commandPattern,
+	}
 
-	const cmd = createCommand({ commands, commandPattern, restricted })
+	onStart(event)
+
+	let cmd
+	try {
+		cmd = createCommand({ commands, commandPattern, restricted })
+	} catch (error) {
+		// l'action a leve : la commande n'existe meme pas assez pour etre
+		// ajoutee a l'historique, il n'y a que l'erreur a rendre
+		onError({ ...event, reason: "thrown", error })
+		return
+	}
+
 	const baseCmd = findCommand({ commands, name: cmd.name, restricted })
 
-	if (baseCmd?.effect && cmd.canExecute) baseCmd.effect({ args: cmd.args })
+	if (baseCmd?.effect && cmd.canExecute) {
+		try {
+			baseCmd.effect({ args: cmd.args })
+		} catch (error) {
+			// l'effet a leve apres que l'action a rendu son texte : la ligne
+			// s'affiche quand meme, le consommateur apprend que le reste a rate
+			onError({ ...event, reason: "thrown", error })
+		}
+	}
 
 	shellActions().addCommand(cmd)
 
-	// l'action a rendu son texte et l'effet a joue : la commande est faite,
-	// meme si rien n'est encore a l'ecran
 	if (cmd.canExecute) {
-		onDone(cmd.name, cmd.args)
-
-		/**
-		 * Et, en plus, si elle est passee par le canal restreint. Les deux
-		 * partent : `onDone` ne fait pas de difference entre une commande
-		 * tapee et une jouee par le code, et c'est celui-ci qui la fait.
-		 */
-		if (restricted) onRestricted(cmd.name, cmd.args)
+		// l'action a rendu son texte et l'effet a joue : la commande est faite,
+		// meme si rien n'est encore a l'ecran
+		onDone(event)
+		return
 	}
+
+	/**
+	 * Un shell sans aucune commande laisse passer ce qu'on lui tape — c'est
+	 * un choix du consommateur, pas une faute du visiteur, et rien n'est
+	 * donc a signaler. Ailleurs, la ligne n'a pas joue : soit le nom est
+	 * inconnu, soit il existe et ses arguments ne passent pas.
+	 */
+	if (Object.keys(commands).length === 0) return
+
+	onError({ ...event, reason: baseCmd ? "args" : "unknown" })
 }
 
 /** joue une commande du visiteur */
