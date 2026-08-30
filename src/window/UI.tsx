@@ -136,6 +136,15 @@ export const topBar = styled.div<{ $move: boolean }>`
 	padding: ${FULL.padding};
 	/* le curseur annonce ce que la barre fait : rien, quand elle ne bouge pas */
 	cursor: ${({ $move }) => ($move ? "move" : "default")};
+
+	/* La barre est ce qu'on attrape pour deplacer la fenetre : sans cela le
+	   glisser selectionne le titre, qui reste surligne une fois la souris
+	   relachee. Les boutons en heritent, et il n'y a rien a copier non plus
+	   dans une croix.
+
+	   Seule la barre est visee : la sortie du terminal, elle, se selectionne
+	   — c'est meme ce qui revele le marqueur invisible. */
+	user-select: none;
 `
 
 export const Content = styled.div`
