@@ -1,7 +1,7 @@
 import { ReactNode, RefObject } from "react"
 
 export type Pos = { x: number; y: number }
-export type Mode = "medium" | "full" | "close"
+export type Mode = "medium" | "full"
 
 /**
  * Le coin du bureau ou la fenetre s'ouvre : l'horizontale, puis la
@@ -60,8 +60,12 @@ export type WindowProps = {
 	canExpand?: boolean
 	/** la croix de fermeture ; vrai par defaut */
 	canClose?: boolean
+	/**
+	 * Elle ne ferme pas d'elle-meme : la croix previent, et c'est `show`
+	 * qui la fait disparaitre. A qui l'affiche de le passer a faux.
+	 */
+	onClose?: () => void
 	/** la fenetre reclame le premier plan */
 	onFocus?: () => void
 	children: ReactNode
-	onClose?: () => void
 }

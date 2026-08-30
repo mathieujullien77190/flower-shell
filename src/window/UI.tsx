@@ -67,7 +67,6 @@ const offset = (word: keyof typeof ANCHOR, $margin: string) => {
 
 const place = ({ $mode, $rank, $drag, $start, $margin }: ContainerProps) => {
 	if ($mode === "full") return { top: 0, left: 0 }
-	if ($mode === "close") return { top: "50%", left: "50%" }
 
 	const shift = $rank * CASCADE
 	const [x, y] = $start.split("-") as [
@@ -87,8 +86,6 @@ export const Container = styled.div.attrs<ContainerProps>(props => ({
 	position: absolute;
 
 	${({ $mode, $bottomInset }) => {
-		if ($mode === "close") return "width: 0; height: 0;"
-
 		const side = $mode === "full" ? 100 : MEDIUM_SIZE
 		return `
 			width: calc(${side}% - ${FULL.borderSize} * 2);
@@ -190,14 +187,12 @@ export const Actions = styled.div`
 	}
 `
 
-export const Wrapper = styled.div<{ $ready: boolean; $mode: Mode }>`
+/**
+ * Le contenu, a plein. Il attendait autrefois que la fenetre soit arrivee a
+ * sa taille pour se montrer, en fondu : la fenetre arrive maintenant a sa
+ * taille du premier coup, et il n'y a plus rien a attendre.
+ */
+export const Wrapper = styled.div`
 	width: 100%;
 	height: 100%;
-	opacity: ${({ $ready }) => ($ready ? 1 : 0)};
-
-	${({ $mode }) =>
-		$mode !== "close" &&
-		`
-    transition: all ${ANIM_TIME / 1000}s ease-out;
-  `};
 `

@@ -20,11 +20,24 @@ const Command = ({
 	const name = command.name
 	const args = command.args.map(arg => `${arg}`).join(" ")
 
+	/**
+	 * Deja ecrite une fois, elle se repose telle quelle. Le terminal peut
+	 * etre demonte puis remonte — une fenetre qu'on ferme et qu'on rouvre —
+	 * alors que l'historique, lui, vit au niveau du module : sans cela tout
+	 * se reecrirait lettre par lettre, et le logo tient vingt secondes.
+	 *
+	 * Cela l'emporte sur `display.animation` : une commande qui reclame son
+	 * animation la reclame pour la fois ou elle joue, pas pour les rendus
+	 * suivants d'un texte deja lu.
+	 */
+	const written = command.isRendered
+
 	const displayResult = useDisplayByLetter({
 		baseTxt: command.result,
 		canRendered,
-		animation:
-			baseCommand?.display?.animation !== undefined
+		animation: written
+			? false
+			: baseCommand?.display?.animation !== undefined
 				? baseCommand?.display?.animation
 				: animation,
 		reverse: baseCommand?.display?.reverse,

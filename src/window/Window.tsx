@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, Ref, forwardRef } from "react"
 import { WindowProps, Pos, Mode } from "./types"
 import * as S from "./UI"
-import { ANIM_TIME, TOP_LAYER } from "./constants"
+import { TOP_LAYER } from "./constants"
 import { clampDrag } from "./helpers"
 
 const NO_DRAG: Pos = { x: 0, y: 0 }
@@ -30,9 +30,8 @@ const BaseWindow = (
 ) => {
 	const [userMode, setUserMode] = useState<Mode>("medium")
 
-	// en mode compact la fenetre reste pleine et non redimensionnable.
-	// "close" passe quand meme, sinon l'animation de fermeture disparaitrait
-	const mode: Mode = compact && userMode !== "close" ? "full" : userMode
+	// en mode compact la fenetre reste pleine et non redimensionnable
+	const mode: Mode = compact ? "full" : userMode
 
 	// pleine, elle n'a plus rien a agrandir : `compact` l'emporte sur le choix
 	const expandable = canExpand && !compact
@@ -44,18 +43,9 @@ const BaseWindow = (
 	 * le meme placement, suit le redimensionnement, et se passe des deux.
 	 */
 	const [drag, setDrag] = useState<Pos>(NO_DRAG)
-	const [ready, setReady] = useState<boolean>(false)
 	const [followMouse, setFollowMouse] = useState<boolean>(false)
 
 	const boxRef = useRef<HTMLDivElement>(null)
-
-	// le contenu n'apparait qu'une fois la fenetre arrivee a sa taille
-	useEffect(() => {
-		if (!show || mode === "close") return
-
-		const timer = window.setTimeout(() => setReady(true), ANIM_TIME + 100)
-		return () => window.clearTimeout(timer)
-	}, [show, mode])
 
 	const handleResize = () => {
 		// changer de taille remet la fenetre a sa place : le deplacement
@@ -64,15 +54,15 @@ const BaseWindow = (
 		setUserMode(prev => (prev === "full" ? "medium" : "full"))
 	}
 
+	/**
+	 * La croix previent, et rien de plus : c'est `show` qui fait disparaitre
+	 * la fenetre, et il vient de l'exterieur. Elle se remet droite au
+	 * passage — deplacee, agrandie, elle rouvrirait telle qu'on l'a laissee.
+	 */
 	const handleClose = () => {
-		setReady(false)
-		setUserMode("close")
-		window.setTimeout(() => {
-			onClose()
-
-			setDrag(NO_DRAG)
-			setUserMode("medium")
-		}, ANIM_TIME + 100)
+		setDrag(NO_DRAG)
+		setUserMode("medium")
+		onClose()
 	}
 
 	useEffect(() => {
@@ -145,7 +135,7 @@ const BaseWindow = (
 						</S.Actions>
 					</S.topBar>
 					<S.Content ref={ref}>
-						<S.Wrapper $ready={ready} $mode={mode}>
+						<S.Wrapper>
 							{children}
 						</S.Wrapper>
 					</S.Content>
