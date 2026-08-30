@@ -26,6 +26,7 @@ const App = () => <Shell commands={baseCommands} />
 | `onCommandStart` | before the command runs; fires for an unknown one too |
 | `onCommandDone` | the action returned its text and the effect played; nothing on screen yet |
 | `onCommandRendered` | the text has finished being written |
+| `onRestrictedCommand` | a command the visitor cannot type has played; alongside `onCommandDone` |
 
 Every prop is optional: `<Shell />` mounts bare. With an empty registry it
 shows the prompt and answers nothing — a typed line moves on to the next, with
@@ -92,8 +93,8 @@ something back after it is yours to write, from `onCommandDone` and
 
 ## Watching the commands
 
-Three props, three moments in the life of a command. All three are handed
-the name and the arguments:
+Three moments in the life of a command, and one kind. All four are handed the
+name and the arguments:
 
 ```tsx
 <Shell
@@ -101,6 +102,7 @@ the name and the arguments:
 	onCommandStart={(name, args) => console.log("about to run", name, args)}
 	onCommandDone={(name) => console.log("ran", name)}
 	onCommandRendered={(name) => console.log("written out", name)}
+	onRestrictedCommand={(name) => console.log("played by the code", name)}
 />
 ```
 
@@ -116,6 +118,11 @@ played. The command is over; nothing is on screen yet.
 `onCommandRendered` fires when the text has finished being written. On a long
 output that is a good while after `onCommandDone` — the animation writes it
 letter by letter. It fires once per command, on the crossing.
+
+`onRestrictedCommand` is not a moment but a kind. It marks the commands the
+visitor cannot type — the opening, a click on a marker, any `runRestricted`
+call — and fires alongside `onCommandDone`, which does not tell a typed
+command from one played by the code.
 
 ## Writing a command
 
@@ -399,9 +406,9 @@ The stories live under `src/stories`, one per case: the bare shell, with custom
 commands, in a window, in each language. Each shows the code that produces it,
 imports included.
 
-**Shell / On command** puts a panel beside the terminal and fills it from the
-three props alone: one row per command, a mark under each moment it has
-reached. Type `title` and watch the gap between the last two marks — that is
+**Shell / Events** puts a panel beside the terminal and fills it from the four
+event props alone: one row per command, a tick under each moment it has
+reached. Type `title` and watch the gap between the last two ticks — that is
 the animation.
 
 **Shell / Theme builder** is a theme maker: you start from a theme of the

@@ -26,6 +26,7 @@ const App = () => <Shell commands={baseCommands} />
 | `onCommandStart` | avant que la commande ne joue ; part aussi pour une commande inconnue |
 | `onCommandDone` | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran |
 | `onCommandRendered` | le texte a fini de s'écrire |
+| `onRestrictedCommand` | une commande que le visiteur ne peut pas taper a joué ; en plus de `onCommandDone` |
 
 Toutes les props sont facultatives : `<Shell />` se monte nu. Le registre
 vide, il affiche l'invite et ne répond à rien — une ligne tapée passe à la
@@ -92,7 +93,7 @@ chose après lui est à vous de l'écrire, depuis `onCommandDone` et
 
 ## Suivre les commandes
 
-Trois props, trois moments de la vie d'une commande. Les trois reçoivent le
+Trois moments de la vie d'une commande, et une sorte. Les quatre reçoivent le
 nom et les arguments :
 
 ```tsx
@@ -101,6 +102,7 @@ nom et les arguments :
 	onCommandStart={(name, args) => console.log("about to run", name, args)}
 	onCommandDone={(name) => console.log("ran", name)}
 	onCommandRendered={(name) => console.log("written out", name)}
+	onRestrictedCommand={(name) => console.log("played by the code", name)}
 />
 ```
 
@@ -108,8 +110,7 @@ nom et les arguments :
 telle qu'elle a été envoyée. À ce moment le shell ne sait pas encore s'il
 connaît une commande de ce nom, donc celle-ci **part aussi pour une ligne
 qu'il refusera** — c'est ce qui en fait l'endroit où voir tout ce qui est
-tapé. Les deux autres ne partent jamais pour une commande qui n'a pas pu
-jouer.
+tapé. Les autres ne partent jamais pour une commande qui n'a pas pu jouer.
 
 `onCommandDone` part une fois que l'action a rendu son texte et que l'effet a
 joué. La commande est faite ; rien n'est encore à l'écran.
@@ -117,6 +118,11 @@ joué. La commande est faite ; rien n'est encore à l'écran.
 `onCommandRendered` part quand le texte a fini de s'écrire. Sur une sortie
 longue, c'est bien après `onCommandDone` — l'animation l'écrit lettre par
 lettre. Il part une fois par commande, au passage.
+
+`onRestrictedCommand` n'est pas un moment mais une sorte. Il marque les
+commandes que le visiteur ne peut pas taper — l'ouverture, un clic sur un
+marqueur, tout appel à `runRestricted` — et part en plus de `onCommandDone`,
+qui ne distingue pas une commande tapée d'une commande jouée par le code.
 
 ## Écrire une commande
 
@@ -405,10 +411,10 @@ Les stories sont sous `src/stories`, une par cas : le shell nu, avec des
 commandes personnalisées, dans une fenêtre, dans chaque langue. Chacune montre
 le code qui la produit, imports compris.
 
-**Shell / On command** pose un panneau à côté du terminal et le remplit avec
-les seules trois props : une ligne par commande, une marque sous chaque
-moment qu'elle a atteint. Tapez `title` et regardez l'écart entre les deux
-dernières marques — c'est l'animation.
+**Shell / Events** pose un panneau à côté du terminal et le remplit avec
+les seules quatre props d'évènement : une ligne par commande, une coche sous
+chaque moment qu'elle a atteint. Tapez `title` et regardez l'écart entre les
+deux dernières coches — c'est l'animation.
 
 **Shell / Theme builder** est un créateur de thème : on part d'un thème du
 catalogue, on déplace les couleurs, l'aperçu suit, et le bloc du bas est la

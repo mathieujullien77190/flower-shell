@@ -14,13 +14,16 @@ const NO_LISTENER: CommandListener = () => {}
  */
 let onStart: CommandListener = NO_LISTENER
 let onDone: CommandListener = NO_LISTENER
+let onRestricted: CommandListener = NO_LISTENER
 
 export const setListeners = (listeners: {
 	start?: CommandListener
 	done?: CommandListener
+	restricted?: CommandListener
 }) => {
 	onStart = listeners.start || NO_LISTENER
 	onDone = listeners.done || NO_LISTENER
+	onRestricted = listeners.restricted || NO_LISTENER
 }
 
 /**
@@ -49,7 +52,16 @@ const send = (commandPattern: string, restricted: boolean) => {
 
 	// l'action a rendu son texte et l'effet a joue : la commande est faite,
 	// meme si rien n'est encore a l'ecran
-	if (cmd.canExecute) onDone(cmd.name, cmd.args)
+	if (cmd.canExecute) {
+		onDone(cmd.name, cmd.args)
+
+		/**
+		 * Et, en plus, si elle est passee par le canal restreint. Les deux
+		 * partent : `onDone` ne fait pas de difference entre une commande
+		 * tapee et une jouee par le code, et c'est celui-ci qui la fait.
+		 */
+		if (restricted) onRestricted(cmd.name, cmd.args)
+	}
 }
 
 /** joue une commande du visiteur */

@@ -123,6 +123,13 @@ export type ShellProps = {
    * au passage, et jamais pour une commande qui n'a pas pu jouer.
    */
   onCommandRendered?: CommandListener;
+  /**
+   * Une commande restreinte a joue : une que le visiteur ne peut pas taper,
+   * lancee par le code — l'ouverture, un clic sur un marqueur, un appel a
+   * `runRestricted`. Elle part en plus de `onCommandDone`, qui ne fait pas
+   * la difference entre une commande tapee et une jouee par le code.
+   */
+  onRestrictedCommand?: CommandListener;
 };
 
 /**
@@ -146,6 +153,7 @@ export const Shell = ({
   onCommandStart,
   onCommandDone,
   onCommandRendered,
+  onRestrictedCommand,
 }: ShellProps) => {
   /**
    * Le cadre, quand la prop `window` est donnee. `area` borne le
@@ -189,8 +197,12 @@ export const Shell = ({
   }, [themes]);
 
   useEffect(() => {
-    setListeners({ start: onCommandStart, done: onCommandDone });
-  }, [onCommandStart, onCommandDone]);
+    setListeners({
+      start: onCommandStart,
+      done: onCommandDone,
+      restricted: onRestrictedCommand,
+    });
+  }, [onCommandStart, onCommandDone, onRestrictedCommand]);
 
   // apres le montage, jamais pendant le rendu : la langue du navigateur
   // n'existe pas au prerendu, l'appliquer plus tot ferait diverger le HTML

@@ -8,20 +8,24 @@ import { fresh } from "../decorators"
 import { source } from "../source"
 
 /**
- * Three moments in the life of a command, three props. The panel on the
- * right is written from them alone, one row per command with a mark under
- * each moment it has reached.
+ * Everything the shell hands back, and nothing else: the panel on the right
+ * is written from the four event props alone, one row per command with a
+ * tick under each moment it has reached.
  *
  * `onCommandStart` fires before anything runs, off the line as it was sent
- * — so it fires for a command that does not exist too, which the other two
+ * — so it fires for a command that does not exist too, which the others
  * never do. `onCommandDone` fires once the action has returned its text and
  * the effect has played: the command is over, but nothing is on screen yet.
  * `onCommandRendered` fires when the text has finished being written, which
  * on a long output is a good while later.
  *
+ * `onRestrictedCommand` is not a moment but a kind: it marks the commands
+ * the visitor cannot type, played by the code — the opening here. It fires
+ * alongside `onCommandDone`, which does not tell the two apart.
+ *
  * Type `hello`, then `title` — the logo takes its time, and the gap between
- * the last two marks is the animation. Then type something that does not
- * exist: only the first mark lands.
+ * the last two ticks is the animation. Then type something that does not
+ * exist: only the first tick lands.
  */
 
 type Watched = {
@@ -29,6 +33,7 @@ type Watched = {
 	args: string[]
 	done: boolean
 	rendered: boolean
+	restricted: boolean
 }
 
 const Watcher = () => {
@@ -37,14 +42,17 @@ const Watcher = () => {
 
 	// useCallback, or the listeners would be reset on every render
 	const start = useCallback((name: string, args: string[]) => {
-		setSeen(list => [...list, { name, args, done: false, rendered: false }])
+		setSeen(list => [
+			...list,
+			{ name, args, done: false, rendered: false, restricted: false },
+		])
 	}, [])
 
 	/**
 	 * The mark lands on the last row still waiting for it: a name can be
 	 * played twice, and the rows are in the order the commands started.
 	 */
-	const mark = (key: "done" | "rendered") => (name: string) =>
+	const mark = (key: "done" | "rendered" | "restricted") => (name: string) =>
 		setSeen(list => {
 			const index = list.findLastIndex(row => row.name === name && !row[key])
 			if (index === -1) return list
@@ -54,6 +62,7 @@ const Watcher = () => {
 
 	const done = useCallback(mark("done"), [])
 	const rendered = useCallback(mark("rendered"), [])
+	const restricted = useCallback(mark("restricted"), [])
 
 	return (
 		<div
@@ -82,12 +91,13 @@ const Watcher = () => {
 					onCommandStart={start}
 					onCommandDone={done}
 					onCommandRendered={rendered}
+					onRestrictedCommand={restricted}
 				/>
 			</div>
 
 			<div
 				style={{
-					width: 320,
+					width: 340,
 					overflowY: "auto",
 					padding: 16,
 					border: "solid 2px #000000",
@@ -138,6 +148,23 @@ const Row = ({ row }: { row: Watched }) => (
 		>
 			<strong>{row.name}</strong>{" "}
 			<span style={{ opacity: 0.6 }}>{row.args.join(" ")}</span>
+			{/* onRestrictedCommand : une sorte, pas un moment — elle tient donc
+			    au nom et non a une colonne de plus */}
+			{row.restricted && (
+				<span
+					title="onRestrictedCommand"
+					style={{
+						marginLeft: 6,
+						padding: "1px 5px",
+						borderRadius: 3,
+						fontSize: 11,
+						background: "#00000012",
+						opacity: 0.7,
+					}}
+				>
+					restricted
+				</span>
+			)}
 		</span>
 		<Cell on />
 		<Cell on={row.done} />
@@ -146,15 +173,14 @@ const Row = ({ row }: { row: Watched }) => (
 )
 
 const meta: Meta<typeof Shell> = {
-	title: "Shell/On command",
+	title: "Shell/Events",
 	component: Shell,
 	decorators: [fresh],
 }
 
 export default meta
 
-export const OnCommand: StoryObj<typeof Shell> = {
-	name: "On command",
+export const Events: StoryObj<typeof Shell> = {
 	parameters: source(`
 import { useCallback, useRef, useState } from "react"
 import { Shell, baseCommands, test } from "flower-shell"
@@ -165,7 +191,10 @@ const Watcher = () => {
 
 	// useCallback, or the listeners would be reset on every render
 	const start = useCallback((name, args) => {
-		setSeen(list => [...list, { name, args, done: false, rendered: false }])
+		setSeen(list => [
+			...list,
+			{ name, args, done: false, rendered: false, restricted: false },
+		])
 	}, [])
 
 	// the mark lands on the last row still waiting for it: a name can be
@@ -191,11 +220,13 @@ const Watcher = () => {
 					onCommandDone={useCallback(mark("done"), [])}
 					// the text has finished being written
 					onCommandRendered={useCallback(mark("rendered"), [])}
+					// played by the code, not typed — alongside onCommandDone
+					onRestrictedCommand={useCallback(mark("restricted"), [])}
 				/>
 			</div>
 
-			{/* one row per command, a mark under each moment it reached */}
-			<div style={{ width: 320, overflowY: "auto" }}>{/* … */}</div>
+			{/* one row per command, a tick under each moment it reached */}
+			<div style={{ width: 340, overflowY: "auto" }}>{/* … */}</div>
 		</div>
 	)
 }
