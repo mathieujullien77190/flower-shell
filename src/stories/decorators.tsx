@@ -1,7 +1,7 @@
 import { useRef, useState } from "react"
 import type { Decorator } from "@storybook/react-vite"
 
-import { defaultTheme, setTheme, setThemes } from "../theme"
+import { setThemes, wearTheme } from "../theme"
 import { shellActions } from "../state/store"
 
 /**
@@ -14,9 +14,10 @@ export const Fresh = ({ children }: { children: React.ReactNode }) => {
 		shellActions().reset()
 		// the theme and its catalogue live at module level: without a reset
 		// they would leak from one story to the next — Themes mounts three of
-		// them. The shell replays its own right after, on mount.
+		// them. Back to nothing mounted and nothing worn, which is what a
+		// shell with no theme prop is; each story declares its own on mount.
 		setThemes()
-		setTheme(defaultTheme)
+		wearTheme()
 		return true
 	})
 

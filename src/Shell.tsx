@@ -16,7 +16,7 @@ import {
   useKeyboardOnFocus,
   useLang,
 } from "./state/store";
-import { setTheme, setThemes, ShellThemeInput } from "./theme";
+import { setThemes, ShellThemeInput, wearTheme } from "./theme";
 import { BaseCommand, BaseCommands, Dictionaries } from "./types";
 
 /**
@@ -57,37 +57,31 @@ export type ShellWindowProps = {
 /** un catalogue de themes, indexes par le nom que le visiteur tape */
 export type ShellThemes = Record<string, ShellThemeInput>;
 
-/**
- * Le meme catalogue, mais vide interdit. `keyof {}` vaut `never`, ce qui
- * fait tomber le type sur `never` et rend `themes={{}}` impossible a
- * ecrire — un shell dont le visiteur n'a aucun theme a prendre n'a pas de
- * sens, et le dire au type evite de le decouvrir a l'execution.
- */
-export type NonEmptyThemes<T extends ShellThemes> = keyof T extends never
-  ? never
-  : T;
-
-export type ShellProps<T extends ShellThemes = ShellThemes> = {
+export type ShellProps = {
   /**
    * Les commandes connues : celles du paquet, plus les votres. Sans elle,
    * le shell se monte nu — il affiche l'invite et ne repond a rien.
    */
   commands?: BaseCommands & { [name: string]: BaseCommand };
-  /** le theme de depart ; un theme partiel garde les valeurs qu'il ne donne pas */
+  /**
+   * Le theme porte au demarrage ; un theme partiel garde les valeurs qu'il
+   * ne donne pas. Sans elle, le shell porte le premier de `themes` — et si
+   * `themes` non plus n'est pas donnee, il ne porte rien.
+   */
   theme?: ShellThemeInput;
   /**
    * Les themes que le visiteur peut prendre, indexes par le nom qu'il tape.
    * Ce sont exactement ceux que `theme <nom>` accepte et que `help theme`
    * liste — rien de plus.
    *
-   * Obligatoire, et au moins un : le shell ne choisit pas a votre place ce
-   * que le visiteur a le droit de prendre. Pour tout le catalogue du
-   * paquet d'un coup, `themes={themes}`.
+   * Pour tout le catalogue du paquet d'un coup, `themes={themes}`. Sans
+   * elle, le visiteur n'a aucun theme a prendre : `theme <nom>` ne repond
+   * plus rien et `help theme` ne liste rien.
    *
    * Chacun se decrit par la clef `theme.<nom>` : a fournir dans votre
    * dictionnaire pour les votres, sans quoi la clef s'affiche telle quelle.
    */
-  themes: NonEmptyThemes<T>;
+  themes?: ShellThemes;
   /**
    * Vos textes, par langue. Ils recouvrent ceux du paquet clef par clef, et
    * une langue absente du paquet devient utilisable par `lang <code>`.
@@ -159,7 +153,7 @@ export type ShellProps<T extends ShellThemes = ShellThemes> = {
  * aussi hors React, une fenetre qui se ferme peut jouer une commande.
  * Corollaire assume : un shell par page.
  */
-export const Shell = <T extends ShellThemes,>({
+export const Shell = ({
   commands = {},
   theme,
   themes,
@@ -174,7 +168,7 @@ export const Shell = <T extends ShellThemes,>({
   onCommandDone,
   onCommandRendered,
   onCommandError,
-}: ShellProps<T>) => {
+}: ShellProps) => {
   /**
    * Le cadre, quand la prop `window` est donnee. `area` borne le
    * deplacement de la fenetre, `content` est ce qui defile — c'est la ref
@@ -191,7 +185,7 @@ export const Shell = <T extends ShellThemes,>({
     // le catalogue avant le theme de depart : `help theme` et `theme <nom>`
     // lisent le premier, et le second n'a pas a en faire partie
     setThemes(themes);
-    setTheme(theme);
+    wearTheme(theme);
     return true;
   });
 
@@ -214,7 +208,8 @@ export const Shell = <T extends ShellThemes,>({
 
   useEffect(() => {
     setThemes(themes);
-  }, [themes]);
+    wearTheme(theme);
+  }, [themes, theme]);
 
   useEffect(() => {
     setListeners({

@@ -53,6 +53,39 @@ export const themes: Record<string, ShellTheme> = {
 export const DEFAULT_THEME_NAME = "flower"
 
 /**
+ * Le theme de qui n'en donne aucun : rien n'est pose, tout est herite.
+ * Le shell prend alors les couleurs et la police de la page qui le tient,
+ * et le balisage cesse de colorer — un marqueur ne fait plus que decouper
+ * le texte.
+ *
+ * `transparent` et non une couleur : un fond pose, meme blanc, recouvrirait
+ * celui du consommateur. Ce qui n'est pas donne ne doit rien peindre.
+ */
+export const bareTheme: ShellTheme = {
+	colors: {
+		background: "transparent",
+		textColor: "inherit",
+		importantColor: "inherit",
+		cmdColor: "inherit",
+		restrictedColor: "inherit",
+		infoColor: "inherit",
+		appColor: "inherit",
+		invisible: "transparent",
+	},
+	prompt: ">",
+	fonts: { shell: "inherit", window: "inherit" },
+	window: {
+		titleBar: "transparent",
+		border: "currentColor",
+		content: "transparent",
+		text: "inherit",
+		button: "inherit",
+		buttonHover: "inherit",
+	},
+	container: {},
+}
+
+/**
  * Le theme du paquet par defaut. `twilightTheme` et `parchmentTheme` restent
  * la pour qui veut un terminal neutre, invite `>` comprise.
  */
@@ -89,27 +122,40 @@ export const setTheme = (theme?: ShellThemeInput) => {
  * courant : un theme partiel donne toujours le meme resultat, quel que
  * soit celui qu'on quitte.
  */
-let mounted: Record<string, ShellTheme> = themes
+let mounted: Record<string, ShellTheme> = {}
 
 /**
  * Les themes du shell sont exactement les clefs de ce qu'on donne ici —
  * rien de plus. `themes={{ flower: flowerTheme, mine }}` en monte deux,
  * `themes={themes}` monte le catalogue du paquet en entier.
  *
- * L'appel sans argument rend le catalogue du paquet. Il ne sert pas au
- * shell, dont la prop est obligatoire : c'est le reset des stories, qui
- * repartent d'un module propre.
+ * Sans argument, aucun : le visiteur n'a alors rien a prendre, et c'est
+ * assume. Ce qu'on ne donne pas n'existe pas.
  */
 export const setThemes = (custom?: Record<string, ShellThemeInput>) => {
-	if (!custom) {
-		mounted = themes
+	mounted = Object.keys(custom || {}).reduce(
+		(all, name) => ({ ...all, [name]: lay(defaultTheme, custom![name]) }),
+		{} as Record<string, ShellTheme>
+	)
+}
+
+/**
+ * Ce que le shell porte au demarrage, dans cet ordre : le theme donne,
+ * sinon le premier du catalogue monte, sinon rien du tout.
+ *
+ * Le theme donne peut etre partiel, et se complete alors sur
+ * `defaultTheme` — pas sur `bareTheme` : donner une couleur ne doit pas
+ * emporter toutes les autres.
+ *
+ * A appeler apres `setThemes`, dont il lit le resultat.
+ */
+export const wearTheme = (theme?: ShellThemeInput) => {
+	if (theme) {
+		current = lay(defaultTheme, theme)
 		return
 	}
 
-	mounted = Object.keys(custom).reduce(
-		(all, name) => ({ ...all, [name]: lay(defaultTheme, custom[name]) }),
-		{} as Record<string, ShellTheme>
-	)
+	current = Object.values(mounted)[0] || bareTheme
 }
 
 /**

@@ -17,8 +17,8 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | --- | --- |
 | `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
 | `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
-| `theme` | le thème porté au démarrage ; couleurs, invite, polices |
-| `themes` | **obligatoire** — les thèmes que le visiteur peut prendre, un par nom, au moins un ; `themes={themes}` pour tout le catalogue |
+| `theme` | le thème porté au démarrage ; sans elle, le premier de `themes` — et sans celle-ci non plus, rien n'est peint |
+| `themes` | les thèmes que le visiteur peut prendre, un par nom ; `themes={themes}` pour tout le catalogue |
 | `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
 | `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
 | `window` | pose le shell dans un cadre ; l'objet porte tout ce que le cadre sait faire |
@@ -28,14 +28,12 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | `onCommandRendered` | le texte a fini de s'écrire |
 | `onCommandError` | la commande n'a pas joué ; `reason` dit pourquoi |
 
-`themes` est la seule prop que le shell réclame. Tout le reste est facultatif :
-`<Shell themes={{ flower: flowerTheme }} />` se monte nu, et le registre vide,
-il affiche l'invite et ne répond à rien — une ligne tapée passe à la suivante,
-sans message d'erreur. Dès qu'une commande existe, une commande inconnue
-redevient une erreur.
-
-Les extraits plus bas laissent `themes` de côté, pour que chacun reste sur la
-prop dont il parle. Remettez-la dans ce que vous copiez.
+Toutes les props sont facultatives, et ce qu'on ne donne pas n'existe
+simplement pas. `<Shell />` se monte sur rien : registre vide, donc une ligne
+tapée passe à la suivante sans message d'erreur, et aucun thème, donc rien
+n'est peint — le shell prend les couleurs et la police de la page qui le
+tient, l'invite retombe sur `>`, et le balisage cesse de colorer. Dès qu'une
+commande existe, une commande inconnue redevient une erreur.
 
 ## Les commandes de base
 
@@ -361,10 +359,11 @@ import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 `theme <nom>` n'accepte que ceux-là, et `help theme` les liste, chacun décrit
 par la clé de dictionnaire `theme.<nom>`.
 
-La prop est obligatoire, et un thème est le minimum : un shell dont le
-visiteur n'a rien à prendre est refusé par le type, pas découvert à
-l'exécution. Le shell ne choisit pas à votre place ce que le visiteur a le
-droit d'atteindre — passez `themes` pour les huit.
+Aucune des deux n'est obligatoire, et aucune ne retombe sur un défaut qui
+habillerait le shell dans votre dos. `theme` décide de ce qu'il porte ; sans
+elle, la première entrée de `themes` ; sans celle-ci non plus, `bareTheme` —
+fond transparent, couleurs et police héritées, `>` pour invite, et un balisage
+qui ne colore plus rien. Ce qu'on ne vous demande pas n'est pas peint.
 
 Donc un shell à vous, avec un thème du paquet, un des vôtres, et aucune sortie
 hors des deux :

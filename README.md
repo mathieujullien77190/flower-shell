@@ -17,8 +17,8 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | --- | --- |
 | `commands` | the known commands, indexed by name: the ones shipped with the package, plus yours; optional |
 | `initialCommands` | commands played at startup, once; this is where the opening goes |
-| `theme` | the theme worn at startup; colours, prompt, fonts |
-| `themes` | **required** — the themes the visitor can reach, one per name, at least one; `themes={themes}` for the whole catalogue |
+| `theme` | the theme worn at startup; without it, the first of `themes` — and without those either, nothing is painted |
+| `themes` | the themes the visitor can reach, one per name; `themes={themes}` for the whole catalogue |
 | `dict` | the languages of the shell, one dictionary per language; without it, English alone |
 | `lang` | starting language, among those of `dict` (`en` by default) |
 | `window` | puts the shell in a frame; the object holds everything the frame can do |
@@ -28,14 +28,12 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | `onCommandRendered` | the text has finished being written |
 | `onCommandError` | the command did not play; `reason` says why |
 
-`themes` is the only prop the shell asks for. Everything else is optional:
-`<Shell themes={{ flower: flowerTheme }} />` mounts bare, and with an empty
-registry it shows the prompt and answers nothing — a typed line moves on to
-the next, with no error message. As soon as one command exists, an unknown
+Every prop is optional, and what is left out simply does not exist. `<Shell />`
+mounts on nothing: an empty registry, so a typed line moves on to the next with
+no error message, and no theme, so nothing is painted — the shell takes the
+colours and the font of the page that holds it, the prompt falls back to `>`,
+and the markup stops colouring. As soon as one command exists, an unknown
 command becomes an error again.
-
-The snippets further down leave `themes` out, to keep each one on the prop it
-is about. Add it back to anything you copy.
 
 ## The base commands
 
@@ -343,7 +341,7 @@ shell wears at startup. `themes` is the catalogue the visitor can reach:
 ```tsx
 import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 
-// the whole catalogue: all eight, and the visitor can reach all eight
+// the whole catalogue: all eight, worn on the first of them
 <Shell commands={baseCommands} themes={themes} />
 
 // one of them, and nothing else to switch to
@@ -351,16 +349,20 @@ import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 
 // the catalogue to reach, and the one it starts on
 <Shell commands={baseCommands} themes={themes} theme={nordTheme} />
+
+// neither: nothing to switch to, and nothing painted
+<Shell commands={baseCommands} />
 ```
 
 **The themes of the shell are exactly the keys of `themes`** — nothing more.
 `theme <name>` accepts those and no others, and `help theme` lists them, each
 described by the `theme.<name>` dictionary key.
 
-The prop is required, and one theme is the minimum: a shell whose visitor has
-nothing to switch to is refused by the type, not discovered at runtime. The
-shell does not pick for you what the visitor is allowed to reach — pass
-`themes` for all eight.
+Neither prop is required, and neither has a fallback that dresses the shell
+behind your back. `theme` decides what it wears; without it, the first entry
+of `themes`; without those either, `bareTheme` — transparent background,
+inherited colours and font, `>` for a prompt, and a markup that no longer
+colours anything. What you do not hand over is not painted.
 
 So a shell of your own, with one theme of the package, one of yours, and no
 way out of the two:

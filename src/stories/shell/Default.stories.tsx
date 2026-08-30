@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
-import { flowerTheme } from "../../theme"
 import { boxed } from "../decorators"
 import { prose } from "../i18n"
 import { source } from "../source"
@@ -12,16 +11,25 @@ const meta: Meta<typeof Shell> = {
 	decorators: [boxed],
 	parameters: prose({
 		en: `
-The smallest shell that can be written: \`themes\` is the only prop it asks
-for, and one theme is enough. \`commands\` is optional, so the registry is
-empty — nothing answers, and nothing complains either. A typed line simply
-moves on to the next one.
+\`<Shell />\`, with nothing at all. Every prop is optional, and what is left
+out simply does not exist.
+
+No \`commands\`, so the registry is empty: nothing answers, and nothing
+complains either — a typed line moves on to the next one. And no theme, so
+nothing is painted: the shell takes the colours and the font of the page that
+holds it, the prompt falls back to \`>\`, and the markup stops colouring. Pass
+\`theme\`, or a \`themes\` catalogue to pick the first of, and it dresses up.
 `,
 		fr: `
-Le plus petit shell qu'on puisse écrire : \`themes\` est la seule prop qu'il
-réclame, et un thème suffit. \`commands\` est facultative, donc le registre est
-vide — rien ne répond, et rien ne proteste non plus. Une ligne tapée passe
-simplement à la suivante.
+\`<Shell />\`, sans rien du tout. Toutes les props sont facultatives, et ce
+qu'on ne donne pas n'existe simplement pas.
+
+Pas de \`commands\`, donc le registre est vide : rien ne répond, et rien ne
+proteste non plus — une ligne tapée passe à la suivante. Et pas de thème, donc
+rien n'est peint : le shell prend les couleurs et la police de la page qui le
+tient, l'invite retombe sur \`>\`, et le balisage cesse de colorer. Donnez
+\`theme\`, ou un catalogue \`themes\` dont il prendra le premier, et il
+s'habille.
 `,
 	}),
 }
@@ -30,11 +38,8 @@ export default meta
 
 export const Default: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, flowerTheme } from "flower-shell"
+import { Shell } from "flower-shell"
 
-<Shell themes={{ flower: flowerTheme }} />
+<Shell />
 `),
-	args: {
-		themes: { flower: flowerTheme },
-	},
 }

@@ -1,10 +1,5 @@
 export { Shell } from "./Shell"
-export type {
-	NonEmptyThemes,
-	ShellProps,
-	ShellThemes,
-	ShellWindowProps,
-} from "./Shell"
+export type { ShellProps, ShellThemes, ShellWindowProps } from "./Shell"
 
 export { baseCommands } from "./commands/base"
 export { highlightFlower, plantFlowers } from "./commands/flowers"
@@ -63,6 +58,7 @@ export {
 } from "./window/constants"
 
 export {
+	bareTheme,
 	defaultTheme,
 	draculaTheme,
 	flowerTheme,
@@ -72,6 +68,7 @@ export {
 	parchmentTheme,
 	setTheme,
 	setThemes,
+	wearTheme,
 	solarizedTheme,
 	theme,
 	themeByName,
