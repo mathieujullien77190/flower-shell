@@ -64,11 +64,14 @@ export type ShellProps = {
    */
   commands?: BaseCommands & { [name: string]: BaseCommand };
   /**
-   * Le theme porte au demarrage ; un theme partiel garde les valeurs qu'il
-   * ne donne pas. Sans elle, le shell porte le premier de `themes` — et si
-   * `themes` non plus n'est pas donnee, il ne porte rien.
+   * Le theme de depart, par son nom : une clef de `themes`, comme `lang`
+   * est une clef de `dict`. Sans elle, le premier du catalogue — et si
+   * `themes` non plus n'est pas donnee, le shell ne porte rien.
+   *
+   * Un nom absent du catalogue est ignore : on ne peut pas partir sur un
+   * theme que le visiteur ne pourrait pas retrouver.
    */
-  theme?: ShellThemeInput;
+  theme?: string;
   /**
    * Les themes que le visiteur peut prendre, indexes par le nom qu'il tape.
    * Ce sont exactement ceux que `theme <nom>` accepte et que `help theme`

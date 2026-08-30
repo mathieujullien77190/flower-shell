@@ -140,22 +140,19 @@ export const setThemes = (custom?: Record<string, ShellThemeInput>) => {
 }
 
 /**
- * Ce que le shell porte au demarrage, dans cet ordre : le theme donne,
- * sinon le premier du catalogue monte, sinon rien du tout.
+ * Ce que le shell porte au demarrage, dans cet ordre : le theme du
+ * catalogue qui porte ce nom, sinon le premier du catalogue, sinon rien.
  *
- * Le theme donne peut etre partiel, et se complete alors sur
- * `defaultTheme` — pas sur `bareTheme` : donner une couleur ne doit pas
- * emporter toutes les autres.
+ * Le nom, et non le theme lui-meme : `themes` dit ce qui existe, `theme`
+ * lequel on porte — comme `dict` dit les langues et `lang` celle du
+ * depart. Un nom qu'on ne trouve pas est ignore plutot que monte en
+ * douce : partir sur un theme que le visiteur ne peut pas retrouver, ni
+ * `theme <nom>` ni `help theme` ne sauraient l'expliquer.
  *
  * A appeler apres `setThemes`, dont il lit le resultat.
  */
-export const wearTheme = (theme?: ShellThemeInput) => {
-	if (theme) {
-		current = lay(defaultTheme, theme)
-		return
-	}
-
-	current = Object.values(mounted)[0] || bareTheme
+export const wearTheme = (name?: string) => {
+	current = (name && mounted[name]) || Object.values(mounted)[0] || bareTheme
 }
 
 /**

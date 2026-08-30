@@ -17,7 +17,7 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | --- | --- |
 | `commands` | the known commands, indexed by name: the ones shipped with the package, plus yours; optional |
 | `initialCommands` | commands played at startup, once; this is where the opening goes |
-| `theme` | the theme worn at startup; without it, the first of `themes` — and without those either, nothing is painted |
+| `theme` | the name of the theme it starts on, a key of `themes`; without it, the first of them — and without those either, nothing is painted |
 | `themes` | the themes the visitor can reach, one per name; `themes={themes}` for the whole catalogue |
 | `dict` | the languages of the shell, one dictionary per language; without it, English alone |
 | `lang` | starting language, among those of `dict` (`en` by default) |
@@ -335,8 +335,8 @@ The package ships eight, in the manner of an editor:
 Each is exported under its own name — `flowerTheme`, `twilightTheme`,
 `nordTheme`… — and `themes` gathers all eight under the keys of the table.
 
-Two props, and they answer two different questions. `theme` is the one the
-shell wears at startup. `themes` is the catalogue the visitor can reach:
+Two props, and they read like `dict` and `lang`. `themes` says which themes
+exist; `theme` names the one it starts on, a key of `themes`:
 
 ```tsx
 import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
@@ -347,8 +347,8 @@ import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 // one of them, and nothing else to switch to
 <Shell commands={baseCommands} themes={{ nord: nordTheme }} />
 
-// the catalogue to reach, and the one it starts on
-<Shell commands={baseCommands} themes={themes} theme={nordTheme} />
+// the catalogue to reach, and the name it starts on
+<Shell commands={baseCommands} themes={themes} theme="nord" />
 
 // neither: nothing to switch to, and nothing painted
 <Shell commands={baseCommands} />
@@ -359,10 +359,14 @@ import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 described by the `theme.<name>` dictionary key.
 
 Neither prop is required, and neither has a fallback that dresses the shell
-behind your back. `theme` decides what it wears; without it, the first entry
-of `themes`; without those either, `bareTheme` — transparent background,
+behind your back. `theme` names what it wears; without it, the first entry of
+`themes`; without those either, `bareTheme` — transparent background,
 inherited colours and font, `>` for a prompt, and a markup that no longer
 colours anything. What you do not hand over is not painted.
+
+A name that is not in the catalogue is ignored rather than quietly mounted:
+starting on a theme the visitor could never get back to is something neither
+`theme <name>` nor `help theme` could explain.
 
 So a shell of your own, with one theme of the package, one of yours, and no
 way out of the two:
@@ -371,24 +375,24 @@ way out of the two:
 <Shell
 	commands={baseCommands}
 	themes={{ nord: nordTheme, mine }}
-	theme={mine}
+	theme="mine"
 	dict={{ en: { theme: { mine: "The house theme" } } }}
 />
 ```
 
-A theme — mounted or handed to `theme` — can be written piece by piece:
+A theme is written piece by piece, and mounted under the name the visitor will
+type:
 
 ```tsx
-<Shell
-	commands={commands}
-	theme={{
-		colors: { background: "#212E35", importantColor: "#FFCC6A" },
-		prompt: "🌼",
-		fonts: { shell: "monospace", window: "monospace" },
-		window: { titleBar: "#ed612e", content: "#f4ebda" },
-		container: { padding: "16px" },
-	}}
-/>
+const mine = {
+	colors: { background: "#212E35", importantColor: "#FFCC6A" },
+	prompt: "🌼",
+	fonts: { shell: "monospace", window: "monospace" },
+	window: { titleBar: "#ed612e", content: "#f4ebda" },
+	container: { padding: "16px" },
+}
+
+<Shell commands={commands} themes={{ mine }} theme="mine" />
 ```
 
 Absent values keep those of `defaultTheme`, inside a group included: giving

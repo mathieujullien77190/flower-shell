@@ -17,7 +17,7 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | --- | --- |
 | `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
 | `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
-| `theme` | le thème porté au démarrage ; sans elle, le premier de `themes` — et sans celle-ci non plus, rien n'est peint |
+| `theme` | le nom du thème de départ, une clé de `themes` ; sans elle, le premier d'entre eux — et sans `themes` non plus, rien n'est peint |
 | `themes` | les thèmes que le visiteur peut prendre, un par nom ; `themes={themes}` pour tout le catalogue |
 | `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
 | `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
@@ -338,21 +338,23 @@ Le paquet en livre huit, à la manière d'un éditeur :
 Chacun s'exporte sous son nom — `flowerTheme`, `twilightTheme`, `nordTheme`… —
 et `themes` rassemble les huit sous les clés du tableau.
 
-Deux props, et elles répondent à deux questions différentes. `theme` est celui
-que le shell porte au démarrage. `themes` est le catalogue que le visiteur
-peut atteindre :
+Deux props, et elles se lisent comme `dict` et `lang`. `themes` dit quels
+thèmes existent ; `theme` nomme celui du départ, une clé de `themes` :
 
 ```tsx
 import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 
-// the whole catalogue: all eight, and the visitor can reach all eight
+// the whole catalogue: all eight, worn on the first of them
 <Shell commands={baseCommands} themes={themes} />
 
 // one of them, and nothing else to switch to
 <Shell commands={baseCommands} themes={{ nord: nordTheme }} />
 
-// the catalogue to reach, and the one it starts on
-<Shell commands={baseCommands} themes={themes} theme={nordTheme} />
+// the catalogue to reach, and the name it starts on
+<Shell commands={baseCommands} themes={themes} theme="nord" />
+
+// neither: nothing to switch to, and nothing painted
+<Shell commands={baseCommands} />
 ```
 
 **Les thèmes du shell sont exactement les clés de `themes`** — rien de plus.
@@ -360,10 +362,14 @@ import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 par la clé de dictionnaire `theme.<nom>`.
 
 Aucune des deux n'est obligatoire, et aucune ne retombe sur un défaut qui
-habillerait le shell dans votre dos. `theme` décide de ce qu'il porte ; sans
-elle, la première entrée de `themes` ; sans celle-ci non plus, `bareTheme` —
-fond transparent, couleurs et police héritées, `>` pour invite, et un balisage
-qui ne colore plus rien. Ce qu'on ne vous demande pas n'est pas peint.
+habillerait le shell dans votre dos. `theme` nomme ce qu'il porte ; sans elle,
+la première entrée de `themes` ; sans celle-ci non plus, `bareTheme` — fond
+transparent, couleurs et police héritées, `>` pour invite, et un balisage qui
+ne colore plus rien. Ce qu'on ne vous demande pas n'est pas peint.
+
+Un nom absent du catalogue est ignoré plutôt que monté en douce : partir sur
+un thème que le visiteur ne pourrait jamais retrouver, ni `theme <nom>` ni
+`help theme` ne sauraient l'expliquer.
 
 Donc un shell à vous, avec un thème du paquet, un des vôtres, et aucune sortie
 hors des deux :
@@ -372,24 +378,24 @@ hors des deux :
 <Shell
 	commands={baseCommands}
 	themes={{ nord: nordTheme, mine }}
-	theme={mine}
+	theme="mine"
 	dict={{ en: { theme: { mine: "The house theme" } } }}
 />
 ```
 
-Un thème — monté ou donné à `theme` — s'écrit aussi par morceaux :
+Un thème s'écrit par morceaux, et se monte sous le nom que le visiteur
+tapera :
 
 ```tsx
-<Shell
-	commands={commands}
-	theme={{
-		colors: { background: "#212E35", importantColor: "#FFCC6A" },
-		prompt: "🌼",
-		fonts: { shell: "monospace", window: "monospace" },
-		window: { titleBar: "#ed612e", content: "#f4ebda" },
-		container: { padding: "16px" },
-	}}
-/>
+const mine = {
+	colors: { background: "#212E35", importantColor: "#FFCC6A" },
+	prompt: "🌼",
+	fonts: { shell: "monospace", window: "monospace" },
+	window: { titleBar: "#ed612e", content: "#f4ebda" },
+	container: { padding: "16px" },
+}
+
+<Shell commands={commands} themes={{ mine }} theme="mine" />
 ```
 
 Les valeurs absentes gardent celles de `defaultTheme`, y compris à

@@ -37,7 +37,7 @@ const Preview = ({ draft }: { draft: ShellTheme }) => {
 	return (
 		<Shell
 			commands={{ ...baseCommands, test }}
-			theme={draft}
+			theme="draft"
 			// le brouillon est le seul theme atteignable : l'apercu montre ce
 			// qu'on est en train d'ecrire, pas le catalogue du paquet
 			themes={{ draft }}
@@ -153,26 +153,33 @@ const Group = ({
 	</section>
 )
 
-/** the theme, written as you would paste it into the `theme` prop */
+/**
+ * Le theme, ecrit comme on le collerait chez soi : dans `themes`, sous un
+ * nom, et `theme` pour partir dessus. Le nom est ce que le visiteur tapera
+ * derriere `theme`, et ce que decrit la clef de dictionnaire `theme.<nom>`.
+ */
 const asCode = (draft: ShellTheme) =>
 	[
+		"const mine = {",
+		"  colors: {",
+		...SHELL_FIELDS.map(
+			field => `    ${field.key}: "${draft.colors[field.key]}",`
+		),
+		"    // the background again: text laid on it shows only when selected",
+		`    invisible: "${draft.colors.background}",`,
+		"  },",
+		`  prompt: "${draft.prompt}",`,
+		"  window: {",
+		...WINDOW_FIELDS.map(
+			field => `    ${field.key}: "${draft.window[field.key]}",`
+		),
+		"  },",
+		"}",
+		"",
 		"<Shell",
 		"  commands={baseCommands}",
-		"  theme={{",
-		"    colors: {",
-		...SHELL_FIELDS.map(
-			field => `      ${field.key}: "${draft.colors[field.key]}",`
-		),
-		"      // the background again: text laid on it shows only when selected",
-		`      invisible: "${draft.colors.background}",`,
-		"    },",
-		`    prompt: "${draft.prompt}",`,
-		"    window: {",
-		...WINDOW_FIELDS.map(
-			field => `      ${field.key}: "${draft.window[field.key]}",`
-		),
-		"    },",
-		"  }}",
+		"  themes={{ mine }}",
+		'  theme="mine"',
 		"/>",
 	].join("\n")
 
