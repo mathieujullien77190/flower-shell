@@ -63,6 +63,14 @@ const dictDe: Dict = {
 	},
 }
 
+/**
+ * A language written outside the package. `dictDe` covers the base commands
+ * itself — nothing lives underneath German — and `lang.de` is added to the
+ * English dictionary so the help still names it once switched back.
+ *
+ * The shell opens on `help lang`, which lists exactly what `dict` mounts:
+ * German and English, and nothing else.
+ */
 const meta: Meta<typeof Shell> = {
 	title: "Shell/German",
 	component: Shell,
@@ -91,6 +99,7 @@ const dictDe: Dict = {
 	error: { unknown: "...", args: "..." },
 }
 
+// help lang opens the shell on the list of what is mounted: de and en
 <Shell
 	commands={{ ...baseCommands, test }}
 	lang="de"
@@ -100,6 +109,7 @@ const dictDe: Dict = {
 		en: { lang: { de: "Shows every text in German" } },
 		de: dictDe,
 	}}
+	initialCommands={["help lang"]}
 />
 `),
 	args: {
@@ -111,5 +121,6 @@ const dictDe: Dict = {
 			en: { lang: { de: "Shows every text in German" } },
 			de: dictDe,
 		},
+		initialCommands: ["help lang"],
 	},
 }

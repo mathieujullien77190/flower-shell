@@ -11,7 +11,7 @@ import { source } from "../source"
 /**
  * French: the package ships it, you only need to mount it. The shell's
  * languages are the keys of `dict` — here both, so `lang fr` and `lang en`
- * both respond.
+ * both respond. The shell opens on `help lang`, which lists exactly those.
  */
 const meta: Meta<typeof Shell> = {
 	title: "Shell/French",
@@ -26,12 +26,18 @@ export const French: StoryObj<typeof Shell> = {
 import { Shell, baseCommands, test, dictEn, dictFr } from "flower-shell"
 
 // the shell's languages are the keys of dict, so both answer:
-// lang fr and lang en
-<Shell commands={{ ...baseCommands, test }} lang="fr" dict={{ en: dictEn, fr: dictFr }} />
+// lang fr and lang en. help lang lists exactly those.
+<Shell
+	commands={{ ...baseCommands, test }}
+	lang="fr"
+	dict={{ en: dictEn, fr: dictFr }}
+	initialCommands={["help lang"]}
+/>
 `),
 	args: {
 		commands: { ...baseCommands, test },
 		lang: "fr",
 		dict: { en: dictEn, fr: dictFr },
+		initialCommands: ["help lang"],
 	},
 }
