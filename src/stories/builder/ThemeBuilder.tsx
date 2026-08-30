@@ -173,17 +173,33 @@ const asCode = (draft: ShellTheme) =>
 		"/>",
 	].join("\n")
 
+/**
+ * Le nom que prend le brouillon des qu'on y touche : il ne sort plus du
+ * catalogue, et le laisser affiche sous le nom d'un theme du paquet
+ * ferait dire au selecteur quelque chose de faux.
+ */
+const CUSTOM = "custom"
+
 export const ThemeBuilder = () => {
 	const [base, setBase] = useState("flower")
 	const [draft, setDraft] = useState<ShellTheme>(themes.flower)
 
 	const pickBase = (name: string) => {
+		// `custom`, c'est deja le brouillon en cours : il n'y a rien a charger
+		if (name === CUSTOM) return
+
 		setBase(name)
 		setDraft(themes[name])
 	}
 
+	/** toute retouche detache le brouillon du theme dont il est parti */
+	const edit = (change: (current: ShellTheme) => ShellTheme) => {
+		setBase(CUSTOM)
+		setDraft(change)
+	}
+
 	const setColor = (key: keyof ShellColors, value: string) =>
-		setDraft(current => ({
+		edit(current => ({
 			...current,
 			// le fond et l'invisible ne font qu'un : l'un suit l'autre
 			colors: {
@@ -194,7 +210,7 @@ export const ThemeBuilder = () => {
 		}))
 
 	const setWindowColor = (key: keyof WindowColors, value: string) =>
-		setDraft(current => ({
+		edit(current => ({
 			...current,
 			window: { ...current.window, [key]: value },
 		}))
@@ -233,6 +249,9 @@ export const ThemeBuilder = () => {
 								{name}
 							</option>
 						))}
+						{/* il n'apparait qu'une fois le brouillon retouche : avant, il
+						    n'y a rien qu'il designerait */}
+						{base === CUSTOM && <option value={CUSTOM}>{CUSTOM}</option>}
 					</select>
 				</Group>
 
@@ -240,11 +259,12 @@ export const ThemeBuilder = () => {
 					<input
 						value={draft.prompt}
 						onChange={event =>
-							setDraft(current => ({ ...current, prompt: event.target.value }))
+							edit(current => ({ ...current, prompt: event.target.value }))
 						}
 						style={{
 							font: "14px/1.5 ui-monospace, monospace",
 							padding: "6px 8px",
+							border: "1px solid #000000",
 							borderRadius: 4,
 							width: 80,
 						}}
