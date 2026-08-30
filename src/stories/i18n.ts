@@ -21,5 +21,11 @@ export type Prose = Record<Locale, string>
  * Corollaire : le meta perd son commentaire, et avec lui l'injection de
  * `parameters` que le plugin CSF fait aux metas qui en portent un — c'est
  * elle qui interdisait de poser des parametres a ce niveau.
+ *
+ * `controls` ouvre la table des props, fermee partout ailleurs : elle est
+ * la meme sur les douze pages, et la repeter noie le cas que chacune
+ * raconte. Une page la porte, celle par ou l'on entre.
  */
-export const prose = (text: Prose) => ({ docs: { prose: text } })
+export const prose = (text: Prose, options?: { controls?: boolean }) => ({
+	docs: { prose: text, controls: options?.controls === true },
+})

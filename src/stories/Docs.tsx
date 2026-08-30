@@ -14,7 +14,9 @@ import {
 import { LOCALES, type Locale, type Prose } from "./i18n"
 
 type MetaWithProse = {
-	preparedMeta?: { parameters?: { docs?: { prose?: Prose } } }
+	preparedMeta?: {
+		parameters?: { docs?: { prose?: Prose; controls?: boolean } }
+	}
 	csfFile?: { stories?: Record<string, unknown> }
 }
 
@@ -76,6 +78,10 @@ export const DocsPage = () => {
 	const { preparedMeta, csfFile } = useOf("meta") as MetaWithProse
 	const prose = preparedMeta?.parameters?.docs?.prose
 
+	// la table des props est la meme sur toutes les pages : une seule la
+	// porte, les autres restent sur ce qu'elles ont a montrer
+	const controls = preparedMeta?.parameters?.docs?.controls === true
+
 	/**
 	 * `Primary` rend deja la premiere story. `Stories` les rend toutes, la
 	 * premiere comprise — son `includePrimary` vaut vrai par defaut — et une
@@ -92,7 +98,7 @@ export const DocsPage = () => {
 			{/* la prose de la story elle-meme, quand elle est seule sur la page */}
 			{single && <Description of="story" />}
 			<Primary />
-			<Controls />
+			{controls && <Controls />}
 			{!single && <Stories includePrimary={false} />}
 		</>
 	)

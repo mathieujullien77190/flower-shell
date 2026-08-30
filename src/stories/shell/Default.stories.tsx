@@ -9,10 +9,14 @@ const meta: Meta<typeof Shell> = {
 	title: "Shell/Default",
 	component: Shell,
 	decorators: [boxed],
-	parameters: prose({
-		en: `
+	// la seule page qui porte la table des props : elle est la meme partout,
+	// et c'est ici qu'on entre
+	parameters: prose(
+		{
+			en: `
 \`<Shell />\`, with nothing at all. Every prop is optional, and what is left
-out simply does not exist.
+out simply does not exist. The table below lists them all — it is on this page
+alone, since it would say the same thing on every other.
 
 No \`commands\`, so the registry is empty: nothing answers, and nothing
 complains either — a typed line moves on to the next one. And no theme, so
@@ -20,9 +24,11 @@ nothing is painted: the shell takes the colours and the font of the page that
 holds it, the prompt falls back to \`>\`, and the markup stops colouring. Pass
 \`theme\`, or a \`themes\` catalogue to pick the first of, and it dresses up.
 `,
-		fr: `
+			fr: `
 \`<Shell />\`, sans rien du tout. Toutes les props sont facultatives, et ce
-qu'on ne donne pas n'existe simplement pas.
+qu'on ne donne pas n'existe simplement pas. La table ci-dessous les liste
+toutes — elle n'est que sur cette page, puisqu'elle dirait la même chose sur
+toutes les autres.
 
 Pas de \`commands\`, donc le registre est vide : rien ne répond, et rien ne
 proteste non plus — une ligne tapée passe à la suivante. Et pas de thème, donc
@@ -31,7 +37,9 @@ tient, l'invite retombe sur \`>\`, et le balisage cesse de colorer. Donnez
 \`theme\`, ou un catalogue \`themes\` dont il prendra le premier, et il
 s'habille.
 `,
-	}),
+		},
+		{ controls: true }
+	),
 }
 
 export default meta
