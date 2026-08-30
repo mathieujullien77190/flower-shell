@@ -122,8 +122,8 @@ const Watcher = () => {
 }
 
 const Cell = ({ on }: { on: boolean }) => (
-	<span style={{ opacity: on ? 1 : 0.2, textAlign: "center" }}>
-		{on ? "●" : "·"}
+	<span style={{ opacity: on ? 1 : 0.25, textAlign: "center" }}>
+		{on ? "✓" : "–"}
 	</span>
 )
 
