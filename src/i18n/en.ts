@@ -49,7 +49,7 @@ export const dictEn: Dict = {
 		set: "language: {lang}",
 	},
 	welcome: {
-		text: "Type `help` to list the commands",
+		text: "Welcome to $flower-shell$ — type `help` to list the commands",
 	},
 	error: {
 		unknown:

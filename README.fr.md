@@ -66,7 +66,7 @@ mettre vos mots, recouvrez cette clé comme n'importe quelle autre :
 <Shell
 	commands={baseCommands}
 	initialCommands={["title", "welcome"]}
-	dict={{ en: { welcome: { text: "Welcome — type `help` to look around" } } }}
+	dict={{ en: { welcome: { text: "Welcome to $acme$ — type `help` to look around" } } }}
 />
 ```
 

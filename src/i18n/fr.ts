@@ -50,7 +50,7 @@ export const dictFr: Dict = {
 		set: "langage : {lang}",
 	},
 	welcome: {
-		text: "Tapez `help` pour afficher la liste des commandes",
+		text: "Bienvenue sur $flower-shell$ — tapez `help` pour afficher la liste des commandes",
 	},
 	error: {
 		unknown:

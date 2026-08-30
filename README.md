@@ -66,7 +66,7 @@ put your own words there, override that key like any other:
 <Shell
 	commands={baseCommands}
 	initialCommands={["title", "welcome"]}
-	dict={{ en: { welcome: { text: "Welcome — type `help` to look around" } } }}
+	dict={{ en: { welcome: { text: "Welcome to $acme$ — type `help` to look around" } } }}
 />
 ```
 
