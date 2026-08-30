@@ -12,13 +12,20 @@ const preview: Preview = {
 		// the shell takes all the room it is given
 		layout: "fullscreen",
 		options: {
-			// Shell first: Markup documents the markers it renders, and reads
-			// better once you have seen where they end up. Inside Shell, the two
-			// smallest cases open the section — the bare terminal, then the same
-			// with the package commands — the rest stays alphabetical, and the
-			// theme builder closes it: it is a tool, not a case to read through.
+			// The landing page first: it is the package running, and it is what
+			// the published site opens on. Then Shell — Markup documents the
+			// markers it renders, and reads better once you have seen where they
+			// end up. Inside Shell, the two smallest cases open the section — the
+			// bare terminal, then the same with the package commands — the rest
+			// stays alphabetical, and the theme builder closes it: it is a tool,
+			// not a case to read through.
 			storySort: {
-				order: ["Shell", ["Default", "Minimal", "*", "Theme builder"], "Markup"],
+				order: [
+					"flower-shell",
+					"Shell",
+					["Default", "Minimal", "*", "Theme builder"],
+					"Markup",
+				],
 			},
 		},
 		docs: {
