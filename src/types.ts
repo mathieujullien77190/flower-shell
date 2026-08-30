@@ -82,7 +82,10 @@ export type BaseCommands = {
   animation?: BaseCommand;
   theme?: BaseCommand;
   lang?: BaseCommand;
-  /** le banc d'essai du balisage : une commande, tout le rendu */
+  /**
+   * le banc d'essai du balisage : une commande, tout le rendu. Il ne part
+   * pas avec `baseCommands`, il se monte a la main
+   */
   test?: BaseCommand;
   /** le mot d'accueil et le logo : restreints, joues par la banniere */
   welcome?: BaseCommand;
@@ -90,6 +93,8 @@ export type BaseCommands = {
   /** restreintes aussi, cherchees par nom quand la saisie ne passe pas */
   unknow?: BaseCommand;
   argumenterror?: BaseCommand;
+  /** restreinte : l'aiguillage des marqueurs cliquables `#libelle ~ cmd#` */
+  actionmap?: BaseCommand;
 };
 
 export type Command = {

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
 import { boxed } from "../decorators"
 import { source } from "../source"
 
@@ -21,15 +22,19 @@ export default meta
 
 export const Default: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands } from "flower-shell"
+import { Shell, baseCommands, test } from "flower-shell"
 
 // title then welcome: the opening is a pair of commands like any other.
 // welcome prints \`welcome.text\`, which the package already carries —
 // override that key through \`dict\` to put your own words there.
-<Shell commands={baseCommands} initialCommands={["title", "welcome"]} />
+// test rides along: it ships beside baseCommands, not inside it.
+<Shell
+	commands={{ ...baseCommands, test }}
+	initialCommands={["title", "welcome"]}
+/>
 `),
 	args: {
-		commands: baseCommands,
+		commands: { ...baseCommands, test },
 		initialCommands: ["title", "welcome"],
 	},
 }

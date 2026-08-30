@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
 import { boxed } from "../decorators"
 import { source } from "../source"
 
@@ -16,12 +17,12 @@ export default meta
 
 export const CustomTheme: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands } from "flower-shell"
+import { Shell, baseCommands, test } from "flower-shell"
 
 // everything can be replaced, missing values keep their defaults —
 // container is the style set on the terminal's own container
 <Shell
-	commands={baseCommands}
+	commands={{ ...baseCommands, test }}
 	theme={{
 		colors: {
 			background: "#1b1b2f",
@@ -38,7 +39,7 @@ import { Shell, baseCommands } from "flower-shell"
 `),
 	name: "Custom theme",
 	args: {
-		commands: baseCommands,
+		commands: { ...baseCommands, test },
 		theme: {
 			colors: {
 				background: "#1b1b2f",

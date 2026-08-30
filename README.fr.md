@@ -31,13 +31,23 @@ inconnue redevient une erreur.
 
 ## Les commandes de base
 
-`help`, `clear`, `hello`, `flowers`, `animation`, `lang`, `theme` et `test`.
+`help`, `clear`, `hello`, `flowers`, `animation`, `lang` et `theme`.
 
-`test` affiche toutes les couleurs du thème, la source à gauche et son rendu à
-droite : de quoi juger une palette, ou retrouver la syntaxe du balisage sans
-ouvrir cette page.
+`test` s'exporte tout seul, à côté de `baseCommands`, et se monte à la main :
+c'est un banc d'essai, pas quelque chose que vos visiteurs ont à trouver.
 
-Plus trois commandes restreintes — que le visiteur ne peut pas taper :
+```tsx
+import { Shell, baseCommands, test } from "flower-shell"
+
+<Shell commands={{ ...baseCommands, test }} />
+```
+
+Il affiche toutes les couleurs du thème, la source à gauche et son rendu à
+droite — de quoi juger une palette, ou retrouver la syntaxe du balisage sans
+ouvrir cette page — et il finit sur un marqueur cliquable qui joue vraiment
+`hello` quand on clique dessus.
+
+Plus les commandes restreintes — que le visiteur ne peut pas taper :
 
 - `title` affiche le logo ASCII du shell et `welcome` le texte de la clé
   `welcome.text`. Ce sont des commandes comme les autres — leur texte vit dans
@@ -49,6 +59,9 @@ Plus trois commandes restreintes — que le visiteur ne peut pas taper :
   rend leur texte quand une commande est inconnue ou mal appelée. Les retirer
   est permis : le dictionnaire du paquet prend le relais, et `commands={{}}` reste un
   shell valide, qui ne répond simplement à rien
+- `actionmap` est l'aiguillage des marqueurs cliquables : un clic sur
+  `#libellé ~ cmd args#` lui envoie `cmd args`, et son effet joue cette ligne.
+  Elle n'affiche rien d'elle-même — retirez-la et le clic ne fait plus rien
 
 ## L'ouverture
 

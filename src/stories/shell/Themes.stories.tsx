@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
 import { boxed } from "../decorators"
 import { source } from "../source"
 
@@ -23,19 +24,19 @@ export default meta
 
 export const Themes: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
+import { Shell, baseCommands, test, nordTheme, themes } from "flower-shell"
 
 // one theme, chosen up front
-<Shell commands={baseCommands} theme={nordTheme} />
+<Shell commands={{ ...baseCommands, test }} theme={nordTheme} />
 
 // or the whole catalogue, indexed by the name the visitor types
-<Shell commands={baseCommands} theme={themes.gruvbox} />
+<Shell commands={{ ...baseCommands, test }} theme={themes.gruvbox} />
 
 // either way, \`theme <name>\` switches live: flower, dark, light,
 // dracula, nord, gruvbox, monokai, solarized
 `),
 	args: {
-		commands: baseCommands,
+		commands: { ...baseCommands, test },
 		initialCommands: ["title", "welcome"],
 		dict: {
 			en: { welcome: { text: "Try \`theme nord\`, or \`help theme\` for the list" } },

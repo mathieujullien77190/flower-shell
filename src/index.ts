@@ -3,6 +3,7 @@ export type { ShellProps } from "./Shell"
 
 export { baseCommands } from "./commands/base"
 export { highlightFlower, plantFlowers } from "./commands/flowers"
+export { test } from "./commands/test"
 export { title } from "./commands/title"
 
 export { run, runRestricted } from "./engine/send"

@@ -32,6 +32,8 @@ export const dictFr: Dict = {
 		colors: "couleurs",
 		tags: "tags",
 		invisible: "la ligne au-dessus finit par un mot invisible — sélectionnez-le",
+		clicked: "cliquable",
+		click: "cliquez pour jouer hello",
 	},
 	theme: {
 		flower: "Le thème du paquet : feuillage sombre, une fleur pour invite",

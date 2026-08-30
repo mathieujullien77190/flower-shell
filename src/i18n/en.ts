@@ -31,6 +31,8 @@ export const dictEn: Dict = {
 		colors: "colours",
 		tags: "tags",
 		invisible: "the line above ends with an invisible word — select it",
+		clicked: "clickable",
+		click: "click to run hello",
 	},
 	theme: {
 		flower: "The package theme: leaf-dark, with a flower for a prompt",

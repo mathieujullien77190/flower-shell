@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
 import { dictEn } from "../../i18n/en"
 import { dictFr } from "../../i18n/fr"
 import { boxed } from "../decorators"
@@ -22,14 +23,14 @@ export default meta
 
 export const French: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands, dictEn, dictFr } from "flower-shell"
+import { Shell, baseCommands, test, dictEn, dictFr } from "flower-shell"
 
 // the shell's languages are the keys of dict, so both answer:
 // lang fr and lang en
-<Shell commands={baseCommands} lang="fr" dict={{ en: dictEn, fr: dictFr }} />
+<Shell commands={{ ...baseCommands, test }} lang="fr" dict={{ en: dictEn, fr: dictFr }} />
 `),
 	args: {
-		commands: baseCommands,
+		commands: { ...baseCommands, test },
 		lang: "fr",
 		dict: { en: dictEn, fr: dictFr },
 	},

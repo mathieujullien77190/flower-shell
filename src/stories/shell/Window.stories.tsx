@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Shell } from "../../Shell"
 import Window from "../../window"
 import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
 import { BaseCommand } from "../../types"
 import { fresh } from "../decorators"
 import { source } from "../source"
@@ -82,7 +83,7 @@ const Framed = () => {
 				onClose={() => setShow(false)}
 			>
 				<Shell
-					commands={{ ...baseCommands, exit }}
+					commands={{ ...baseCommands, test, exit }}
 					initialCommands={["title", "help exit"]}
 					scrollRef={content}
 				/>
@@ -105,7 +106,7 @@ export const InWindow: StoryObj<typeof Shell> = {
 		layout: "fullscreen",
 		...source(`
 import { useRef, useState } from "react"
-import { Shell, Window, baseCommands } from "flower-shell"
+import { Shell, Window, baseCommands, test } from "flower-shell"
 import type { BaseCommand } from "flower-shell"
 
 // show is React state in Framed; the command reaches it through this
@@ -138,7 +139,7 @@ const Framed = () => {
 				onClose={() => setShow(false)}
 			>
 				<Shell
-					commands={{ ...baseCommands, exit }}
+					commands={{ ...baseCommands, test, exit }}
 					initialCommands={["title", "help exit"]}
 					scrollRef={content}
 				/>

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
 import { BaseCommand } from "../../types"
 import { boxed } from "../decorators"
 import { source } from "../source"
@@ -32,7 +33,7 @@ export default meta
 export const CustomCommands: StoryObj<typeof Shell> = {
 	name: "Custom commands",
 	parameters: source(`
-import { Shell, baseCommands } from "flower-shell"
+import { Shell, baseCommands, test } from "flower-shell"
 import type { BaseCommand } from "flower-shell"
 
 // the texts are written where they are used: no dictionary, no keys.
@@ -46,9 +47,9 @@ const ping: BaseCommand = {
 }
 
 // the command is added to the object, the rest stays put
-<Shell commands={{ ...baseCommands, ping }} />
+<Shell commands={{ ...baseCommands, test, ping }} />
 `),
 	args: {
-		commands: { ...baseCommands, ping },
+		commands: { ...baseCommands, test, ping },
 	},
 }

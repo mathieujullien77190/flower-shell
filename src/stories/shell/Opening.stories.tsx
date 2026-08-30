@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
 import { boxed } from "../decorators"
 import { source } from "../source"
 
@@ -21,14 +22,14 @@ export default meta
 export const Opening: StoryObj<typeof Shell> = {
 	name: "Opening after clear",
 	parameters: source(`
-import { Shell, baseCommands } from "flower-shell"
+import { Shell, baseCommands, test } from "flower-shell"
 
 // banner instead of initialCommands: played at startup, and again
 // after every clear
-<Shell commands={baseCommands} banner={["title", "welcome"]} />
+<Shell commands={{ ...baseCommands, test }} banner={["title", "welcome"]} />
 `),
 	args: {
-		commands: baseCommands,
+		commands: { ...baseCommands, test },
 		banner: ["title", "welcome"],
 	},
 }

@@ -31,13 +31,23 @@ error again.
 
 ## The base commands
 
-`help`, `clear`, `hello`, `flowers`, `animation`, `lang`, `theme` and `test`.
+`help`, `clear`, `hello`, `flowers`, `animation`, `lang` and `theme`.
 
-`test` prints every colour of the theme, the source on the left and its render
-on the right: enough to judge a palette, or to find the markup syntax again
-without opening this page.
+`test` is exported on its own, beside `baseCommands`, and mounted by hand: it
+is a workbench, not something a visitor of yours needs to find.
 
-Plus three restricted commands — ones the visitor cannot type:
+```tsx
+import { Shell, baseCommands, test } from "flower-shell"
+
+<Shell commands={{ ...baseCommands, test }} />
+```
+
+It prints every colour of the theme, the source on the left and its render on
+the right — enough to judge a palette, or to find the markup syntax again
+without opening this page — and it ends on a clickable marker that really
+runs `hello` when you click it.
+
+Plus the restricted commands — ones the visitor cannot type:
 
 - `title` prints the ASCII logo of the shell and `welcome` the text of the
   `welcome.text` key. They are commands like any other — their text lives in
@@ -49,6 +59,9 @@ Plus three restricted commands — ones the visitor cannot type:
   renders their text when a command is unknown or badly called. Removing them
   is allowed: the package dictionary takes over, and `commands={{}}` remains a
   valid shell, one that simply answers nothing
+- `actionmap` is the router of the clickable markers: a click on
+  `#label ~ cmd args#` sends it `cmd args`, and its effect plays that line. It
+  shows nothing of its own — remove it and a click does nothing
 
 ## The opening
 
