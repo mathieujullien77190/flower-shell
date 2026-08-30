@@ -10,8 +10,9 @@ const meta: Meta<typeof ThemeBuilder> = {
 	parameters: prose({
 		en: `
 Pick a theme to start from, move the colours, and read the result twice: once
-as a shell, once as the code that produces it. The block at the bottom is a
-real \`theme\` prop — copy it into your own \`<Shell />\`.
+as a shell, once as the code that produces it. The block at the bottom is the
+pair to paste: the theme itself, and the \`themes\` entry plus the \`theme\`
+name that mount it.
 
 The preview is the real thing: a \`Shell\` in a \`Window\`, wearing the draft,
 opening on \`test\` — the command that prints every colour of the theme. Both
@@ -24,7 +25,8 @@ alone, so the palette lands with the colour and not a second later.
 		fr: `
 Choisissez un thème de départ, déplacez les couleurs, et lisez le résultat
 deux fois : une fois en shell, une fois en code qui le produit. Le bloc du bas
-est une vraie prop \`theme\` — copiez-la dans votre \`<Shell />\`.
+est la paire à coller : le thème lui-même, et l'entrée \`themes\` plus le nom
+\`theme\` qui le montent.
 
 L'aperçu est le vrai : un \`Shell\` dans une \`Window\`, portant le brouillon,
 ouvrant sur \`test\` — la commande qui affiche toutes les couleurs du thème.

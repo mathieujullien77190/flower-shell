@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react"
 import {
 	Controls,
+	Description,
 	DocsContext,
 	Markdown,
 	Primary,
@@ -14,6 +15,7 @@ import { LOCALES, type Locale, type Prose } from "./i18n"
 
 type MetaWithProse = {
 	preparedMeta?: { parameters?: { docs?: { prose?: Prose } } }
+	csfFile?: { stories?: Record<string, unknown> }
 }
 
 /** ce dont la page a besoin, et que le type public du contexte ne dit pas */
@@ -71,17 +73,27 @@ const useLocale = (): Locale => {
  */
 export const DocsPage = () => {
 	const locale = useLocale()
-	const { preparedMeta } = useOf("meta") as MetaWithProse
+	const { preparedMeta, csfFile } = useOf("meta") as MetaWithProse
 	const prose = preparedMeta?.parameters?.docs?.prose
+
+	/**
+	 * `Primary` rend deja la premiere story. `Stories` les rend toutes, la
+	 * premiere comprise — son `includePrimary` vaut vrai par defaut — et une
+	 * page d'une seule story l'affichait donc deux fois. Un fichier a story
+	 * unique se passe du bloc ; les autres le prennent sans la primaire.
+	 */
+	const single = Object.keys(csfFile?.stories || {}).length === 1
 
 	return (
 		<>
 			<Title />
 			<Subtitle />
 			{prose && <Markdown>{prose[locale] || prose.en}</Markdown>}
+			{/* la prose de la story elle-meme, quand elle est seule sur la page */}
+			{single && <Description of="story" />}
 			<Primary />
 			<Controls />
-			<Stories />
+			{!single && <Stories includePrimary={false} />}
 		</>
 	)
 }
