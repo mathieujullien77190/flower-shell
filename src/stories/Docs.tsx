@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react"
 import {
 	Controls,
 	Description,
+	DocsContainer,
 	DocsContext,
 	Markdown,
 	Primary,
@@ -10,6 +11,7 @@ import {
 	Title,
 	useOf,
 } from "@storybook/addon-docs/blocks"
+import { themes } from "storybook/theming"
 
 import { LOCALES, type Locale, type Prose } from "./i18n"
 
@@ -45,8 +47,9 @@ const isLocale = (value: unknown): value is Locale =>
  * de la lecture ci-dessous, ce qui evite d'avoir a deviner la forme de ce
  * que l'evenement transporte.
  */
-const useLocale = (): Locale => {
-	const context = useContext(DocsContext) as unknown as DocsInternals
+const useGlobalsFromDocs = (
+	context: DocsInternals
+): Record<string, unknown> => {
 	const [, redraw] = useState(0)
 
 	useEffect(() => {
@@ -59,9 +62,39 @@ const useLocale = (): Locale => {
 		return () => channel.off("globalsUpdated", refresh)
 	}, [context])
 
-	const globals = context?.getStoryContext?.(context.primaryStory)?.globals
+	return context?.getStoryContext?.(context.primaryStory)?.globals || {}
+}
 
-	return isLocale(globals?.locale) ? globals.locale : "en"
+const useLocale = (): Locale => {
+	const context = useContext(DocsContext) as unknown as DocsInternals
+	const globals = useGlobalsFromDocs(context)
+
+	return isLocale(globals.locale) ? globals.locale : "en"
+}
+
+/**
+ * Le conteneur de la page docs, pose avec elle dans `preview.tsx`.
+ *
+ * Il ne sert qu'a passer un theme a celui de Storybook. Le manager a le
+ * sien, repose par `manager.ts` ; la page docs vit dans l'autre document
+ * et lit le meme global de son cote, sans quoi la barre laterale
+ * changerait de couleur et la page resterait blanche.
+ */
+export const Container = ({
+	context,
+	children,
+}: {
+	context: unknown
+	children: React.ReactNode
+}) => {
+	const globals = useGlobalsFromDocs(context as DocsInternals)
+	const theme = globals.theme === "dark" ? themes.dark : themes.light
+
+	return (
+		<DocsContainer context={context as never} theme={theme}>
+			{children as never}
+		</DocsContainer>
+	)
 }
 
 /**

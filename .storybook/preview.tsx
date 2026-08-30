@@ -1,6 +1,6 @@
 import type { Preview } from "@storybook/react-vite"
 
-import { DocsPage } from "../src/stories/Docs"
+import { Container, DocsPage } from "../src/stories/Docs"
 import { LOCALES } from "../src/stories/i18n"
 
 const preview: Preview = {
@@ -34,6 +34,9 @@ const preview: Preview = {
 			// toolbar. A comment above the meta could not do that — those are
 			// extracted at build time.
 			page: DocsPage,
+			// le conteneur porte le theme : le manager a le sien, la page docs
+			// vit dans l autre document et lit le meme global de son cote
+			container: Container,
 			// the code as written in the file, not the JSX rebuilt from args
 			source: { type: "code" },
 			// the stories bound themselves on the window height: on a docs
@@ -60,8 +63,29 @@ const preview: Preview = {
 				dynamicTitle: true,
 			},
 		},
+		/**
+		 * Le theme de Storybook lui-meme — pas celui du shell, qui a ses
+		 * propres props. Clair par defaut : la documentation se lit, et les
+		 * terminaux qu'elle montre sont sombres, ce qui les detache.
+		 *
+		 * Le manager ne se theme pas depuis ici : `manager.ts` regarde ce
+		 * global et repose sa config. La page docs, elle, le lit dans son
+		 * conteneur.
+		 */
+		theme: {
+			description: "Storybook theme",
+			toolbar: {
+				title: "Theme",
+				icon: "sun",
+				items: [
+					{ value: "light", title: "Light", icon: "sun" },
+					{ value: "dark", title: "Dark", icon: "moon" },
+				],
+				dynamicTitle: true,
+			},
+		},
 	},
-	initialGlobals: { locale: LOCALES[0] },
+	initialGlobals: { locale: LOCALES[0], theme: "light" },
 }
 
 export default preview
