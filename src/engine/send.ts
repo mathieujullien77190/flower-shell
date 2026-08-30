@@ -1,4 +1,4 @@
-import { getBanner, getCommands } from "@state/registry"
+import { getCommands } from "@state/registry"
 import { shellActions } from "@state/store"
 import { createCommand, findCommand } from "./terminalEngine"
 
@@ -21,11 +21,6 @@ const send = (commandPattern: string, restricted: boolean) => {
 	const baseCmd = findCommand({ commands, name: cmd.name, restricted })
 
 	if (baseCmd?.effect && cmd.canExecute) baseCmd.effect({ args: cmd.args })
-
-	// effacer l'ecran laisse la banniere, comme au demarrage
-	if (!restricted && cmd.name === "clear" && cmd.canExecute) {
-		getBanner().forEach(name => runRestricted(name))
-	}
 
 	shellActions().addCommand(cmd)
 

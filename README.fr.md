@@ -17,7 +17,6 @@ const App = () => <Shell commands={baseCommands} />
 | --- | --- |
 | `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
 | `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
-| `banner` | commandes rejouées au démarrage **et après chaque `clear`** |
 | `theme` | le thème porté au démarrage ; couleurs, invite, polices |
 | `themes` | les thèmes que le visiteur peut prendre, un par nom ; sans elle, le catalogue du paquet |
 | `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
@@ -53,9 +52,8 @@ Plus les commandes restreintes — que le visiteur ne peut pas taper :
 - `title` affiche le logo ASCII du shell et `welcome` le texte de la clé
   `welcome.text`. Ce sont des commandes comme les autres — leur texte vit dans
   le dictionnaire, et vous y mettez vos mots en recouvrant cette clé par
-  `dict`. Vous les jouez en les mettant dans `initialCommands`, ou dans
-  `banner` pour qu'elles reviennent après un `clear`. Sans ça le shell démarre
-  nu, et vous posez votre marque
+  `dict`. Vous les jouez en les mettant dans `initialCommands`. Sans ça le
+  shell démarre nu, et vous posez votre marque
 - `unknow` et `argumenterror` sont cherchées **par nom** par le moteur, qui
   rend leur texte quand une commande est inconnue ou mal appelée. Les retirer
   est permis : le dictionnaire du paquet prend le relais, et `commands={{}}` reste un
@@ -85,8 +83,8 @@ mettre vos mots, recouvrez cette clé comme n'importe quelle autre :
 ```
 
 `initialCommands` ne joue qu'une fois, sur un écran vierge : un `clear` ne les
-rejoue pas. Ce qui doit revenir après un `clear` va dans `banner`, à la même
-syntaxe près.
+rejoue pas. `clear` efface l'écran et rien d'autre — faire revenir quelque
+chose après lui est à vous de l'écrire, depuis `onCommand` et `runRestricted`.
 
 ## Écrire une commande
 
@@ -109,8 +107,9 @@ pas.
 Un texte est **toujours une `string`**. Dans une `action`, c'est à vous
 d'appeler `t("clé")` — vous pouvez donc mélanger : `` `${t("ping.pong")} ${nom}` ``.
 Dans les champs statiques (`help.description`, `description` d'un pattern),
-vous écrivez **la clé** et le shell la traduit au moment de s'en servir. Une clé absente du dictionnaire s'affiche telle quelle, ce qui permet
-d'écrire directement `description: "répond pong"` quand une seule langue suffit.
+vous écrivez **la clé** et le shell la traduit au moment de s'en servir. Une
+clé absente du dictionnaire s'affiche telle quelle, ce qui permet d'écrire
+directement `description: "répond pong"` quand une seule langue suffit.
 
 | champ | rôle |
 | --- | --- |
@@ -334,6 +333,10 @@ npm run storybook   # le terminal seul, sans le reste du site
 Les stories sont sous `src/stories`, une par cas : le shell nu, avec des
 commandes personnalisées, dans une fenêtre, dans chaque langue. Chacune montre
 le code qui la produit, imports compris.
+
+**Shell / On command** pose un panneau à côté du terminal et le remplit avec
+le seul `onCommand` : une ligne par commande jouée, avec ses arguments. C'est
+là qu'on voit ce que le shell rend — `clear` compris.
 
 **Shell / Theme builder** est un créateur de thème : on part d'un thème du
 catalogue, on déplace les couleurs, l'aperçu suit, et le bloc du bas est la

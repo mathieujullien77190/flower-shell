@@ -2,7 +2,6 @@ import { create } from "zustand"
 import { useShallow } from "zustand/react/shallow"
 
 import { Command } from "@types"
-import { getBanner } from "./registry"
 import { DEFAULT_THEME_NAME, setTheme, themeByName } from "@theme"
 
 /** le nom d'un theme du catalogue : ce que le visiteur tape */
@@ -146,19 +145,16 @@ export const useGetCurrentCommand = () =>
 	useShellStore(state => state.commands[state.cursor] || null)
 
 /**
- * Le demarrage est fini : toute la banniere est rendue et le visiteur n'a
- * encore rien tape. Le compte vient de la banniere elle-meme, elle est
- * posee par le consommateur et peut avoir n'importe quelle longueur.
+ * Le demarrage est fini : plus une commande restreinte en attente de rendu,
+ * et le visiteur n'a encore rien tape. C'est ce que joue `initialCommands`
+ * qui remplit la premiere condition, quelle qu'en soit la longueur.
  */
 export const useGetStart = () =>
-	useShellStore(state => {
-		const expected = getBanner().length
-		const done = state.restrictedCommands.filter(
-			command => command.isRendered
-		).length
-
-		return done >= expected && state.commands.length === 0
-	})
+	useShellStore(
+		state =>
+			state.restrictedCommands.every(command => command.isRendered) &&
+			state.commands.length === 0
+	)
 
 /** derniere commande jouee par le visiteur, les restreintes exclues */
 export const useGetLastCommand = () =>

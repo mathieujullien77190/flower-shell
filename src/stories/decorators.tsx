@@ -7,7 +7,7 @@ import { shellActions } from "../state/store"
 /**
  * The shell state lives in a module: without this, one story's history would
  * carry into the next. The reset happens while the decorator renders, so
- * before the shell mounts and plays its banner.
+ * before the shell mounts and plays its opening.
  */
 export const Fresh = ({ children }: { children: React.ReactNode }) => {
 	useState(() => {

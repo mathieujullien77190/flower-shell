@@ -17,7 +17,6 @@ const App = () => <Shell commands={baseCommands} />
 | --- | --- |
 | `commands` | the known commands, indexed by name: the ones shipped with the package, plus yours; optional |
 | `initialCommands` | commands played at startup, once; this is where the opening goes |
-| `banner` | commands replayed at startup **and after every `clear`** |
 | `theme` | the theme worn at startup; colours, prompt, fonts |
 | `themes` | the themes the visitor can reach, one per name; without it, the package catalogue |
 | `dict` | the languages of the shell, one dictionary per language; without it, English alone |
@@ -53,9 +52,8 @@ Plus the restricted commands — ones the visitor cannot type:
 - `title` prints the ASCII logo of the shell and `welcome` the text of the
   `welcome.text` key. They are commands like any other — their text lives in
   the dictionary, and you put your own words there by overriding that key
-  through `dict`. You play them by putting them in `initialCommands`, or in
-  `banner` so they come back after a `clear`. Without that the shell starts
-  bare, and you put your own mark on it
+  through `dict`. You play them by putting them in `initialCommands`. Without
+  that the shell starts bare, and you put your own mark on it
 - `unknow` and `argumenterror` are looked up **by name** by the engine, which
   renders their text when a command is unknown or badly called. Removing them
   is allowed: the package dictionary takes over, and `commands={{}}` remains a
@@ -84,9 +82,10 @@ put your own words there, override that key like any other:
 />
 ```
 
-`initialCommands` only plays once, on a blank screen: a `clear` does not replay
-them. What has to come back after a `clear` goes in `banner`, with the same
-syntax.
+`initialCommands` only plays once, on a blank screen: a `clear` does not
+replay them. `clear` wipes the screen and does nothing else — bringing
+something back after it is yours to write, from `onCommand` and
+`runRestricted`.
 
 ## Writing a command
 
@@ -109,9 +108,9 @@ field.
 A text is **always a `string`**. Inside an `action`, calling `t("key")` is up
 to you — so you can mix: `` `${t("ping.pong")} ${name}` ``. In the static
 fields (`help.description`, a pattern `description`) you write **the key** and
-the shell translates it when it uses it. A key missing
-from the dictionary shows as-is, which lets you write
-`description: "answers pong"` directly when one language is enough.
+the shell translates it when it uses it. A key missing from the dictionary
+shows as-is, which lets you write `description: "answers pong"` directly when
+one language is enough.
 
 | field | role |
 | --- | --- |
@@ -332,6 +331,10 @@ npm run storybook   # the terminal alone, without the rest of the site
 The stories live under `src/stories`, one per case: the bare shell, with custom
 commands, in a window, in each language. Each shows the code that produces it,
 imports included.
+
+**Shell / On command** puts a panel beside the terminal and fills it from
+`onCommand` alone: one line per command played, with its arguments. It is
+where to look to see what the shell hands back — `clear` included.
 
 **Shell / Theme builder** is a theme maker: you start from a theme of the
 catalogue, move the colours, the preview follows, and the block at the bottom

@@ -16,12 +16,3 @@ export const setCommands = (commands: BaseCommands) => {
 }
 
 export const getCommands = (): BaseCommands => registry
-
-/** les commandes restreintes rejouees au demarrage et apres un clear */
-let banner: string[] = []
-
-export const setBanner = (commands: string[]) => {
-	banner = commands
-}
-
-export const getBanner = (): string[] => banner

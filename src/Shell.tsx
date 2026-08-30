@@ -4,7 +4,7 @@ import Terminal from "./render/Terminal";
 
 import { run, runRestricted, setListener } from "./engine/send";
 import { setDict } from "./i18n/lang";
-import { getCommands, setBanner, setCommands } from "./state/registry";
+import { getCommands, setCommands } from "./state/registry";
 import {
   shellActions,
   useAnimation,
@@ -22,11 +22,6 @@ export type ShellProps = {
    * le shell se monte nu — il affiche l'invite et ne repond a rien.
    */
   commands?: BaseCommands & { [name: string]: BaseCommand };
-  /**
-   * Commandes restreintes rejouees au demarrage et apres un clear. C'est
-   * la que se met la marque : le shell, lui, n'en connait aucune.
-   */
-  banner?: string[];
   /** le theme de depart ; un theme partiel garde les valeurs qu'il ne donne pas */
   theme?: ShellThemeInput;
   /**
@@ -46,13 +41,15 @@ export type ShellProps = {
   /** langue de depart ; sans elle, le francais */
   lang?: string;
   /**
-   * Commandes jouees au demarrage, apres la banniere, dans l'ordre du
-   * tableau. Chacune part comme tapee ; les restreintes (`title`,
-   * `welcome`...) sont jouees comme par la banniere. C'est ici que se met
-   * l'ouverture — `["title", "welcome"]` pour le logo puis l'accueil.
+   * Commandes jouees au demarrage, dans l'ordre du tableau. Chacune part
+   * comme tapee ; les restreintes (`title`, `welcome`...) passent par le
+   * canal restreint. C'est ici que se met l'ouverture — `["title",
+   * "welcome"]` pour le logo puis l'accueil.
    *
    * Jouees une seule fois, sur un ecran vierge : un `clear` ne les rejoue
-   * pas. Ce qui doit revenir apres un `clear` va dans `banner`.
+   * pas, il efface et rien d'autre. Les faire revenir est l'affaire du
+   * consommateur — `onCommand` le previent du `clear`, `runRestricted` lui
+   * permet de rejouer ce qu'il veut.
    */
   initialCommands?: string[];
   /**
@@ -73,7 +70,6 @@ export type ShellProps = {
  */
 export const Shell = ({
   commands = {},
-  banner = [],
   theme,
   themes,
   dict,
@@ -87,7 +83,6 @@ export const Shell = ({
     // le dictionnaire d'abord : une commande jouee traduit en s'executant
     setDict(dict);
     setCommands(commands);
-    setBanner(banner);
     // le catalogue avant le theme de depart : `help theme` et `theme <nom>`
     // lisent le premier, et le second n'a pas a en faire partie
     setThemes(themes);
@@ -113,10 +108,6 @@ export const Shell = ({
   }, [commands]);
 
   useEffect(() => {
-    setBanner(banner);
-  }, [banner]);
-
-  useEffect(() => {
     setThemes(themes);
   }, [themes]);
 
@@ -131,7 +122,7 @@ export const Shell = ({
   }, [lang]);
 
   /**
-   * La banniere s'ecrit au montage, mais seulement si l'ecran est vide.
+   * L'ouverture se joue au montage, mais seulement si l'ecran est vide.
    * Le shell peut etre demonte puis remonte — une fenetre qu'on ferme et
    * qu'on rouvre — alors que l'historique, lui, vit au niveau du module
    * et a survecu : la rejouer afficherait le titre deux fois.
@@ -145,9 +136,8 @@ export const Shell = ({
     );
 
     if (!onScreen) {
-      banner.forEach((name) => runRestricted(name));
-      // apres la banniere : les commandes de depart, enchainees dans l'ordre.
-      // une restreinte (title...) passe par le canal restreint, sinon comme tapee
+      // les commandes de depart, enchainees dans l ordre du tableau. une
+      // restreinte (title...) passe par le canal restreint, sinon comme tapee
       initialCommands.forEach((pattern) => {
         const name = pattern.split(" ")[0];
         if (getCommands()[name]?.restricted) runRestricted(pattern);
