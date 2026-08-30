@@ -2,8 +2,8 @@ import { colors, fonts } from "../../theme"
 import type { ShellColors } from "../../theme"
 
 /**
- * `highlight` colours text through paired markers. Each theme colour has its
- * own marker; wrapped in brackets it becomes a tag (coloured background,
+ * `highlight` colors text through paired markers. Each theme color has its
+ * own marker; wrapped in brackets it becomes a tag (colored background,
  * readable text inside). A backslash before a marker prints it as-is. These
  * stories render the function on its own, outside the shell.
  */
@@ -13,7 +13,7 @@ export const noop = (name: string, args: string[]) =>
 	// eslint-disable-next-line no-console
 	console.log("marker click:", name, args)
 
-/** a terminal-like frame, on the colours of a given theme */
+/** a terminal-like frame, on the colors of a given theme */
 export const Screen = ({
 	palette = colors(),
 	children,
@@ -57,7 +57,7 @@ export const Row = ({
 	</div>
 )
 
-/** one marker per theme colour, inline */
+/** one marker per theme color, inline */
 export const MARKERS = [
 	"§important§",
 	"+info+",
@@ -67,7 +67,7 @@ export const MARKERS = [
 	"_invisible (select me)_",
 ]
 
-/** the same colours in brackets: a solid background instead of a text colour */
+/** the same colors in brackets: a solid background instead of a text color */
 export const TAGS = [
 	"[§important§]",
 	"[+info+]",

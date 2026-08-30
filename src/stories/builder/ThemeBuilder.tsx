@@ -9,7 +9,7 @@ import type { ShellColors, ShellTheme, WindowColors } from "../../theme"
 
 /**
  * The preview: a real shell, in a real window, wearing the draft. It opens
- * on `test`, which prints every colour of the theme — the palette being
+ * on `test`, which prints every color of the theme — the palette being
  * edited, rendered by the code that will render it for real.
  *
  * It remounts on every touch of a picker, through the `key` its parent
@@ -18,7 +18,7 @@ import type { ShellColors, ShellTheme, WindowColors } from "../../theme"
  * would find the previous lines on screen and skip `initialCommands`.
  *
  * Animation off, and only here: replaying `test` letter by letter at every
- * keystroke would show the palette a second after the colour changed.
+ * keystroke would show the palette a second after the color changed.
  *
  * And the keyboard focus let go, which matters more than it sounds: the
  * shell takes it back on every mouse release anywhere on the page, so that
@@ -71,8 +71,8 @@ const WINDOW_FIELDS: { key: keyof WindowColors; label: string }[] = [
 ]
 
 /**
- * A colour input only accepts `#rrggbb`. Two of the shipped themes name a
- * CSS colour instead — `lightGray`, `gray` — so the picker needs a hex to
+ * A color input only accepts `#rrggbb`. Two of the shipped themes name a
+ * CSS color instead — `lightGray`, `gray` — so the picker needs a hex to
  * open on. The browser measures it for us.
  */
 const toHex = (value: string) => {

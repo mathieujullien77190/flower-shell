@@ -10,7 +10,7 @@ import { prose } from "../i18n"
 import { source } from "../source"
 
 /**
- * Written from scratch: only the colours and the prompt. What a theme does
+ * Written from scratch: only the colors and the prompt. What a theme does
  * not say keeps the value of `defaultTheme` — the window frame and the
  * fonts, here.
  */

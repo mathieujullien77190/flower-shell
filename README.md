@@ -31,8 +31,8 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 Every prop is optional, and what is left out simply does not exist. `<Shell />`
 mounts on nothing: an empty registry, so a typed line moves on to the next with
 no error message, and no theme, so nothing is painted — the shell takes the
-colours and the font of the page that holds it, the prompt falls back to `>`,
-and the markup stops colouring. As soon as one command exists, an unknown
+colors and the font of the page that holds it, the prompt falls back to `>`,
+and the markup stops coloring. As soon as one command exists, an unknown
 command becomes an error again.
 
 ## The base commands
@@ -48,7 +48,7 @@ import { Shell, baseCommands, test } from "flower-shell"
 <Shell commands={{ ...baseCommands, test }} />
 ```
 
-It prints every colour of the theme, the source on the left and its render on
+It prints every color of the theme, the source on the left and its render on
 the right — enough to judge a palette, or to find the markup syntax again
 without opening this page — and it ends on a clickable marker that really
 runs `hello` when you click it.
@@ -170,7 +170,7 @@ one language is enough.
 | `JSX` | React render under the output, for a command that shows better than it tells |
 | `help` | the help; a function when it depends on state, like the one of `lang` |
 | `testArgs` | accepted arguments (`authorize`, `empty`); `authorize` accepts a function |
-| `display` | animation, styles, custom colouring |
+| `display` | animation, styles, custom coloring |
 | `restricted` | true when the visitor cannot type it; reserved for code |
 
 ## The window
@@ -257,20 +257,20 @@ reading mode, preference.
 
 ## Text markup
 
-Answers go through a colouring pass. Each theme colour has its own marker:
+Answers go through a coloring pass. Each theme color has its own marker:
 
 | marker | effect |
 | --- | --- |
-| `§text§` | accent colour |
-| `+text+` | info colour |
-| `` `text` `` | command colour |
-| `!text!` | restricted colour |
-| `$text$` | brand colour |
-| `_text_` | the background colour: invisible until selected |
+| `§text§` | accent color |
+| `+text+` | info color |
+| `` `text` `` | command color |
+| `!text!` | restricted color |
+| `$text$` | brand color |
+| `_text_` | the background color: invisible until selected |
 | `#label ~ cmd args#` | clickable and underlined: the click plays `cmd` with its arguments |
 
 A marker in brackets — `[+text+]` — becomes a tag: a solid background instead
-of a text colour, the label in black or white depending on how light the
+of a text color, the label in black or white depending on how light the
 background is.
 
 A backslash before a marker prints it as-is: `\+` gives `+`. A backslash with
@@ -361,8 +361,8 @@ described by the `theme.<name>` dictionary key.
 Neither prop is required, and neither has a fallback that dresses the shell
 behind your back. `theme` names what it wears; without it, the first entry of
 `themes`; without those either, `bareTheme` — transparent background,
-inherited colours and font, `>` for a prompt, and a markup that no longer
-colours anything. What you do not hand over is not painted.
+inherited colors and font, `>` for a prompt, and a markup that no longer
+colors anything. What you do not hand over is not painted.
 
 A name that is not in the catalogue is ignored rather than quietly mounted:
 starting on a theme the visitor could never get back to is something neither
@@ -396,7 +396,7 @@ const mine = {
 ```
 
 Absent values keep those of `defaultTheme`, inside a group included: giving
-only `colors.background` leaves the other colours in place. A mounted theme is
+only `colors.background` leaves the other colors in place. A mounted theme is
 laid on `defaultTheme` and not on the one it replaces, so switching to it
 gives the same result whichever theme you are leaving.
 
@@ -445,10 +445,10 @@ gap between the last two ticks, that is the animation; then `nope`,
 `theme nope` and `boom`, one for each reason an error carries.
 
 **Shell / Theme builder** is a theme maker: you start from a theme of the
-catalogue, move the colours, the preview follows, and the block at the bottom
+catalogue, move the colors, the preview follows, and the block at the bottom
 is the matching `theme` prop — to be copied as-is.
 
-**Markup** documents the markup, marker by marker: the colours, the tags, the
+**Markup** documents the markup, marker by marker: the colors, the tags, the
 escaping.
 
 ## Licence

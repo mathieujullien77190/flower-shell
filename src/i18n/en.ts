@@ -27,8 +27,8 @@ export const dictEn: Dict = {
 		disabled: "disabled",
 	},
 	test: {
-		usage: "Shows every colour of the theme, written and rendered",
-		colors: "colours",
+		usage: "Shows every color of the theme, written and rendered",
+		colors: "colors",
 		tags: "tags",
 		invisible: "the line above ends with an invisible word — select it",
 		clicked: "clickable",

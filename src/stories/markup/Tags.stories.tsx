@@ -9,7 +9,7 @@ import { Row, Screen, TAGS, noop } from "./screen"
 const meta: Meta = {
 	title: "Markup/Tags",
 	parameters: prose({
-		en: "The same colours, as tags: `[+…+]` gives a solid background.",
+		en: "The same colors, as tags: `[+…+]` gives a solid background.",
 		fr: "Les mêmes couleurs, en tags : `[+…+]` donne un fond plein.",
 	}),
 }

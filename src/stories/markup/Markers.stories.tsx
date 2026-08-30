@@ -9,7 +9,7 @@ import { MARKERS, Row, Screen, noop } from "./screen"
 const meta: Meta = {
 	title: "Markup/Markers",
 	parameters: prose({
-		en: "Each marker, its source on the left and its coloured render on the right.",
+		en: "Each marker, its source on the left and its colored render on the right.",
 		fr: "Chaque marqueur, sa source à gauche et son rendu coloré à droite.",
 	}),
 }

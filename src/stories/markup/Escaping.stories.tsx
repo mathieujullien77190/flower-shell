@@ -9,7 +9,7 @@ import { Row, Screen, noop } from "./screen"
 const meta: Meta = {
 	title: "Markup/Escaping",
 	parameters: prose({
-		en: "Escaping: `\\+` prints the marker instead of colouring, and a lone backslash stays as-is.",
+		en: "Escaping: `\\+` prints the marker instead of coloring, and a lone backslash stays as-is.",
 		fr: "Échappement : `\\+` affiche le marqueur au lieu de colorer, et un antislash seul reste tel quel.",
 	}),
 }
@@ -21,7 +21,7 @@ export const Escaping: StoryObj = {
 	render: () => {
 		setTheme(twilightTheme)
 		const lines = [
-			"Coloured: +this+ — escaped: \+this\+",
+			"Colored: +this+ — escaped: \+this\+",
 			"Raw markers: \§ \+ \` \! \$",
 		]
 		return (
