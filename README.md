@@ -205,7 +205,8 @@ frame content, so `scrollRef` has nothing left to say:
 | `compact` | full and not resizable: it takes the whole container, and `start` and `margin` have nothing left to place |
 | `canExpand` | the maximise button, and the double-click on the bar |
 | `canClose` | the closing cross |
-| `onClose` | called once the closing is animated, after the frame is gone |
+| `open` | open or closed, held by the caller; without it the frame holds its own |
+| `onClose` | the cross was clicked |
 
 `start` reads horizontal first, then vertical, out of `left | center | right`
 and `top | center | bottom` — `right-top`, `left-bottom`, `center-center`.
@@ -217,6 +218,31 @@ its corner.
 
 The shell only takes the size of what holds it: give that a height, the
 package imposes none.
+
+### Opening it from outside
+
+Without `open`, the frame holds its own state: it opens on mount, the cross
+closes it, and nothing reopens it. Pass `open` and that state moves out — a
+button of yours and the cross now write to the same place, and the cross has
+stopped deciding anything: it reports through `onClose` and waits for the prop
+to come back false.
+
+```tsx
+const [open, setOpen] = useState(false)
+
+;<>
+	<button onClick={() => setOpen(current => !current)}>the terminal</button>
+	<Shell
+		commands={baseCommands}
+		initialCommands={["title", "welcome"]}
+		window={{ title: "flower-shell", open, onClose: () => setOpen(false) }}
+	/>
+</>
+```
+
+Closed, the terminal is unmounted; the history is not — it lives at module
+level. Reopening finds what was written still there, posted at once rather
+than typed out again, and `initialCommands` does not play a second time.
 
 ### The frame on its own
 
@@ -243,7 +269,7 @@ const container = useRef<HTMLDivElement>(null)
 | `Window` prop | role |
 | --- | --- |
 | `children` | what the frame holds |
-| `show` | mounted or not; closing animates before unmounting |
+| `show` | mounted or not; the frame never closes itself, `onClose` reports |
 | `container` | the frame bounds its movement to this element |
 | `title` | the text of the bar |
 | `bottomInset` | height reserved at the bottom, for a taskbar |

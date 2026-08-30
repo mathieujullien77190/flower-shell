@@ -205,7 +205,8 @@ cadre : `scrollRef` n'a plus rien à dire.
 | `compact` | pleine et non redimensionnable : elle prend tout le conteneur, et `start` comme `margin` n'ont plus rien à placer |
 | `canExpand` | le bouton d'agrandissement, et le double-clic sur la barre |
 | `canClose` | la croix de fermeture |
-| `onClose` | appelé une fois la fermeture animée, après que le cadre a disparu |
+| `open` | ouverte ou fermée, tenue par l'appelant ; sans elle le cadre tient la sienne |
+| `onClose` | la croix a été cliquée |
 
 `start` se lit horizontale d'abord, puis verticale, parmi
 `left | center | right` et `top | center | bottom` — `right-top`,
@@ -218,6 +219,31 @@ coin.
 
 Le shell ne prend que la taille de ce qui le tient : donnez-lui une hauteur,
 le paquet n'en impose aucune.
+
+### L'ouvrir de l'extérieur
+
+Sans `open`, le cadre tient son état lui-même : il s'ouvre au montage, la
+croix le ferme, et rien ne le rouvre. Donnez `open` et cet état sort — un
+bouton à vous et la croix écrivent alors au même endroit, et la croix ne
+décide plus rien : elle prévient par `onClose` et attend que la prop revienne
+à faux.
+
+```tsx
+const [open, setOpen] = useState(false)
+
+;<>
+	<button onClick={() => setOpen(current => !current)}>the terminal</button>
+	<Shell
+		commands={baseCommands}
+		initialCommands={["title", "welcome"]}
+		window={{ title: "flower-shell", open, onClose: () => setOpen(false) }}
+	/>
+</>
+```
+
+Fermée, le terminal est démonté ; l'historique, non — il vit au niveau du
+module. La rouvrir retrouve ce qui y était écrit, posé d'un coup et non
+réécrit lettre par lettre, et `initialCommands` ne se rejoue pas.
 
 ### Le cadre tout seul
 
@@ -245,7 +271,7 @@ const container = useRef<HTMLDivElement>(null)
 | prop de `Window` | rôle |
 | --- | --- |
 | `children` | ce que le cadre contient |
-| `show` | montée ou non ; la fermeture s'anime avant de démonter |
+| `show` | montée ou non ; le cadre ne se ferme jamais seul, `onClose` prévient |
 | `container` | le cadre borne le déplacement à cet élément |
 | `title` | le texte de la barre |
 | `bottomInset` | hauteur réservée en bas, pour une barre des tâches |

@@ -1,3 +1,4 @@
+import { useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
@@ -143,4 +144,86 @@ export const Fixed: StoryObj<typeof Shell> = {
 			canClose: false,
 		},
 	},
+}
+
+// le bouton et la croix ecrivent le meme etat
+const Externalised = () => {
+	const [open, setOpen] = useState(false)
+
+	return (
+		<div style={{ height: "100%", display: "flex", flexDirection: "column" }}>
+			<div style={{ padding: 16 }}>
+				<button
+					onClick={() => setOpen(current => !current)}
+					style={{
+						font: "inherit",
+						padding: "6px 14px",
+						cursor: "pointer",
+						border: "solid 1px #000000",
+						borderRadius: 4,
+						background: "#F2E7C8",
+					}}
+				>
+					{open ? "close the terminal" : "open the terminal"}
+				</button>
+			</div>
+			<div style={{ flex: 1, minHeight: 0 }}>
+				<Shell
+					commands={{ ...baseCommands, test }}
+					themes={themes}
+					initialCommands={["title", "welcome"]}
+					window={{
+						title: "flower-shell",
+						start: "right-top",
+						margin: "24px",
+						open,
+						onClose: () => setOpen(false),
+					}}
+				/>
+			</div>
+		</div>
+	)
+}
+
+/**
+ * A shell whose frame it does not hold. `open` hands that over to whoever
+ * mounts it: the button and the cross write to the same state, and the cross
+ * has stopped deciding — it says it was clicked, through `onClose`, and
+ * waits for the prop to come back false.
+ *
+ * Closed, the terminal is unmounted; the history is not. It lives at module
+ * level, so reopening finds what was written still there — posted at once,
+ * not typed out again, since it has already been read — and the opening does
+ * not play a second time. Type something, close, open again.
+ */
+export const Externally: StoryObj<typeof Shell> = {
+	name: "Opened from outside",
+	parameters: {
+		layout: "fullscreen",
+		...source(`
+import { useState } from "react"
+import { Shell, baseCommands, test, themes } from "flower-shell"
+
+const [open, setOpen] = useState(false)
+
+<button onClick={() => setOpen(current => !current)}>
+	{open ? "close the terminal" : "open the terminal"}
+</button>
+
+<Shell
+	commands={{ ...baseCommands, test }}
+	themes={themes}
+	initialCommands={["title", "welcome"]}
+	window={{
+		title: "flower-shell",
+		start: "right-top",
+		margin: "24px",
+		// the caller holds it: the cross only reports, it no longer closes
+		open,
+		onClose: () => setOpen(false),
+	}}
+/>
+`),
+	},
+	render: () => <Externalised />,
 }

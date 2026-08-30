@@ -50,7 +50,24 @@ export type ShellWindowProps = {
   canExpand?: boolean;
   /** la croix de fermeture */
   canClose?: boolean;
-  /** appele une fois la fermeture animee, apres que la fenetre a disparu */
+  /**
+   * Ouverte ou fermee. Sans elle, la fenetre tient son etat toute seule :
+   * ouverte au montage, la croix la ferme, et rien ne la rouvre.
+   *
+   * Donnee, c'est l'appelant qui decide, et la fenetre ne fait plus que ce
+   * qu'on lui dit — la croix ne ferme plus rien, elle previent par
+   * `onClose` et attend que la prop passe a faux. C'est ce qu'il faut pour
+   * un bouton qui rouvre le terminal : le meme etat ouvre et ferme.
+   *
+   * Fermee, le terminal est demonte, mais l'historique vit au niveau du
+   * module : rouverte, la fenetre retrouve ce qui y etait ecrit, et
+   * l'ouverture ne se rejoue pas.
+   */
+  open?: boolean;
+  /**
+   * La croix a ete cliquee. Avec `open`, c'est tout ce qui se passe : a
+   * l'appelant de passer la prop a faux s'il veut voir la fenetre partir.
+   */
   onClose?: () => void;
 };
 
@@ -180,6 +197,14 @@ export const Shell = ({
   const area = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLDivElement>(null);
   const [framed, setFramed] = useState(true);
+
+  /**
+   * Qui tient l'ouverture. `open` donnee, c'est l'appelant : la fenetre
+   * suit sa prop et la croix ne fait plus que prevenir. Sinon le shell la
+   * tient pour lui, comme avant.
+   */
+  const ownFrame = frame?.open === undefined;
+  const shown = ownFrame ? framed : frame.open;
   // pose avant le premier rendu : le terminal lit le registre en se rendant
   const [ready] = useState(() => {
     // le dictionnaire d'abord : une commande jouee traduit en s'executant
@@ -317,7 +342,7 @@ export const Shell = ({
     <div ref={area} style={{ position: "relative", height: "100%" }}>
       <Window
         ref={content}
-        show={framed}
+        show={shown}
         container={area}
         title={frame.title}
         move={frame.move}
@@ -326,10 +351,9 @@ export const Shell = ({
         compact={frame.compact}
         canExpand={frame.canExpand}
         canClose={frame.canClose}
-        // la croix anime la fermeture puis previent : la fenetre part d'ici,
-        // et le consommateur apprend qu'elle est partie
+        // la fenetre ne part d'ici que si personne d'autre ne la tient
         onClose={() => {
-          setFramed(false);
+          if (ownFrame) setFramed(false);
           frame.onClose?.();
         }}
       >
