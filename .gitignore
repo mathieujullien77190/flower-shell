@@ -3,3 +3,9 @@ storybook-static/
 dist/
 *.tgz
 *.tsbuildinfo
+
+# Claude Code
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json
