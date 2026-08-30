@@ -22,7 +22,13 @@ type CreateCommandProps = {
 	restricted: boolean
 }
 
-let i = 0
+/**
+ * Le rang d'arrivee, strictement croissant. Il ordonne l'affichage a la
+ * place de `timestamp` : deux commandes enchainees dans la meme boucle —
+ * l'ouverture — tombent sur la meme milliseconde, et le tri, stable, rendait
+ * alors l'ordre des deux listes plutot que celui de la frappe.
+ */
+let count = 0
 
 export const createCommand = ({
 	commands,
@@ -30,6 +36,7 @@ export const createCommand = ({
 	restricted = false,
 }: CreateCommandProps): Command => {
 	const timestamp = new Date().getTime()
+	const order = count++
 	const split = commandPattern.split(" ")
 	const name = split[0]
 	const args = split.slice(1)
@@ -47,7 +54,8 @@ export const createCommand = ({
 				result: executeCommand({ commands, name, command: select, args }),
 				pattern: commandPattern,
 				timestamp,
-				id: `${timestamp}-${name}-${i++}`,
+				order,
+				id: `${timestamp}-${name}-${order}`,
 				isRendered: false,
 				canExecute: true,
 			}
@@ -72,7 +80,8 @@ export const createCommand = ({
 					  })
 					: t("error.args"),
 				timestamp,
-				id: `${timestamp}-${name}-${i++}`,
+				order,
+				id: `${timestamp}-${name}-${order}`,
 				isRendered: false,
 				canExecute: false,
 			}
@@ -104,7 +113,8 @@ export const createCommand = ({
 				  })
 				: t("error.unknown", { name }),
 			timestamp,
-			id: `${timestamp}-${name}-${i++}`,
+			order,
+			id: `${timestamp}-${name}-${order}`,
 			isRendered: false,
 			canExecute: false,
 		}

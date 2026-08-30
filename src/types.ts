@@ -106,6 +106,12 @@ export type Command = {
   restricted: boolean;
   visible?: boolean;
   timestamp?: number;
+  /**
+   * Le rang d'arrivee dans la session, strictement croissant. C'est lui qui
+   * ordonne l'affichage, et non `timestamp` : deux commandes enchainees dans
+   * la meme boucle tombent sur la meme milliseconde.
+   */
+  order?: number;
   id: string;
   canExecute: boolean;
   isRendered: boolean;

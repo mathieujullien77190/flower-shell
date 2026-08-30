@@ -125,9 +125,15 @@ export const useShellStore = create<Shell>(set => ({
 }))
 
 /**
- * Les deux listes remises dans l'ordre. Le tableau est reconstruit a chaque
- * appel, d'ou useShallow : sans lui, la nouvelle reference relancerait un
- * rendu a chaque changement du store, meme sans rapport.
+ * Les deux listes remises dans l'ordre d'arrivee. Le tri passe par `order`
+ * et non par `timestamp` : les commandes de l'ouverture partent dans la meme
+ * boucle et tombent sur la meme milliseconde, et le tri, stable, rendait
+ * alors les non restreintes avant les restreintes — `help theme` avant
+ * `title`, quel que soit l'ordre demande.
+ *
+ * Le tableau est reconstruit a chaque appel, d'ou useShallow : sans lui, la
+ * nouvelle reference relancerait un rendu a chaque changement du store, meme
+ * sans rapport.
  */
 export const useGetCommands = () =>
 	useShellStore(
@@ -135,7 +141,7 @@ export const useGetCommands = () =>
 			[
 				...state.commands.filter(command => command.visible),
 				...state.restrictedCommands.filter(command => command.visible),
-			].sort((a, b) => a.timestamp - b.timestamp)
+			].sort((a, b) => a.order - b.order)
 		)
 	)
 
