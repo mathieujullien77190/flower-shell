@@ -11,8 +11,11 @@ const preview: Preview = {
 		options: {
 			// Shell first: Markup documents the markers it renders, and reads
 			// better once you have seen where they end up. Inside Shell, the bare
-			// terminal opens the section and the rest stays alphabetical.
-			storySort: { order: ["Shell", ["Default", "*"], "Markup"] },
+			// terminal opens the section, the rest stays alphabetical, and the
+			// theme builder closes it — it is a tool, not a case to read through.
+			storySort: {
+				order: ["Shell", ["Default", "*", "Theme builder"], "Markup"],
+			},
 		},
 		docs: {
 			// the code as written in the file, not the JSX rebuilt from args
