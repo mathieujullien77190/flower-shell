@@ -1,16 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
-import { baseCommands } from "../../commands/base"
-import { test } from "../../commands/test"
 import { boxed } from "../decorators"
 import { source } from "../source"
 
 /**
- * The commands shipped with the package, and the usual opening: the logo,
- * then the welcome message, chained through `initialCommands`. Without a
- * `dict` prop the shell only speaks English, and it wears `flowerTheme` —
- * the package default, flower on the prompt included.
+ * A bare shell: `commands` is optional, so `<Shell />` mounts on its own.
+ * With an empty registry nothing answers — and nothing complains either.
+ * A typed line simply moves on to the next one.
  */
 const meta: Meta<typeof Shell> = {
 	title: "Shell/Default",
@@ -22,19 +19,8 @@ export default meta
 
 export const Default: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands, test } from "flower-shell"
+import { Shell } from "flower-shell"
 
-// title then welcome: the opening is a pair of commands like any other.
-// welcome prints \`welcome.text\`, which the package already carries —
-// override that key through \`dict\` to put your own words there.
-// test rides along: it ships beside baseCommands, not inside it.
-<Shell
-	commands={{ ...baseCommands, test }}
-	initialCommands={["title", "welcome"]}
-/>
+<Shell />
 `),
-	args: {
-		commands: { ...baseCommands, test },
-		initialCommands: ["title", "welcome"],
-	},
 }
