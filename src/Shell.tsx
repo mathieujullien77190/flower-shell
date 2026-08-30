@@ -87,9 +87,9 @@ export type ShellProps = {
    */
   window?: ShellWindowProps;
   /**
-   * Element a faire defiler quand la sortie s'allonge. Sans la prop
-   * `window`, c'est au consommateur de le donner — dans un cadre monte a
-   * la main, <Window> expose le sien par sa ref.
+   * Element a faire defiler quand la sortie s'allonge : la boite qui tient
+   * le shell, quand elle a son propre defilement. Avec `window`, le cadre
+   * s'en charge et cette prop est ignoree.
    */
   scrollRef?: RefObject<HTMLElement>;
   /** appele a chaque commande jouee, y compris celles du paquet */

@@ -160,31 +160,22 @@ package imposes none.
 
 ### The frame on its own
 
-`Window` is a component of its own, and it knows nothing about the shell: a
-retro frame — draggable title bar, maximise, close — around whatever you put
-inside. It takes `children`, and the shell is only one of them. Reach for it
-when the frame holds something else, sits in a desktop of several windows, or
-has to be opened and closed from the outside.
+`Window` is exported on its own, and it knows nothing about the shell: a retro
+frame — draggable title bar, maximise, close — around whatever you put inside.
+It takes `children`, so it holds a picture, a form, a game just as well.
 
-Its ref is the scrollable content of the frame: that is what `scrollRef`
-expects, and the shell then scrolls the window down as the output grows.
+A shell does not go in it by hand: that is what the `window` prop is for, and
+it is the only way the two are meant to meet.
 
 ```tsx
-import { Shell, Window, baseCommands } from "flower-shell"
+import { Window } from "flower-shell"
 
-// container bounds the movement, content is what scrolls
+// container bounds the movement, the ref is the scrollable content
 const container = useRef<HTMLDivElement>(null)
-const content = useRef<HTMLDivElement>(null)
 
 ;<div ref={container} style={{ position: "relative", height: "100vh" }}>
-	<Window
-		ref={content}
-		show={true}
-		title="flower-shell"
-		container={container}
-		onClose={onClose}
-	>
-		<Shell commands={baseCommands} scrollRef={content} />
+	<Window show={true} title="a frame" container={container} onClose={onClose}>
+		<YourContent />
 	</Window>
 </div>
 ```

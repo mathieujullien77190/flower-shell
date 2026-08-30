@@ -160,31 +160,23 @@ le paquet n'en impose aucune.
 
 ### Le cadre tout seul
 
-`Window` est un composant à part, qui ne sait rien du shell : un cadre rétro —
+`Window` s'exporte tout seul, et il ne sait rien du shell : un cadre rétro —
 barre de titre à glisser, agrandissement, fermeture — autour de ce qu'on met
-dedans. Il prend des `children`, et le shell n'en est qu'un parmi d'autres.
-On y vient quand le cadre tient autre chose, vit dans un bureau à plusieurs
-fenêtres, ou doit s'ouvrir et se fermer depuis l'extérieur.
+dedans. Il prend des `children`, donc il tient aussi bien une image, un
+formulaire, un jeu.
 
-Sa ref est le contenu défilant du cadre : c'est ce que `scrollRef` attend, et
-le shell fait alors descendre la fenêtre à mesure que la sortie s'allonge.
+Un shell ne s'y met pas à la main : c'est le rôle de la prop `window`, et
+c'est la seule façon dont les deux sont censés se rencontrer.
 
 ```tsx
-import { Shell, Window, baseCommands } from "flower-shell"
+import { Window } from "flower-shell"
 
-// container borne le déplacement, content est ce qui défile
+// container borne le déplacement, la ref est le contenu défilant
 const container = useRef<HTMLDivElement>(null)
-const content = useRef<HTMLDivElement>(null)
 
 ;<div ref={container} style={{ position: "relative", height: "100vh" }}>
-	<Window
-		ref={content}
-		show={true}
-		title="flower-shell"
-		container={container}
-		onClose={onClose}
-	>
-		<Shell commands={baseCommands} scrollRef={content} />
+	<Window show={true} title="a frame" container={container} onClose={onClose}>
+		<YourContent />
 	</Window>
 </div>
 ```
