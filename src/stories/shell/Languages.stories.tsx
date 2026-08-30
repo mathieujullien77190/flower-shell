@@ -4,6 +4,8 @@ import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { themes } from "../../theme"
+import { dictEn } from "../../i18n/en"
+import { dictFr } from "../../i18n/fr"
 import { Dict } from "../../types"
 import { boxed } from "../decorators"
 import { prose } from "../i18n"
@@ -66,32 +68,66 @@ const dictDe: Dict = {
 }
 
 const meta: Meta<typeof Shell> = {
-	title: "Shell/German",
+	title: "Shell/Languages",
 	component: Shell,
 	decorators: [boxed],
 	parameters: prose({
 		en: `
-A language written outside the package. \`dictDe\` covers the base commands
-itself — nothing lives underneath German — and \`lang.de\` is added to the
-English dictionary so the help still names it once switched back.
+**The languages of the shell are exactly the keys of \`dict\`** — nothing more.
+\`lang\` picks the one it starts on, among those. Both stories below open on
+\`help lang\`, which lists what each of them mounts and nothing else.
 
-The shell opens on \`help lang\`, which lists exactly what \`dict\` mounts:
-German and English, and nothing else.
+**French** is the easy case: the package ships \`dictFr\`, you only need to
+mount it beside \`dictEn\`, and \`lang fr\` and \`lang en\` both answer.
+
+**German** is the other one, and the pattern for any language the package
+does not know. Nothing lives underneath, so \`dictDe\` has to cover the base
+commands itself. And \`lang.de\` is added to the English dictionary, otherwise
+the help would show that bare key once the visitor switched back to English.
 `,
 		fr: `
-Une langue écrite hors du paquet. \`dictDe\` couvre les commandes de base
-lui-même — rien ne vit sous l'allemand — et \`lang.de\` est ajoutée au
-dictionnaire anglais pour que l'aide sache encore la nommer une fois revenu à
-l'anglais.
+**Les langues du shell sont exactement les clés de \`dict\`** — rien de plus.
+\`lang\` choisit celle du départ, parmi celles-là. Les deux stories ci-dessous
+ouvrent sur \`help lang\`, qui liste ce que chacune monte, et rien d'autre.
 
-Le shell ouvre sur \`help lang\`, qui liste exactement ce que \`dict\` monte :
-l'allemand et l'anglais, rien d'autre.
+**Le français** est le cas facile : le paquet livre \`dictFr\`, il n'y a qu'à
+le monter à côté de \`dictEn\`, et \`lang fr\` comme \`lang en\` répondent.
+
+**L'allemand** est l'autre cas, et le modèle pour toute langue que le paquet
+ne connaît pas. Rien ne vit dessous, donc \`dictDe\` doit couvrir les commandes
+de base lui-même. Et \`lang.de\` est ajoutée au dictionnaire anglais, sans quoi
+l'aide afficherait cette clé nue une fois le visiteur revenu à l'anglais.
 `,
 	}),
 }
 
 export default meta
 
+/** the package ships it: `dictFr` beside `dictEn`, and both answer */
+export const French: StoryObj<typeof Shell> = {
+	parameters: source(`
+import { Shell, baseCommands, test, themes, dictEn, dictFr } from "flower-shell"
+
+// the shell's languages are the keys of dict, so both answer:
+// lang fr and lang en. help lang lists exactly those.
+<Shell
+	commands={{ ...baseCommands, test }}
+	themes={themes}
+	lang="fr"
+	dict={{ en: dictEn, fr: dictFr }}
+	initialCommands={["help lang"]}
+/>
+`),
+	args: {
+		commands: { ...baseCommands, test },
+		themes,
+		lang: "fr",
+		dict: { en: dictEn, fr: dictFr },
+		initialCommands: ["help lang"],
+	},
+}
+
+/** written outside the package: the dictionary covers the base commands */
 export const German: StoryObj<typeof Shell> = {
 	parameters: source(`
 import { Shell, baseCommands, test, themes } from "flower-shell"
