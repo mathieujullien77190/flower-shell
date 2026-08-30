@@ -2,15 +2,16 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { highlight } from "../../render/Command/helpers"
 import { twilightTheme, setTheme } from "../../theme"
+import { prose } from "../i18n"
 import { renderOnly } from "../source"
 import { Row, Screen, noop } from "./screen"
 
-/**
- * Escaping: `\+` prints the marker instead of colouring, and a lone backslash
- * stays as-is.
- */
 const meta: Meta = {
 	title: "Markup/Escaping",
+	parameters: prose({
+		en: "Escaping: `\\+` prints the marker instead of colouring, and a lone backslash stays as-is.",
+		fr: "Échappement : `\\+` affiche le marqueur au lieu de colorer, et un antislash seul reste tel quel.",
+	}),
 }
 
 export default meta

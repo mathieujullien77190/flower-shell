@@ -2,12 +2,16 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { highlight } from "../../render/Command/helpers"
 import { twilightTheme, setTheme } from "../../theme"
+import { prose } from "../i18n"
 import { renderOnly } from "../source"
 import { Row, Screen, TAGS, noop } from "./screen"
 
-/** the same colours, as tags: `[+…+]` gives a solid background */
 const meta: Meta = {
 	title: "Markup/Tags",
+	parameters: prose({
+		en: "The same colours, as tags: `[+…+]` gives a solid background.",
+		fr: "Les mêmes couleurs, en tags : `[+…+]` donne un fond plein.",
+	}),
 }
 
 export default meta

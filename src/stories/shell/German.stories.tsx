@@ -5,6 +5,7 @@ import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { Dict } from "../../types"
 import { boxed } from "../decorators"
+import { prose } from "../i18n"
 import { source } from "../source"
 
 /**
@@ -63,18 +64,29 @@ const dictDe: Dict = {
 	},
 }
 
-/**
- * A language written outside the package. `dictDe` covers the base commands
- * itself — nothing lives underneath German — and `lang.de` is added to the
- * English dictionary so the help still names it once switched back.
- *
- * The shell opens on `help lang`, which lists exactly what `dict` mounts:
- * German and English, and nothing else.
- */
 const meta: Meta<typeof Shell> = {
 	title: "Shell/German",
 	component: Shell,
 	decorators: [boxed],
+	parameters: prose({
+		en: `
+A language written outside the package. \`dictDe\` covers the base commands
+itself — nothing lives underneath German — and \`lang.de\` is added to the
+English dictionary so the help still names it once switched back.
+
+The shell opens on \`help lang\`, which lists exactly what \`dict\` mounts:
+German and English, and nothing else.
+`,
+		fr: `
+Une langue écrite hors du paquet. \`dictDe\` couvre les commandes de base
+lui-même — rien ne vit sous l'allemand — et \`lang.de\` est ajoutée au
+dictionnaire anglais pour que l'aide sache encore la nommer une fois revenu à
+l'anglais.
+
+Le shell ouvre sur \`help lang\`, qui liste exactement ce que \`dict\` monte :
+l'allemand et l'anglais, rien d'autre.
+`,
+	}),
 }
 
 export default meta

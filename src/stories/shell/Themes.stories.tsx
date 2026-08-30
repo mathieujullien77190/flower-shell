@@ -6,19 +6,8 @@ import { test } from "../../commands/test"
 import { flowerTheme, nordTheme } from "../../theme"
 import type { ShellThemeInput } from "../../theme"
 import { boxed } from "../decorators"
+import { prose } from "../i18n"
 import { source } from "../source"
-
-/**
- * `themes` is the catalogue the visitor can reach: exactly what
- * `theme <name>` accepts and what `help theme` lists. Three of them here,
- * one of each kind — `flower`, the package default; `nord`, another one
- * taken from the package; and `neon`, written from scratch in the story
- * file.
- *
- * The shell opens on `help theme`, so the list is the first thing you read.
- * Then try `theme neon`, `theme nord`, `theme flower` — and `theme dracula`,
- * which is refused: the package ships it, this shell did not mount it.
- */
 
 /**
  * Written from scratch: only the colours and the prompt. What a theme does
@@ -43,6 +32,29 @@ const meta: Meta<typeof Shell> = {
 	title: "Shell/Themes",
 	component: Shell,
 	decorators: [boxed],
+	parameters: prose({
+		en: `
+\`themes\` is the catalogue the visitor can reach: exactly what \`theme <name>\`
+accepts and what \`help theme\` lists. Three of them here, one of each kind —
+\`flower\`, the package default; \`nord\`, another one taken from the package;
+and \`neon\`, written from scratch in the story file.
+
+The shell opens on \`help theme\`, so the list is the first thing you read.
+Then try \`theme neon\`, \`theme nord\`, \`theme flower\` — and \`theme dracula\`,
+which is refused: the package ships it, this shell did not mount it.
+`,
+		fr: `
+\`themes\` est le catalogue que le visiteur peut atteindre : exactement ce que
+\`theme <nom>\` accepte et ce que \`help theme\` liste. Trois ici, un de chaque
+sorte — \`flower\`, le thème du paquet ; \`nord\`, un autre pris au paquet ; et
+\`neon\`, écrit de toutes pièces dans le fichier de la story.
+
+Le shell ouvre sur \`help theme\`, la liste est donc la première chose qu'on
+lit. Essayez ensuite \`theme neon\`, \`theme nord\`, \`theme flower\` — puis
+\`theme dracula\`, qui est refusé : le paquet le livre, ce shell ne l'a pas
+monté.
+`,
+	}),
 }
 
 export default meta

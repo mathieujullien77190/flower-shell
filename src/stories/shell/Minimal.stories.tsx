@@ -4,21 +4,33 @@ import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { boxed } from "../decorators"
+import { prose } from "../i18n"
 import { source } from "../source"
 
-/**
- * One step up from the bare shell: the commands shipped with the package,
- * and the usual opening — the logo, then the welcome message, chained
- * through `initialCommands`. This is the smallest shell that answers
- * something, and the shape most consumers start from.
- *
- * Without a `dict` prop it only speaks English, and it wears `flowerTheme`,
- * the package default, flower on the prompt included.
- */
 const meta: Meta<typeof Shell> = {
 	title: "Shell/Minimal",
 	component: Shell,
 	decorators: [boxed],
+	parameters: prose({
+		en: `
+One step up from the bare shell: the commands shipped with the package, and
+the usual opening — the logo, then the welcome message, chained through
+\`initialCommands\`. This is the smallest shell that answers something, and the
+shape most consumers start from.
+
+Without a \`dict\` prop it only speaks English, and it wears \`flowerTheme\`, the
+package default, flower on the prompt included.
+`,
+		fr: `
+Un cran au-dessus du shell nu : les commandes du paquet, et l'ouverture
+habituelle — le logo, puis le mot d'accueil, enchaînés par
+\`initialCommands\`. C'est le plus petit shell qui réponde quelque chose, et la
+forme dont partent la plupart des consommateurs.
+
+Sans prop \`dict\` il ne parle qu'anglais, et il porte \`flowerTheme\`, le thème
+du paquet, fleur sur l'invite comprise.
+`,
+	}),
 }
 
 export default meta

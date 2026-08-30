@@ -7,30 +7,8 @@ import { test } from "../../commands/test"
 import type { BaseCommand } from "../../types"
 import type { CommandErrorEvent, CommandEvent } from "../../engine/send"
 import { fresh } from "../decorators"
+import { prose } from "../i18n"
 import { source } from "../source"
-
-/**
- * Everything the shell hands back, and nothing else: the panel on the right
- * is written from the four event props alone, one row per command with a
- * tick under each moment it has reached.
- *
- * **Open the browser console.** Every event is logged there in full, which
- * is where you see what the panel cannot show: each one carries the name,
- * the arguments, and `pattern` — the whole line as it was sent.
- *
- * `onCommandStart` fires before anything runs, off that line — so it fires
- * for a command that does not exist too, which the others never do.
- * `onCommandDone` fires once the action has returned its text and the
- * effect has played: the command is over, but nothing is on screen yet.
- * `onCommandRendered` fires when the text has finished being written, which
- * on a long output is a good while later.
- *
- * `onCommandError` fires instead of `onCommandDone` when the command did not
- * play, and says why through `reason`. Three lines to try, one for each:
- * `nope` is `unknown`, `theme nope` is `args` — the command exists, the
- * argument does not — and `boom` throws on purpose, which is `thrown` and
- * carries the error itself.
- */
 
 type Watched = {
 	name: string
@@ -214,6 +192,53 @@ const meta: Meta<typeof Shell> = {
 	title: "Shell/Events",
 	component: Shell,
 	decorators: [fresh],
+	parameters: prose({
+		en: `
+Everything the shell hands back, and nothing else: the panel on the right is
+written from the four event props alone, one row per command with a tick under
+each moment it has reached.
+
+**Open the browser console.** Every event is logged there in full, which is
+where you see what the panel cannot show: each one carries the name, the
+arguments, and \`pattern\` — the whole line as it was sent.
+
+\`onCommandStart\` fires before anything runs, off that line — so it fires for
+a command that does not exist too, which the others never do.
+\`onCommandDone\` fires once the action has returned its text and the effect
+has played: the command is over, but nothing is on screen yet.
+\`onCommandRendered\` fires when the text has finished being written, which on
+a long output is a good while later.
+
+\`onCommandError\` fires instead of \`onCommandDone\` when the command did not
+play, and says why through \`reason\`. Three lines to try, one for each: \`nope\`
+is \`unknown\`, \`theme nope\` is \`args\` — the command exists, the argument does
+not — and \`boom\` throws on purpose, which is \`thrown\` and carries the error
+itself.
+`,
+		fr: `
+Tout ce que le shell rend, et rien d'autre : le panneau de droite est écrit
+avec les seules quatre props d'évènement, une ligne par commande, une coche
+sous chaque moment qu'elle a atteint.
+
+**Ouvrez la console du navigateur.** Chaque évènement y part en entier, et
+c'est là qu'on voit ce que le panneau ne peut pas montrer : chacun porte le
+nom, les arguments, et \`pattern\` — la ligne entière telle qu'elle a été
+envoyée.
+
+\`onCommandStart\` part avant que quoi que ce soit ne joue, lu sur cette ligne
+— il part donc aussi pour une commande qui n'existe pas, ce que les autres ne
+font jamais. \`onCommandDone\` part une fois que l'action a rendu son texte et
+que l'effet a joué : la commande est faite, mais rien n'est encore à l'écran.
+\`onCommandRendered\` part quand le texte a fini de s'écrire, ce qui sur une
+sortie longue arrive bien plus tard.
+
+\`onCommandError\` part à la place de \`onCommandDone\` quand la commande n'a pas
+joué, et dit pourquoi par \`reason\`. Trois lignes à essayer, une par raison :
+\`nope\` donne \`unknown\`, \`theme nope\` donne \`args\` — la commande existe,
+l'argument non — et \`boom\` lève exprès, ce qui donne \`thrown\` et porte
+l'erreur elle-même.
+`,
+	}),
 }
 
 export default meta

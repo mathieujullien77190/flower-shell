@@ -2,12 +2,16 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { highlight } from "../../render/Command/helpers"
 import { twilightTheme, setTheme } from "../../theme"
+import { prose } from "../i18n"
 import { renderOnly } from "../source"
 import { MARKERS, Row, Screen, noop } from "./screen"
 
-/** each marker, its source on the left and its coloured render on the right */
 const meta: Meta = {
 	title: "Markup/Markers",
+	parameters: prose({
+		en: "Each marker, its source on the left and its coloured render on the right.",
+		fr: "Chaque marqueur, sa source à gauche et son rendu coloré à droite.",
+	}),
 }
 
 export default meta
