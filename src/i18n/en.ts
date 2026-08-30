@@ -48,6 +48,9 @@ export const dictEn: Dict = {
 		en: "Shows every text in English",
 		set: "language: {lang}",
 	},
+	welcome: {
+		text: "Type `help` to list the commands",
+	},
 	error: {
 		unknown:
 			"{name} is not recognised as an internal command, type `help` to list the commands",

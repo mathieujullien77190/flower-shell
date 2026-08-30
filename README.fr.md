@@ -16,7 +16,6 @@ const App = () => <Shell commands={baseCommands} />
 | prop | rôle |
 | --- | --- |
 | `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
-| `welcome` | le texte du mot d'accueil ; une clé du dictionnaire ou le texte lui-même |
 | `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
 | `banner` | commandes rejouées au démarrage **et après chaque `clear`** |
 | `theme` | couleurs, invite, polices |
@@ -40,10 +39,12 @@ ouvrir cette page.
 
 Plus trois commandes restreintes — que le visiteur ne peut pas taper :
 
-- `title` affiche le logo ASCII du shell et `welcome` le mot d'accueil de la
-  prop du même nom. Ce sont des commandes comme les autres : vous les jouez en
-  les mettant dans `initialCommands`, ou dans `banner` pour qu'elles reviennent
-  après un `clear`. Sans ça le shell démarre nu, et vous posez votre marque
+- `title` affiche le logo ASCII du shell et `welcome` le texte de la clé
+  `welcome.text`. Ce sont des commandes comme les autres — leur texte vit dans
+  le dictionnaire, et vous y mettez vos mots en recouvrant cette clé par
+  `dict`. Vous les jouez en les mettant dans `initialCommands`, ou dans
+  `banner` pour qu'elles reviennent après un `clear`. Sans ça le shell démarre
+  nu, et vous posez votre marque
 - `unknow` et `argumenterror` sont cherchées **par nom** par le moteur, qui
   rend leur texte quand une commande est inconnue ou mal appelée. Les retirer
   est permis : le dictionnaire du paquet prend le relais, et `commands={{}}` reste un
@@ -55,11 +56,17 @@ Le shell démarre nu. Le logo et le mot d'accueil sont deux commandes, jouées
 comme les autres :
 
 ```tsx
+<Shell commands={baseCommands} initialCommands={["title", "welcome"]} />
+```
+
+`welcome` affiche la clé `welcome.text`, que le paquet porte déjà. Pour y
+mettre vos mots, recouvrez cette clé comme n'importe quelle autre :
+
+```tsx
 <Shell
 	commands={baseCommands}
-	welcome="app.welcome"
 	initialCommands={["title", "welcome"]}
-	dict={{ en: { app: { welcome: "Type `help` to list the commands" } } }}
+	dict={{ en: { welcome: { text: "Welcome — type `help` to look around" } } }}
 />
 ```
 
@@ -87,9 +94,8 @@ pas.
 
 Un texte est **toujours une `string`**. Dans une `action`, c'est à vous
 d'appeler `t("clé")` — vous pouvez donc mélanger : `` `${t("ping.pong")} ${nom}` ``.
-Dans les champs statiques (`help.description`, `description` d'un pattern, prop
-`welcome`), vous écrivez **la clé** et le shell la traduit au moment de s'en
-servir. Une clé absente du dictionnaire s'affiche telle quelle, ce qui permet
+Dans les champs statiques (`help.description`, `description` d'un pattern),
+vous écrivez **la clé** et le shell la traduit au moment de s'en servir. Une clé absente du dictionnaire s'affiche telle quelle, ce qui permet
 d'écrire directement `description: "répond pong"` quand une seule langue suffit.
 
 | champ | rôle |
@@ -197,8 +203,8 @@ n'ajouter qu'un texte sans perdre les autres.
 	commands={commands}
 	lang="de"
 	dict={{
-		en: { app: { welcome: "Type `help`" } },   // l'anglais du paquet, plus votre clé
-		de: dictDe,                                 // le vôtre, écrit chez vous
+		en: { welcome: { text: "Type `help`" } },   // l'anglais du paquet, une clé recouverte
+		de: dictDe,                                  // le vôtre, écrit chez vous
 	}}
 />
 ```

@@ -2,7 +2,6 @@ import { BaseCommands, Help } from "@types"
 import { langs, t } from "@i18n/lang"
 import { readHelp } from "@engine/terminalEngine"
 import { colors, themeNames } from "@theme"
-import { getWelcome } from "@state/registry"
 import { shellActions } from "@state/store"
 import { highlightFlower, plantFlowers } from "./flowers"
 import { title } from "./title"
@@ -211,7 +210,9 @@ export const baseCommands: BaseCommands = {
 	},
 	welcome: {
 		restricted: true,
-		action: () => t(getWelcome()),
+		// une commande comme les autres : son texte est une clef du
+		// dictionnaire, que le consommateur recouvre par `dict`
+		action: () => t("welcome.text"),
 		help: { description: "common.restricted", patterns: [] },
 		display: {
 			hideCmd: true,

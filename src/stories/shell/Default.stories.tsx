@@ -24,20 +24,12 @@ export const Default: StoryObj<typeof Shell> = {
 import { Shell, baseCommands } from "flower-shell"
 
 // title then welcome: the opening is a pair of commands like any other.
-// welcome only holds the text — the command is what prints it.
-<Shell
-	commands={baseCommands}
-	welcome="app.welcome"
-	initialCommands={["title", "welcome"]}
-	dict={{ en: { app: { welcome: "Type \`help\` to list the commands" } } }}
-/>
+// welcome prints \`welcome.text\`, which the package already carries —
+// override that key through \`dict\` to put your own words there.
+<Shell commands={baseCommands} initialCommands={["title", "welcome"]} />
 `),
 	args: {
 		commands: baseCommands,
-		welcome: "app.welcome",
 		initialCommands: ["title", "welcome"],
-		dict: {
-			en: { app: { welcome: "Type `help` to list the commands" } },
-		},
 	},
 }

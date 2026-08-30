@@ -4,7 +4,7 @@ import Terminal from "./render/Terminal";
 
 import { run, runRestricted, setListener } from "./engine/send";
 import { setDict } from "./i18n/lang";
-import { getCommands, setBanner, setCommands, setWelcome } from "./state/registry";
+import { getCommands, setBanner, setCommands } from "./state/registry";
 import {
   shellActions,
   useAnimation,
@@ -27,12 +27,6 @@ export type ShellProps = {
    * la que se met la marque : le shell, lui, n'en connait aucune.
    */
   banner?: string[];
-  /**
-   * Le texte du mot d'accueil : une clef du dictionnaire, ou le texte
-   * lui-meme. Il ne s'affiche pas tout seul — c'est la commande `welcome`
-   * qui le lit, a mettre dans `initialCommands` ou dans `banner`.
-   */
-  welcome?: string;
   theme?: ShellThemeInput;
   /**
    * Vos textes, par langue. Ils recouvrent ceux du paquet clef par clef, et
@@ -70,7 +64,6 @@ export type ShellProps = {
 export const Shell = ({
   commands = {},
   banner = [],
-  welcome,
   theme,
   dict,
   lang,
@@ -84,7 +77,6 @@ export const Shell = ({
     setDict(dict);
     setCommands(commands);
     setBanner(banner);
-    setWelcome(welcome || "");
     setTheme(theme);
     return true;
   });
@@ -109,10 +101,6 @@ export const Shell = ({
   useEffect(() => {
     setBanner(banner);
   }, [banner]);
-
-  useEffect(() => {
-    setWelcome(welcome || "");
-  }, [welcome]);
 
   useEffect(() => {
     setListener(onCommand);

@@ -36,10 +36,9 @@ import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 `),
 	args: {
 		commands: baseCommands,
-		welcome: "app.welcome",
 		initialCommands: ["title", "welcome"],
 		dict: {
-			en: { app: { welcome: "Try \`theme nord\`, or \`help theme\` for the list" } },
+			en: { welcome: { text: "Try \`theme nord\`, or \`help theme\` for the list" } },
 		},
 	},
 }

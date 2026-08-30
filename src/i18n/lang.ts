@@ -51,7 +51,8 @@ let dict: Dictionaries = DEFAULT_DICT
  *
  * Chaque langue est posee sur l'anglais du paquet : une clef que le
  * dictionnaire donne ne couvre pas sort en anglais plutot qu'en clef nue,
- * et `{ en: { app: { welcome } } }` ajoute un texte sans perdre les autres.
+ * et `{ en: { welcome: { text } } }` recouvre un seul texte sans perdre les
+ * autres.
  */
 export const setDict = (custom?: Dictionaries) => {
 	if (!custom) {

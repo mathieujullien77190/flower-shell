@@ -16,7 +16,6 @@ const App = () => <Shell commands={baseCommands} />
 | prop | role |
 | --- | --- |
 | `commands` | the known commands, indexed by name: the ones shipped with the package, plus yours; optional |
-| `welcome` | the text of the welcome message; a dictionary key or the text itself |
 | `initialCommands` | commands played at startup, once; this is where the opening goes |
 | `banner` | commands replayed at startup **and after every `clear`** |
 | `theme` | colours, prompt, fonts |
@@ -40,10 +39,12 @@ without opening this page.
 
 Plus three restricted commands — ones the visitor cannot type:
 
-- `title` prints the ASCII logo of the shell and `welcome` the welcome message
-  of the prop of the same name. They are commands like any other: you play them
-  by putting them in `initialCommands`, or in `banner` so they come back after a
-  `clear`. Without that the shell starts bare, and you put your own mark on it
+- `title` prints the ASCII logo of the shell and `welcome` the text of the
+  `welcome.text` key. They are commands like any other — their text lives in
+  the dictionary, and you put your own words there by overriding that key
+  through `dict`. You play them by putting them in `initialCommands`, or in
+  `banner` so they come back after a `clear`. Without that the shell starts
+  bare, and you put your own mark on it
 - `unknow` and `argumenterror` are looked up **by name** by the engine, which
   renders their text when a command is unknown or badly called. Removing them
   is allowed: the package dictionary takes over, and `commands={{}}` remains a
@@ -55,11 +56,17 @@ The shell starts bare. The logo and the welcome message are two commands,
 played like any other:
 
 ```tsx
+<Shell commands={baseCommands} initialCommands={["title", "welcome"]} />
+```
+
+`welcome` prints the `welcome.text` key, which the package already carries. To
+put your own words there, override that key like any other:
+
+```tsx
 <Shell
 	commands={baseCommands}
-	welcome="app.welcome"
 	initialCommands={["title", "welcome"]}
-	dict={{ en: { app: { welcome: "Type `help` to list the commands" } } }}
+	dict={{ en: { welcome: { text: "Welcome — type `help` to look around" } } }}
 />
 ```
 
@@ -87,8 +94,8 @@ field.
 
 A text is **always a `string`**. Inside an `action`, calling `t("key")` is up
 to you — so you can mix: `` `${t("ping.pong")} ${name}` ``. In the static
-fields (`help.description`, a pattern `description`, the `welcome` prop) you
-write **the key** and the shell translates it when it uses it. A key missing
+fields (`help.description`, a pattern `description`) you write **the key** and
+the shell translates it when it uses it. A key missing
 from the dictionary shows as-is, which lets you write
 `description: "answers pong"` directly when one language is enough.
 
@@ -195,8 +202,8 @@ you can add a single text without losing the others.
 	commands={commands}
 	lang="de"
 	dict={{
-		en: { app: { welcome: "Type `help`" } },   // the package English, plus your key
-		de: dictDe,                                 // yours, written at home
+		en: { welcome: { text: "Type `help`" } },   // the package English, one key overridden
+		de: dictDe,                                  // yours, written at home
 	}}
 />
 ```

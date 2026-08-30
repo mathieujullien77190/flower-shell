@@ -24,20 +24,19 @@ export const Opening: StoryObj<typeof Shell> = {
 import { Shell, baseCommands } from "flower-shell"
 
 // banner instead of initialCommands: played at startup, and again
-// after every clear
+// after every clear. The welcome text is your own: \`welcome.text\`
+// overridden through \`dict\`.
 <Shell
 	commands={baseCommands}
-	welcome="app.welcome"
 	banner={["title", "welcome"]}
-	dict={{ en: { app: { welcome: "Type \`help\` to list the commands" } } }}
+	dict={{ en: { welcome: { text: "Type \`help\` to list the commands" } } }}
 />
 `),
 	args: {
 		commands: baseCommands,
-		welcome: "app.welcome",
 		banner: ["title", "welcome"],
 		dict: {
-			en: { app: { welcome: "Type `help` to list the commands" } },
+			en: { welcome: { text: "Type `help` to list the commands" } },
 		},
 	},
 }

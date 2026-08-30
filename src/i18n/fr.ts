@@ -49,6 +49,9 @@ export const dictFr: Dict = {
 		en: "Affiche tout les textes en anglais",
 		set: "langage : {lang}",
 	},
+	welcome: {
+		text: "Tapez `help` pour afficher la liste des commandes",
+	},
 	error: {
 		unknown:
 			"{name} n’est pas reconnu en tant que commande interne, tapez `help` pour afficher la liste des commandes",
