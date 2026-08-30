@@ -9,9 +9,9 @@ import { source } from "../source"
 
 /**
  * A custom command, written without a dictionary: its texts are spelled out
- * where they are used. `help` reads the description as it stands. A `dict`
- * only becomes useful once the same command has to speak more than one
- * language.
+ * where they are used. `help` reads the description as it stands — the shell
+ * opens on `help ping` to show it. A `dict` only becomes useful once the same
+ * command has to speak more than one language.
  */
 const ping: BaseCommand = {
 	restricted: false,
@@ -46,10 +46,15 @@ const ping: BaseCommand = {
 	},
 }
 
-// the command is added to the object, the rest stays put
-<Shell commands={{ ...baseCommands, test, ping }} />
+// the command is added to the object, the rest stays put.
+// help ping opens the shell on what the help block above produces.
+<Shell
+	commands={{ ...baseCommands, test, ping }}
+	initialCommands={["help ping"]}
+/>
 `),
 	args: {
 		commands: { ...baseCommands, test, ping },
+		initialCommands: ["help ping"],
 	},
 }
