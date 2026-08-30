@@ -23,7 +23,9 @@ const App = () => <Shell commands={baseCommands} />
 | `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
 | `window` | pose le shell dans un cadre ; l'objet porte tout ce que le cadre sait faire |
 | `scrollRef` | élément à faire défiler quand la sortie s'allonge ; ignorée avec `window` |
-| `onCommand` | appelé à chaque commande jouée, y compris celles du paquet |
+| `onCommandStart` | avant que la commande ne joue ; part aussi pour une commande inconnue |
+| `onCommandDone` | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran |
+| `onCommandRendered` | le texte a fini de s'écrire |
 
 Toutes les props sont facultatives : `<Shell />` se monte nu. Le registre
 vide, il affiche l'invite et ne répond à rien — une ligne tapée passe à la
@@ -85,7 +87,36 @@ mettre vos mots, recouvrez cette clé comme n'importe quelle autre :
 
 `initialCommands` ne joue qu'une fois, sur un écran vierge : un `clear` ne les
 rejoue pas. `clear` efface l'écran et rien d'autre — faire revenir quelque
-chose après lui est à vous de l'écrire, depuis `onCommand` et `runRestricted`.
+chose après lui est à vous de l'écrire, depuis `onCommandDone` et
+`runRestricted`.
+
+## Suivre les commandes
+
+Trois props, trois moments de la vie d'une commande. Les trois reçoivent le
+nom et les arguments :
+
+```tsx
+<Shell
+	commands={baseCommands}
+	onCommandStart={(name, args) => console.log("about to run", name, args)}
+	onCommandDone={(name) => console.log("ran", name)}
+	onCommandRendered={(name) => console.log("written out", name)}
+/>
+```
+
+`onCommandStart` part avant que quoi que ce soit ne joue, lu sur la ligne
+telle qu'elle a été envoyée. À ce moment le shell ne sait pas encore s'il
+connaît une commande de ce nom, donc celle-ci **part aussi pour une ligne
+qu'il refusera** — c'est ce qui en fait l'endroit où voir tout ce qui est
+tapé. Les deux autres ne partent jamais pour une commande qui n'a pas pu
+jouer.
+
+`onCommandDone` part une fois que l'action a rendu son texte et que l'effet a
+joué. La commande est faite ; rien n'est encore à l'écran.
+
+`onCommandRendered` part quand le texte a fini de s'écrire. Sur une sortie
+longue, c'est bien après `onCommandDone` — l'animation l'écrit lettre par
+lettre. Il part une fois par commande, au passage.
 
 ## Écrire une commande
 
@@ -374,8 +405,9 @@ commandes personnalisées, dans une fenêtre, dans chaque langue. Chacune montre
 le code qui la produit, imports compris.
 
 **Shell / On command** pose un panneau à côté du terminal et le remplit avec
-le seul `onCommand` : une ligne par commande jouée, avec ses arguments. C'est
-là qu'on voit ce que le shell rend — `clear` compris.
+les seules trois props : une ligne par commande, une marque sous chaque
+moment qu'elle a atteint. Tapez `title` et regardez l'écart entre les deux
+dernières marques — c'est l'animation.
 
 **Shell / Theme builder** est un créateur de thème : on part d'un thème du
 catalogue, on déplace les couleurs, l'aperçu suit, et le bloc du bas est la

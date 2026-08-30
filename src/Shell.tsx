@@ -4,7 +4,8 @@ import Terminal from "./render/Terminal";
 import Window from "./window";
 import type { WindowStart } from "./window/types";
 
-import { run, runRestricted, setListener } from "./engine/send";
+import { run, runRestricted, setListeners } from "./engine/send";
+import type { CommandListener } from "./engine/send";
 import { setDict } from "./i18n/lang";
 import { getCommands, setCommands } from "./state/registry";
 import {
@@ -79,8 +80,8 @@ export type ShellProps = {
    *
    * Jouees une seule fois, sur un ecran vierge : un `clear` ne les rejoue
    * pas, il efface et rien d'autre. Les faire revenir est l'affaire du
-   * consommateur — `onCommand` le previent du `clear`, `runRestricted` lui
-   * permet de rejouer ce qu'il veut.
+   * consommateur — `onCommandDone` le previent du `clear`, `runRestricted`
+   * lui permet de rejouer ce qu'il veut.
    */
   initialCommands?: string[];
   /**
@@ -98,8 +99,24 @@ export type ShellProps = {
    * s'en charge et cette prop est ignoree.
    */
   scrollRef?: RefObject<HTMLElement>;
-  /** appele a chaque commande jouee, y compris celles du paquet */
-  onCommand?: (name: string, args: string[]) => void;
+  /**
+   * Avant que la commande ne joue. Le nom et les arguments sont lus sur la
+   * ligne envoyee : a ce moment le shell ne sait pas encore s'il connait
+   * une commande de ce nom, et ce temoin part donc aussi pour une ligne
+   * qu'il refusera ensuite.
+   */
+  onCommandStart?: CommandListener;
+  /**
+   * L'action a rendu son texte et l'effet a joue. La commande est faite,
+   * mais rien n'est encore a l'ecran : l'ecriture, elle, prend le temps de
+   * son animation. Ne part que pour une commande qui a pu jouer.
+   */
+  onCommandDone?: CommandListener;
+  /**
+   * La commande a fini de s'ecrire a l'ecran. Part une fois par commande,
+   * au passage, et jamais pour une commande qui n'a pas pu jouer.
+   */
+  onCommandRendered?: CommandListener;
 };
 
 /**
@@ -120,7 +137,9 @@ export const Shell = ({
   // corps du composant garde acces a l'un comme a l'autre
   window: frame,
   scrollRef,
-  onCommand,
+  onCommandStart,
+  onCommandDone,
+  onCommandRendered,
 }: ShellProps) => {
   /**
    * Le cadre, quand la prop `window` est donnee. `area` borne le
@@ -164,8 +183,8 @@ export const Shell = ({
   }, [themes]);
 
   useEffect(() => {
-    setListener(onCommand);
-  }, [onCommand]);
+    setListeners({ start: onCommandStart, done: onCommandDone });
+  }, [onCommandStart, onCommandDone]);
 
   // apres le montage, jamais pendant le rendu : la langue du navigateur
   // n'existe pas au prerendu, l'appliquer plus tot ferait diverger le HTML
@@ -205,12 +224,26 @@ export const Shell = ({
     target?.scrollTo(0, 1000000);
   }, [frame, scrollRef]);
 
+  /**
+   * La fin d'ecriture est signalee a chaque rendu tant que la commande est
+   * a l'ecran, pas seulement au passage : le temoin ne part donc que sur la
+   * bascule, quand la commande n'etait pas encore marquee rendue. Sans ce
+   * garde-fou, `onCommandRendered` repartirait a chaque rendu du terminal.
+   */
   const handleRendered = useCallback(
     (id: string) => {
+      const { commands: played, restrictedCommands } = shellActions();
+      const done = [...played, ...restrictedCommands].find(
+        (command) => command.id === id,
+      );
+      const first = !!done && !done.isRendered;
+
       shellActions().setIsRendered(id);
       scrollDown();
+
+      if (first && done.canExecute) onCommandRendered?.(done.name, done.args);
     },
-    [scrollDown],
+    [scrollDown, onCommandRendered],
   );
 
   const moveCursor = useCallback((direction: number) => {

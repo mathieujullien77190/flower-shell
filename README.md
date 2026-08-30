@@ -23,7 +23,9 @@ const App = () => <Shell commands={baseCommands} />
 | `lang` | starting language, among those of `dict` (`en` by default) |
 | `window` | puts the shell in a frame; the object holds everything the frame can do |
 | `scrollRef` | element to scroll as the output grows; ignored with `window` |
-| `onCommand` | called on every command played, the package ones included |
+| `onCommandStart` | before the command runs; fires for an unknown one too |
+| `onCommandDone` | the action returned its text and the effect played; nothing on screen yet |
+| `onCommandRendered` | the text has finished being written |
 
 Every prop is optional: `<Shell />` mounts bare. With an empty registry it
 shows the prompt and answers nothing — a typed line moves on to the next, with
@@ -85,8 +87,35 @@ put your own words there, override that key like any other:
 
 `initialCommands` only plays once, on a blank screen: a `clear` does not
 replay them. `clear` wipes the screen and does nothing else — bringing
-something back after it is yours to write, from `onCommand` and
+something back after it is yours to write, from `onCommandDone` and
 `runRestricted`.
+
+## Watching the commands
+
+Three props, three moments in the life of a command. All three are handed
+the name and the arguments:
+
+```tsx
+<Shell
+	commands={baseCommands}
+	onCommandStart={(name, args) => console.log("about to run", name, args)}
+	onCommandDone={(name) => console.log("ran", name)}
+	onCommandRendered={(name) => console.log("written out", name)}
+/>
+```
+
+`onCommandStart` fires before anything runs, off the line as it was sent. At
+that point the shell does not yet know whether it has a command of that name,
+so this one **also fires for a line it will refuse** — which is what makes it
+the place to watch everything typed. The other two never fire for a command
+that could not run.
+
+`onCommandDone` fires once the action has returned its text and the effect has
+played. The command is over; nothing is on screen yet.
+
+`onCommandRendered` fires when the text has finished being written. On a long
+output that is a good while after `onCommandDone` — the animation writes it
+letter by letter. It fires once per command, on the crossing.
 
 ## Writing a command
 
@@ -369,9 +398,10 @@ The stories live under `src/stories`, one per case: the bare shell, with custom
 commands, in a window, in each language. Each shows the code that produces it,
 imports included.
 
-**Shell / On command** puts a panel beside the terminal and fills it from
-`onCommand` alone: one line per command played, with its arguments. It is
-where to look to see what the shell hands back — `clear` included.
+**Shell / On command** puts a panel beside the terminal and fills it from the
+three props alone: one row per command, a mark under each moment it has
+reached. Type `title` and watch the gap between the last two marks — that is
+the animation.
 
 **Shell / Theme builder** is a theme maker: you start from a theme of the
 catalogue, move the colours, the preview follows, and the block at the bottom

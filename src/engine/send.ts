@@ -2,11 +2,25 @@ import { getCommands } from "@state/registry"
 import { shellActions } from "@state/store"
 import { createCommand, findCommand } from "./terminalEngine"
 
-/** prevenu a chaque commande jouee, pose par le consommateur */
-let listener: (name: string, args: string[]) => void = () => {}
+/** ce que recoit un temoin : le nom de la commande, et ses arguments */
+export type CommandListener = (name: string, args: string[]) => void
 
-export const setListener = (fn?: (name: string, args: string[]) => void) => {
-	listener = fn || (() => {})
+const NO_LISTENER: CommandListener = () => {}
+
+/**
+ * Les deux temoins que ce module peut prevenir, poses par le consommateur.
+ * Le troisieme — la commande a fini de s'ecrire — appartient au rendu et
+ * vit dans le shell : ici, rien ne sait ce qui est a l'ecran.
+ */
+let onStart: CommandListener = NO_LISTENER
+let onDone: CommandListener = NO_LISTENER
+
+export const setListeners = (listeners: {
+	start?: CommandListener
+	done?: CommandListener
+}) => {
+	onStart = listeners.start || NO_LISTENER
+	onDone = listeners.done || NO_LISTENER
 }
 
 /**
@@ -17,6 +31,15 @@ export const setListener = (fn?: (name: string, args: string[]) => void) => {
 const send = (commandPattern: string, restricted: boolean) => {
 	const commands = getCommands()
 
+	/**
+	 * Le depart se signale avant `createCommand`, qui joue deja l'action :
+	 * apres, il serait trop tard pour etre un « avant ». Le nom et les
+	 * arguments viennent donc de la ligne elle-meme, et non de la commande
+	 * — a ce moment le shell ne sait pas encore s'il en connait une.
+	 */
+	const split = commandPattern.split(" ")
+	onStart(split[0], split.slice(1))
+
 	const cmd = createCommand({ commands, commandPattern, restricted })
 	const baseCmd = findCommand({ commands, name: cmd.name, restricted })
 
@@ -24,7 +47,9 @@ const send = (commandPattern: string, restricted: boolean) => {
 
 	shellActions().addCommand(cmd)
 
-	if (cmd.canExecute) listener(cmd.name, cmd.args)
+	// l'action a rendu son texte et l'effet a joue : la commande est faite,
+	// meme si rien n'est encore a l'ecran
+	if (cmd.canExecute) onDone(cmd.name, cmd.args)
 }
 
 /** joue une commande du visiteur */
