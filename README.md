@@ -179,6 +179,7 @@ frame content, so `scrollRef` has nothing left to say:
 | `move` | dragged by its bar; `true` by default |
 | `start` | the corner it opens in; `center-center` by default |
 | `margin` | how far it is held off the edges `start` sent it to; zero by default |
+| `compact` | full and not resizable: it takes the whole container, and `start` and `margin` have nothing left to place |
 | `canExpand` | the maximise button, and the double-click on the bar |
 | `canClose` | the closing cross |
 | `onClose` | called once the closing is animated, after the frame is gone |

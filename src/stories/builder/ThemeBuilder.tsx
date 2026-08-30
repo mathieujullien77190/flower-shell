@@ -19,11 +19,18 @@ import type { ShellColors, ShellTheme, WindowColors } from "../../theme"
  *
  * Animation off, and only here: replaying `test` letter by letter at every
  * keystroke would show the palette a second after the colour changed.
+ *
+ * And the keyboard focus let go, which matters more than it sounds: the
+ * shell takes it back on every mouse release anywhere on the page, so that
+ * a visitor can type without aiming. Here the page is not the shell — it is
+ * a form around it, and a picker or a select would be closed the instant it
+ * was opened.
  */
 const Preview = ({ draft }: { draft: ShellTheme }) => {
 	useState(() => {
 		shellActions().reset()
 		shellActions().setAnimation(false)
+		shellActions().setKeyboardOnFocus(false)
 		return true
 	})
 
@@ -32,7 +39,10 @@ const Preview = ({ draft }: { draft: ShellTheme }) => {
 			commands={{ ...baseCommands, test }}
 			theme={draft}
 			initialCommands={["test"]}
-			window={{ title: "flower-shell", canClose: false }}
+			// pleine : l'apercu sert a lire une palette, chaque pixel rendu au
+			// terminal en est un de moins a faire defiler. La marge tient au
+			// cadre autour, pas a la fenetre
+			window={{ title: "flower-shell", canClose: false, compact: true }}
 		/>
 	)
 }
@@ -266,11 +276,20 @@ export const ThemeBuilder = () => {
 
 			<div style={{ display: "grid", gap: 20 }}>
 				<Group title="preview">
-					{/* La fenetre se place en pourcentage de ce cadre : il lui faut
-					    une hauteur, le paquet n'en impose aucune. Assez haute pour
-					    que `test` tienne : le shell descend sur sa derniere ligne,
-					    et c'est la liste des couleurs qui passerait au-dessus. */}
-					<div style={{ height: 700, background: "#84787A", borderRadius: 6 }}>
+					{/* La fenetre prend tout ce cadre : il lui faut une hauteur, le
+					    paquet n'en impose aucune. Assez haute pour que `test` tienne
+					    d'un bloc — le shell descend sur sa derniere ligne, et c'est
+					    la liste des couleurs qui passerait au-dessus. La marge, elle,
+					    se pose ici : quelques pixels pour detacher le cadre. */}
+					<div
+						style={{
+							height: 700,
+							padding: 8,
+							boxSizing: "border-box",
+							background: "#84787A",
+							borderRadius: 6,
+						}}
+					>
 						<Preview key={signature} draft={draft} />
 					</div>
 				</Group>

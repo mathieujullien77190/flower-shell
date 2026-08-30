@@ -40,6 +40,12 @@ export type ShellWindowProps = {
    * aux axes centres. Zero par defaut.
    */
   margin?: string;
+  /**
+   * Pleine et non redimensionnable : elle prend tout le conteneur, et
+   * `start` comme `margin` n'ont alors plus rien a placer. La marge se
+   * pose sur ce qui la tient.
+   */
+  compact?: boolean;
   /** le bouton d'agrandissement, et le double-clic sur la barre */
   canExpand?: boolean;
   /** la croix de fermeture */
@@ -281,6 +287,7 @@ export const Shell = ({
         move={frame.move}
         start={frame.start}
         margin={frame.margin}
+        compact={frame.compact}
         canExpand={frame.canExpand}
         canClose={frame.canClose}
         // la croix anime la fermeture puis previent : la fenetre part d'ici,

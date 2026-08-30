@@ -90,11 +90,26 @@ export const useShellStore = create<Shell>(set => ({
 				  }
 		),
 
+	/**
+	 * La fin d'ecriture est signalee a chaque rendu tant que la commande est
+	 * a l'ecran, et pas seulement au passage. Sans ce depart anticipe, le
+	 * `map` refabriquait la liste et l'objet a chaque appel : l'etat changeait
+	 * d'identite pour une valeur identique, et le terminal se rendait a
+	 * nouveau, ce qui resignalait la fin. Marquer rendu ce qui l'est deja ne
+	 * change rien, et ne doit donc rien reveiller.
+	 */
 	setIsRendered: id =>
-		set(state => ({
-			commands: rendered(state.commands, id),
-			restrictedCommands: rendered(state.restrictedCommands, id),
-		})),
+		set(state => {
+			const done = (list: Command[]) =>
+				list.some(command => command.id === id && command.isRendered)
+
+			if (done(state.commands) || done(state.restrictedCommands)) return state
+
+			return {
+				commands: rendered(state.commands, id),
+				restrictedCommands: rendered(state.restrictedCommands, id),
+			}
+		}),
 
 	clear: () =>
 		set(state => ({

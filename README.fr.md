@@ -180,6 +180,7 @@ cadre : `scrollRef` n'a plus rien à dire.
 | `move` | se déplace par sa barre ; `true` par défaut |
 | `start` | le coin où elle s'ouvre ; `center-center` par défaut |
 | `margin` | de combien elle est écartée des bords où `start` l'a envoyée ; zéro par défaut |
+| `compact` | pleine et non redimensionnable : elle prend tout le conteneur, et `start` comme `margin` n'ont plus rien à placer |
 | `canExpand` | le bouton d'agrandissement, et le double-clic sur la barre |
 | `canClose` | la croix de fermeture |
 | `onClose` | appelé une fois la fermeture animée, après que le cadre a disparu |
