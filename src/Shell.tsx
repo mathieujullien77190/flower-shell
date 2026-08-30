@@ -1,6 +1,8 @@
-import { RefObject, useCallback, useEffect, useState } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 
 import Terminal from "./render/Terminal";
+import Window from "./window";
+import type { WindowStart } from "./window/types";
 
 import { run, runRestricted, setListener } from "./engine/send";
 import { setDict } from "./i18n/lang";
@@ -15,6 +17,29 @@ import {
 } from "./state/store";
 import { setTheme, setThemes, ShellThemeInput } from "./theme";
 import { BaseCommand, BaseCommands, Dictionaries } from "./types";
+
+/**
+ * De quoi poser le shell dans une fenetre sans l'assembler soi-meme. La
+ * presence de l'objet suffit : le shell se rend alors dans un `Window`,
+ * qui borne son deplacement au conteneur que le shell pose autour de lui.
+ *
+ * Pour un cadre qui tient autre chose que le shell, ou qui vit dans un
+ * bureau a plusieurs fenetres, `Window` s'utilise directement.
+ */
+export type ShellWindowProps = {
+  /** le texte de la barre de titre */
+  title?: string;
+  /** elle se deplace a la souris par sa barre ; vrai par defaut */
+  move?: boolean;
+  /** le coin ou elle s'ouvre ; `center-center` par defaut */
+  start?: WindowStart;
+  /** le bouton d'agrandissement, et le double-clic sur la barre */
+  canExpand?: boolean;
+  /** la croix de fermeture */
+  canClose?: boolean;
+  /** appele une fois la fermeture animee, apres que la fenetre a disparu */
+  onClose?: () => void;
+};
 
 export type ShellProps = {
   /**
@@ -53,8 +78,18 @@ export type ShellProps = {
    */
   initialCommands?: string[];
   /**
-   * Element a faire defiler quand la sortie s'allonge. Dans un cadre, c'est
-   * le contenu de la fenetre : <Window> expose le sien par sa ref.
+   * Pose le shell dans une fenetre. Sans elle, il se rend nu et remplit ce
+   * qui le tient.
+   *
+   * Le shell fournit alors le conteneur qui borne le deplacement et se
+   * fait defiler par le contenu du cadre : `scrollRef` n'a plus rien a
+   * dire et est ignoree.
+   */
+  window?: ShellWindowProps;
+  /**
+   * Element a faire defiler quand la sortie s'allonge. Sans la prop
+   * `window`, c'est au consommateur de le donner — dans un cadre monte a
+   * la main, <Window> expose le sien par sa ref.
    */
   scrollRef?: RefObject<HTMLElement>;
   /** appele a chaque commande jouee, y compris celles du paquet */
@@ -75,9 +110,20 @@ export const Shell = ({
   dict,
   lang,
   initialCommands = [],
+  // `window` est aussi le nom de l'objet global : renomme ici pour que le
+  // corps du composant garde acces a l'un comme a l'autre
+  window: frame,
   scrollRef,
   onCommand,
 }: ShellProps) => {
+  /**
+   * Le cadre, quand la prop `window` est donnee. `area` borne le
+   * deplacement de la fenetre, `content` est ce qui defile — c'est la ref
+   * que `Window` expose, et elle remplace alors `scrollRef`.
+   */
+  const area = useRef<HTMLDivElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const [framed, setFramed] = useState(true);
   // pose avant le premier rendu : le terminal lit le registre en se rendant
   const [ready] = useState(() => {
     // le dictionnaire d'abord : une commande jouee traduit en s'executant
@@ -148,8 +194,10 @@ export const Shell = ({
   }, [ready]);
 
   const scrollDown = useCallback(() => {
-    scrollRef?.current?.scrollTo(0, 1000000);
-  }, [scrollRef]);
+    // dans un cadre, c'est lui qui defile : sa ref remplace `scrollRef`
+    const target = frame ? content.current : scrollRef?.current;
+    target?.scrollTo(0, 1000000);
+  }, [frame, scrollRef]);
 
   const handleRendered = useCallback(
     (id: string) => {
@@ -163,7 +211,7 @@ export const Shell = ({
     shellActions().moveCursor(direction);
   }, []);
 
-  return (
+  const terminal = (
     <Terminal
       options={options}
       commands={history}
@@ -175,5 +223,35 @@ export const Shell = ({
       onSendNextCommand={() => moveCursor(1)}
       onRendered={handleRendered}
     />
+  );
+
+  if (!frame) return terminal;
+
+  /**
+   * Le conteneur borne le deplacement de la fenetre, et c'est tout ce que
+   * le shell impose : il prend la place qu'on lui donne. A qui l'affiche
+   * de poser la hauteur, ici ou sur ce qui le tient.
+   */
+  return (
+    <div ref={area} style={{ position: "relative", height: "100%" }}>
+      <Window
+        ref={content}
+        show={framed}
+        container={area}
+        title={frame.title}
+        move={frame.move}
+        start={frame.start}
+        canExpand={frame.canExpand}
+        canClose={frame.canClose}
+        // la croix anime la fermeture puis previent : la fenetre part d'ici,
+        // et le consommateur apprend qu'elle est partie
+        onClose={() => {
+          setFramed(false);
+          frame.onClose?.();
+        }}
+      >
+        {terminal}
+      </Window>
+    </div>
   );
 };

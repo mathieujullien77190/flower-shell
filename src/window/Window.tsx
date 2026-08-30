@@ -18,6 +18,10 @@ const BaseWindow = (
 		rank = 0,
 		bottomInset = "0px",
 		compact = false,
+		move = true,
+		start = "center-center",
+		canExpand = true,
+		canClose = true,
 		onFocus = () => {},
 		onClose = () => {},
 	}: WindowProps,
@@ -28,6 +32,9 @@ const BaseWindow = (
 	// en mode compact la fenetre reste pleine et non redimensionnable.
 	// "close" passe quand meme, sinon l'animation de fermeture disparaitrait
 	const mode: Mode = compact && userMode !== "close" ? "full" : userMode
+
+	// pleine, elle n'a plus rien a agrandir : `compact` l'emporte sur le choix
+	const expandable = canExpand && !compact
 
 	/**
 	 * Deplacement applique a la souris, en pixels, par-dessus une position
@@ -114,23 +121,25 @@ const BaseWindow = (
 					$followMouse={followMouse}
 					$layer={layer}
 					$bottomInset={bottomInset}
+					$start={start}
 					onMouseDown={onFocus}
 				>
 					<S.topBar
 						data-tutorial={tutorial}
-						onDoubleClick={compact ? undefined : handleResize}
+						$move={move}
+						onDoubleClick={expandable ? handleResize : undefined}
 						onMouseDown={() => {
-							if (mode !== "full") setFollowMouse(true)
+							if (move && mode !== "full") setFollowMouse(true)
 						}}
 					>
 						<S.Title>{title}</S.Title>
 						<S.Actions>
-							{!compact && (
+							{expandable && (
 								<span onClick={handleResize}>
 									{mode === "full" ? "-" : "+"}
 								</span>
 							)}
-							<span onClick={handleClose}>x</span>
+							{canClose && <span onClick={handleClose}>x</span>}
 						</S.Actions>
 					</S.topBar>
 					<S.Content ref={ref}>

@@ -3,6 +3,22 @@ import { ReactNode, RefObject } from "react"
 export type Pos = { x: number; y: number }
 export type Mode = "medium" | "full" | "close"
 
+/**
+ * Le coin du bureau ou la fenetre s'ouvre : l'horizontale, puis la
+ * verticale. `center-center` est la place par defaut, celle qu'elle a
+ * toujours eue.
+ */
+export type WindowStart =
+	| "left-top"
+	| "center-top"
+	| "right-top"
+	| "left-center"
+	| "center-center"
+	| "right-center"
+	| "left-bottom"
+	| "center-bottom"
+	| "right-bottom"
+
 export type WindowProps = {
 	show: boolean
 	container: RefObject<HTMLDivElement>
@@ -26,6 +42,18 @@ export type WindowProps = {
 	 * aucun seuil.
 	 */
 	compact?: boolean
+	/** elle se deplace a la souris par sa barre de titre ; vrai par defaut */
+	move?: boolean
+	/** le coin ou elle s'ouvre ; `center-center` par defaut */
+	start?: WindowStart
+	/**
+	 * Le bouton d'agrandissement, et le double-clic sur la barre. Faux le
+	 * retire et la fenetre garde son gabarit. `compact` l'emporte : pleine,
+	 * elle n'a plus rien a agrandir.
+	 */
+	canExpand?: boolean
+	/** la croix de fermeture ; vrai par defaut */
+	canClose?: boolean
 	/** la fenetre reclame le premier plan */
 	onFocus?: () => void
 	children: ReactNode

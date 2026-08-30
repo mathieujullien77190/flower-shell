@@ -21,7 +21,8 @@ const App = () => <Shell commands={baseCommands} />
 | `themes` | the themes the visitor can reach, one per name; without it, the package catalogue |
 | `dict` | the languages of the shell, one dictionary per language; without it, English alone |
 | `lang` | starting language, among those of `dict` (`en` by default) |
-| `scrollRef` | element to scroll as the output grows |
+| `window` | puts the shell in a frame; the object holds everything the frame can do |
+| `scrollRef` | element to scroll as the output grows; ignored with `window` |
 | `onCommand` | called on every command played, the package ones included |
 
 Every prop is optional: `<Shell />` mounts bare. With an empty registry it
@@ -124,9 +125,46 @@ one language is enough.
 
 ## The window
 
+For a shell in a frame, the `window` prop is all it takes. The shell then
+provides the container that bounds the movement and scrolls itself through the
+frame content, so `scrollRef` has nothing left to say:
+
+```tsx
+<Shell
+	commands={baseCommands}
+	window={{
+		title: "flower-shell",
+		start: "right-top",
+		move: true,
+		canExpand: true,
+		canClose: true,
+		onClose: () => console.log("closed"),
+	}}
+/>
+```
+
+| `window` key | role |
+| --- | --- |
+| `title` | the text of the title bar |
+| `move` | dragged by its bar; `true` by default |
+| `start` | the corner it opens in; `center-center` by default |
+| `canExpand` | the maximise button, and the double-click on the bar |
+| `canClose` | the closing cross |
+| `onClose` | called once the closing is animated, after the frame is gone |
+
+`start` reads horizontal first, then vertical, out of `left | center | right`
+and `top | center | bottom` — `right-top`, `left-bottom`, `center-center`.
+
+The shell only takes the size of what holds it: give that a height, the
+package imposes none.
+
+### The frame on its own
+
 `Window` is a component of its own, and it knows nothing about the shell: a
 retro frame — draggable title bar, maximise, close — around whatever you put
-inside. It takes `children`, and the shell is only one of them.
+inside. It takes `children`, and the shell is only one of them. Reach for it
+when the frame holds something else, sits in a desktop of several windows, or
+has to be opened and closed from the outside.
 
 Its ref is the scrollable content of the frame: that is what `scrollRef`
 expects, and the shell then scrolls the window down as the output grows.
@@ -159,6 +197,7 @@ const content = useRef<HTMLDivElement>(null)
 | `title` | the text of the bar |
 | `bottomInset` | height reserved at the bottom, for a taskbar |
 | `compact` | full and not resizable |
+| `move` / `start` / `canExpand` / `canClose` | the same four as above |
 | `layer` | stacking floor |
 | `rank` | rank in the cascade, so as not to open on top of the previous one |
 | `onFocus` / `onClose` | the window asks for the front, or closes |

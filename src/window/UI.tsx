@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Mode, Pos } from "./types"
+import { Mode, Pos, WindowStart } from "./types"
 import { colors, fonts, windowColors } from "@theme"
 import {
 	FULL,
@@ -16,6 +16,8 @@ type ContainerProps = {
 	$drag: Pos
 	$followMouse: boolean
 	$layer: number
+	/** le coin du bureau ou la fenetre s'ouvre */
+	$start: WindowStart
 	/**
 	 * Hauteur reservee en bas du conteneur, en CSS. Le bureau y met sa
 	 * barre des taches ; sans elle, la fenetre passerait dessous.
@@ -36,15 +38,33 @@ type ContainerProps = {
  * transforme devient le referentiel des position: fixed qu'il contient,
  * ce qui decalait le canvas plein ecran de stux.
  */
-const place = ({ $mode, $rank, $drag }: ContainerProps) => {
+/**
+ * La part du bureau laissee devant la fenetre, en pourcentage, pour chacun
+ * des mots de `start`. Le gabarit moyen occupe `MEDIUM_SIZE` : centre, il
+ * laisse la moitie du reste de chaque cote — c'est `MEDIUM_MARGIN`, et
+ * c'est la place que la fenetre a toujours eue.
+ */
+const ANCHOR = {
+	left: 0,
+	top: 0,
+	center: MEDIUM_MARGIN,
+	right: 100 - MEDIUM_SIZE,
+	bottom: 100 - MEDIUM_SIZE,
+} as const
+
+const place = ({ $mode, $rank, $drag, $start }: ContainerProps) => {
 	if ($mode === "full") return { top: 0, left: 0 }
 	if ($mode === "close") return { top: "50%", left: "50%" }
 
 	const shift = $rank * CASCADE
+	const [x, y] = $start.split("-") as [
+		"left" | "center" | "right",
+		"top" | "center" | "bottom",
+	]
 
 	return {
-		top: `calc(${MEDIUM_MARGIN}% + ${shift + $drag.y}px)`,
-		left: `calc(${MEDIUM_MARGIN}% + ${shift + $drag.x}px)`,
+		top: `calc(${ANCHOR[y]}% + ${shift + $drag.y}px)`,
+		left: `calc(${ANCHOR[x]}% + ${shift + $drag.x}px)`,
 	}
 }
 
@@ -92,7 +112,7 @@ export const Container = styled.div.attrs<ContainerProps>(props => ({
 	}}
 `
 
-export const topBar = styled.div`
+export const topBar = styled.div<{ $move: boolean }>`
 	height: 15px;
 	background-color: ${() => windowColors().titleBar};
 	border-bottom-style: solid;
@@ -101,7 +121,8 @@ export const topBar = styled.div`
 	display: flex;
 	align-items: center;
 	padding: ${FULL.padding};
-	cursor: move;
+	/* le curseur annonce ce que la barre fait : rien, quand elle ne bouge pas */
+	cursor: ${({ $move }) => ($move ? "move" : "default")};
 `
 
 export const Content = styled.div`

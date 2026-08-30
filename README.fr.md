@@ -21,7 +21,8 @@ const App = () => <Shell commands={baseCommands} />
 | `themes` | les thèmes que le visiteur peut prendre, un par nom ; sans elle, le catalogue du paquet |
 | `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
 | `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
-| `scrollRef` | élément à faire défiler quand la sortie s'allonge |
+| `window` | pose le shell dans un cadre ; l'objet porte tout ce que le cadre sait faire |
+| `scrollRef` | élément à faire défiler quand la sortie s'allonge ; ignorée avec `window` |
 | `onCommand` | appelé à chaque commande jouée, y compris celles du paquet |
 
 Toutes les props sont facultatives : `<Shell />` se monte nu. Le registre
@@ -123,9 +124,47 @@ directement `description: "répond pong"` quand une seule langue suffit.
 
 ## La fenêtre
 
+Pour un shell dans un cadre, la prop `window` suffit. Le shell fournit alors
+le conteneur qui borne le déplacement et se fait défiler par le contenu du
+cadre : `scrollRef` n'a plus rien à dire.
+
+```tsx
+<Shell
+	commands={baseCommands}
+	window={{
+		title: "flower-shell",
+		start: "right-top",
+		move: true,
+		canExpand: true,
+		canClose: true,
+		onClose: () => console.log("closed"),
+	}}
+/>
+```
+
+| clé de `window` | rôle |
+| --- | --- |
+| `title` | le texte de la barre de titre |
+| `move` | se déplace par sa barre ; `true` par défaut |
+| `start` | le coin où elle s'ouvre ; `center-center` par défaut |
+| `canExpand` | le bouton d'agrandissement, et le double-clic sur la barre |
+| `canClose` | la croix de fermeture |
+| `onClose` | appelé une fois la fermeture animée, après que le cadre a disparu |
+
+`start` se lit horizontale d'abord, puis verticale, parmi
+`left | center | right` et `top | center | bottom` — `right-top`,
+`left-bottom`, `center-center`.
+
+Le shell ne prend que la taille de ce qui le tient : donnez-lui une hauteur,
+le paquet n'en impose aucune.
+
+### Le cadre tout seul
+
 `Window` est un composant à part, qui ne sait rien du shell : un cadre rétro —
 barre de titre à glisser, agrandissement, fermeture — autour de ce qu'on met
 dedans. Il prend des `children`, et le shell n'en est qu'un parmi d'autres.
+On y vient quand le cadre tient autre chose, vit dans un bureau à plusieurs
+fenêtres, ou doit s'ouvrir et se fermer depuis l'extérieur.
 
 Sa ref est le contenu défilant du cadre : c'est ce que `scrollRef` attend, et
 le shell fait alors descendre la fenêtre à mesure que la sortie s'allonge.
@@ -158,6 +197,7 @@ const content = useRef<HTMLDivElement>(null)
 | `title` | le texte de la barre |
 | `bottomInset` | hauteur réservée en bas, pour une barre des tâches |
 | `compact` | pleine et non redimensionnable |
+| `move` / `start` / `canExpand` / `canClose` | les quatre mêmes que ci-dessus |
 | `layer` | étage d'empilement |
 | `rank` | rang dans la cascade, pour ne pas s'ouvrir sur la précédente |
 | `onFocus` / `onClose` | la fenêtre réclame le premier plan, ou se ferme |

@@ -15,6 +15,12 @@ import { source } from "../source"
  * you put inside it. Here it holds a `Shell` — it would hold anything else
  * just as well.
  *
+ * For a shell in a plain frame, the `window` prop does all of this on its
+ * own — see **In a window**. This is the assembly underneath: what to write
+ * when the frame holds something else, sits in a desktop of several
+ * windows, or has to be opened and closed from the outside, as the dock
+ * icon does here.
+ *
  * Its ref is the scrollable content, which is what `scrollRef` wants: the
  * shell then scrolls the frame as its output grows. The `exit` command
  * closes the window, and `title` then `help exit` are chained at startup
@@ -93,7 +99,7 @@ const Framed = () => {
 }
 
 const meta: Meta<typeof Shell> = {
-	title: "Shell/In a window",
+	title: "Shell/Window on its own",
 	component: Shell,
 	decorators: [fresh],
 }
@@ -101,7 +107,7 @@ const meta: Meta<typeof Shell> = {
 export default meta
 
 export const InWindow: StoryObj<typeof Shell> = {
-	name: "In a window",
+	name: "Window on its own",
 	parameters: {
 		layout: "fullscreen",
 		...source(`

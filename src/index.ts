@@ -1,5 +1,5 @@
 export { Shell } from "./Shell"
-export type { ShellProps } from "./Shell"
+export type { ShellProps, ShellWindowProps } from "./Shell"
 
 export { baseCommands } from "./commands/base"
 export { highlightFlower, plantFlowers } from "./commands/flowers"
@@ -41,7 +41,7 @@ export {
 } from "./state/store"
 
 export { default as Window } from "./window"
-export type { Mode, Pos, WindowProps } from "./window/types"
+export type { Mode, Pos, WindowProps, WindowStart } from "./window/types"
 export {
 	ANIM_TIME,
 	CASCADE,
