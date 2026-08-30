@@ -1,7 +1,9 @@
+**English** · [Français](./README.fr.md)
+
 # flower-shell
 
-Un terminal rétro en React : moteur de commandes, historique, autocomplétion,
-rendu ASCII animé, et une fenêtre pour le poser. Aucune mise en page imposée.
+A retro terminal in React: a command engine, history, autocompletion, animated
+ASCII rendering, and a window to put it in. No layout imposed.
 
 ```tsx
 import { Shell, baseCommands } from "flower-shell"
@@ -9,48 +11,48 @@ import { Shell, baseCommands } from "flower-shell"
 const App = () => <Shell commands={baseCommands} />
 ```
 
-## Le composant
+## The component
 
-| prop | rôle |
+| prop | role |
 | --- | --- |
-| `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
-| `welcome` | le texte du mot d'accueil ; une clé du dictionnaire ou le texte lui-même |
-| `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
-| `banner` | commandes rejouées au démarrage **et après chaque `clear`** |
-| `theme` | couleurs, invite, polices |
-| `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
-| `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
-| `scrollRef` | élément à faire défiler quand la sortie s'allonge |
-| `onCommand` | appelé à chaque commande jouée, y compris celles du paquet |
+| `commands` | the known commands, indexed by name: the ones shipped with the package, plus yours; optional |
+| `welcome` | the text of the welcome message; a dictionary key or the text itself |
+| `initialCommands` | commands played at startup, once; this is where the opening goes |
+| `banner` | commands replayed at startup **and after every `clear`** |
+| `theme` | colours, prompt, fonts |
+| `dict` | the languages of the shell, one dictionary per language; without it, English alone |
+| `lang` | starting language, among those of `dict` (`en` by default) |
+| `scrollRef` | element to scroll as the output grows |
+| `onCommand` | called on every command played, the package ones included |
 
-Toutes les props sont facultatives : `<Shell />` se monte nu. Le registre
-vide, il affiche l'invite et ne répond à rien — une ligne tapée passe à la
-suivante, sans message d'erreur. Dès qu'une commande existe, une commande
-inconnue redevient une erreur.
+Every prop is optional: `<Shell />` mounts bare. With an empty registry it
+shows the prompt and answers nothing — a typed line moves on to the next, with
+no error message. As soon as one command exists, an unknown command becomes an
+error again.
 
-## Les commandes de base
+## The base commands
 
-`help`, `clear`, `hello`, `flowers`, `animation`, `lang`, `theme` et `test`.
+`help`, `clear`, `hello`, `flowers`, `animation`, `lang`, `theme` and `test`.
 
-`test` affiche toutes les couleurs du thème, la source à gauche et son rendu à
-droite : de quoi juger une palette, ou retrouver la syntaxe du balisage sans
-ouvrir cette page.
+`test` prints every colour of the theme, the source on the left and its render
+on the right: enough to judge a palette, or to find the markup syntax again
+without opening this page.
 
-Plus trois commandes restreintes — que le visiteur ne peut pas taper :
+Plus three restricted commands — ones the visitor cannot type:
 
-- `title` affiche le logo ASCII du shell et `welcome` le mot d'accueil de la
-  prop du même nom. Ce sont des commandes comme les autres : vous les jouez en
-  les mettant dans `initialCommands`, ou dans `banner` pour qu'elles reviennent
-  après un `clear`. Sans ça le shell démarre nu, et vous posez votre marque
-- `unknow` et `argumenterror` sont cherchées **par nom** par le moteur, qui
-  rend leur texte quand une commande est inconnue ou mal appelée. Les retirer
-  est permis : le dictionnaire du paquet prend le relais, et `commands={{}}` reste un
-  shell valide, qui ne répond simplement à rien
+- `title` prints the ASCII logo of the shell and `welcome` the welcome message
+  of the prop of the same name. They are commands like any other: you play them
+  by putting them in `initialCommands`, or in `banner` so they come back after a
+  `clear`. Without that the shell starts bare, and you put your own mark on it
+- `unknow` and `argumenterror` are looked up **by name** by the engine, which
+  renders their text when a command is unknown or badly called. Removing them
+  is allowed: the package dictionary takes over, and `commands={{}}` remains a
+  valid shell, one that simply answers nothing
 
-## L'ouverture
+## The opening
 
-Le shell démarre nu. Le logo et le mot d'accueil sont deux commandes, jouées
-comme les autres :
+The shell starts bare. The logo and the welcome message are two commands,
+played like any other:
 
 ```tsx
 <Shell
@@ -61,17 +63,17 @@ comme les autres :
 />
 ```
 
-`initialCommands` ne joue qu'une fois, sur un écran vierge : un `clear` ne les
-rejoue pas. Ce qui doit revenir après un `clear` va dans `banner`, à la même
-syntaxe près.
+`initialCommands` only plays once, on a blank screen: a `clear` does not replay
+them. What has to come back after a `clear` goes in `banner`, with the same
+syntax.
 
-## Écrire une commande
+## Writing a command
 
 ```tsx
 const ping: BaseCommand = {
 	restricted: false,
 	action: () => t("ping.pong"),
-	effect: () => console.log("joué"),
+	effect: () => console.log("played"),
 	help: {
 		patterns: [{ pattern: "ping", description: "ping.usage" }],
 	},
@@ -80,39 +82,39 @@ const ping: BaseCommand = {
 const commands: BaseCommands = { ...baseCommands, ping }
 ```
 
-Le nom qui invoque la commande est sa clé dans l'objet : le champ `name` n'existe
-pas.
+The name that invokes the command is its key in the object: there is no `name`
+field.
 
-Un texte est **toujours une `string`**. Dans une `action`, c'est à vous
-d'appeler `t("clé")` — vous pouvez donc mélanger : `` `${t("ping.pong")} ${nom}` ``.
-Dans les champs statiques (`help.description`, `description` d'un pattern, prop
-`welcome`), vous écrivez **la clé** et le shell la traduit au moment de s'en
-servir. Une clé absente du dictionnaire s'affiche telle quelle, ce qui permet
-d'écrire directement `description: "répond pong"` quand une seule langue suffit.
+A text is **always a `string`**. Inside an `action`, calling `t("key")` is up
+to you — so you can mix: `` `${t("ping.pong")} ${name}` ``. In the static
+fields (`help.description`, a pattern `description`, the `welcome` prop) you
+write **the key** and the shell translates it when it uses it. A key missing
+from the dictionary shows as-is, which lets you write
+`description: "answers pong"` directly when one language is enough.
 
-| champ | rôle |
+| field | role |
 | --- | --- |
-| `action` | le texte affiché, déjà traduit |
-| `effect` | l'effet de bord ; la commande attaque votre état elle-même |
-| `JSX` | rendu React sous la sortie, pour une commande qui affiche mieux qu'un texte |
-| `help` | l'aide ; une fonction si elle dépend de l'état, comme celle de `lang` |
-| `testArgs` | arguments acceptés (`authorize`, `empty`) ; `authorize` accepte une fonction |
-| `display` | animation, styles, coloration personnalisée |
-| `restricted` | vraie si le visiteur ne peut pas la taper ; réservée au code |
+| `action` | the text displayed, already translated |
+| `effect` | the side effect; the command reaches your state itself |
+| `JSX` | React render under the output, for a command that shows better than it tells |
+| `help` | the help; a function when it depends on state, like the one of `lang` |
+| `testArgs` | accepted arguments (`authorize`, `empty`); `authorize` accepts a function |
+| `display` | animation, styles, custom colouring |
+| `restricted` | true when the visitor cannot type it; reserved for code |
 
-## La fenêtre
+## The window
 
-`Window` est un composant à part, qui ne sait rien du shell : un cadre rétro —
-barre de titre à glisser, agrandissement, fermeture — autour de ce qu'on met
-dedans. Il prend des `children`, et le shell n'en est qu'un parmi d'autres.
+`Window` is a component of its own, and it knows nothing about the shell: a
+retro frame — draggable title bar, maximise, close — around whatever you put
+inside. It takes `children`, and the shell is only one of them.
 
-Sa ref est le contenu défilant du cadre : c'est ce que `scrollRef` attend, et
-le shell fait alors descendre la fenêtre à mesure que la sortie s'allonge.
+Its ref is the scrollable content of the frame: that is what `scrollRef`
+expects, and the shell then scrolls the window down as the output grows.
 
 ```tsx
 import { Shell, Window, baseCommands } from "flower-shell"
 
-// container borne le déplacement, content est ce qui défile
+// container bounds the movement, content is what scrolls
 const container = useRef<HTMLDivElement>(null)
 const content = useRef<HTMLDivElement>(null)
 
@@ -129,40 +131,48 @@ const content = useRef<HTMLDivElement>(null)
 </div>
 ```
 
-| prop de `Window` | rôle |
+| `Window` prop | role |
 | --- | --- |
-| `children` | ce que le cadre contient |
-| `show` | montée ou non ; la fermeture s'anime avant de démonter |
-| `container` | le cadre borne le déplacement à cet élément |
-| `title` | le texte de la barre |
-| `bottomInset` | hauteur réservée en bas, pour une barre des tâches |
-| `compact` | pleine et non redimensionnable |
-| `layer` | étage d'empilement |
-| `rank` | rang dans la cascade, pour ne pas s'ouvrir sur la précédente |
-| `onFocus` / `onClose` | la fenêtre réclame le premier plan, ou se ferme |
+| `children` | what the frame holds |
+| `show` | mounted or not; closing animates before unmounting |
+| `container` | the frame bounds its movement to this element |
+| `title` | the text of the bar |
+| `bottomInset` | height reserved at the bottom, for a taskbar |
+| `compact` | full and not resizable |
+| `layer` | stacking floor |
+| `rank` | rank in the cascade, so as not to open on top of the previous one |
+| `onFocus` / `onClose` | the window asks for the front, or closes |
 
-`compact` retire le bouton d'agrandissement et le double-clic. Le paquet ne
-fixe aucun seuil : c'est à qui l'affiche de décider quand — petit écran, mode
-lecture, préférence.
+`compact` removes the maximise button and the double-click. The package sets no
+threshold: it is up to whoever displays it to decide when — small screen,
+reading mode, preference.
 
-## Le balisage du texte
+## Text markup
 
-Les réponses passent par une passe de coloration :
+Answers go through a colouring pass. Each theme colour has its own marker:
 
-| marqueur | effet |
+| marker | effect |
 | --- | --- |
-| `` `texte` `` | commande cliquable, qui se rejoue au clic |
-| `$texte$` | fond vert, texte noir |
-| `§texte§` | couleur d'accent |
-| `+texte+` | couleur d'information |
+| `§text§` | accent colour |
+| `+text+` | info colour |
+| `` `text` `` | command colour |
+| `!text!` | restricted colour |
+| `$text$` | brand colour |
+| `_text_` | the background colour: invisible until selected |
+| `#label ~ cmd args#` | clickable and underlined: the click plays `cmd` with its arguments |
 
-Un marqueur précédé de `£` s'affiche tel quel.
+A marker in brackets — `[+text+]` — becomes a tag: a solid background instead
+of a text colour, the label in black or white depending on how light the
+background is.
 
-## Les langues
+A backslash before a marker prints it as-is: `\+` gives `+`. A backslash with
+no marker behind it stays as-is, so there is no need to escape it.
 
-Le paquet livre ses textes en deux dictionnaires — `dictEn` et `dictFr`, un
-fichier chacun — mais n'en monte **qu'un seul par défaut : l'anglais**. Les
-langues du shell sont exactement les clés de la prop `dict` :
+## Languages
+
+The package ships its texts in two dictionaries — `dictEn` and `dictFr`, one
+file each — but mounts **only one by default: English**. The languages of the
+shell are exactly the keys of the `dict` prop:
 
 ```tsx
 import { Shell, baseCommands, dictEn, dictFr } from "flower-shell"
@@ -171,50 +181,51 @@ import { Shell, baseCommands, dictEn, dictFr } from "flower-shell"
 <Shell commands={baseCommands} lang="fr" dict={{ en: dictEn, fr: dictFr }} />
 ```
 
-`lang` choisit celle du départ ; la commande `lang` n'accepte que celles qui
-sont montées, et son aide les liste — chacune se décrit par la clé
-`lang.<code>`, à fournir dans votre dictionnaire pour votre langue.
+`lang` picks the starting one; the `lang` command only accepts those that are
+mounted, and its help lists them — each describes itself through the
+`lang.<code>` key, to be provided in your dictionary for your language.
 
-Pour une autre langue, vous écrivez le dictionnaire, sur le modèle de ceux du
-paquet. Chaque langue montée est posée **sur l'anglais** : une clé que votre
-dictionnaire ne couvre pas sort en anglais plutôt qu'en clé nue, et vous pouvez
-n'ajouter qu'un texte sans perdre les autres.
+For another language, you write the dictionary, on the model of the package
+ones. Every mounted language is laid **on top of English**: a key your
+dictionary does not cover comes out in English rather than as a bare key, and
+you can add a single text without losing the others.
 
 ```tsx
 <Shell
 	commands={commands}
 	lang="de"
 	dict={{
-		en: { app: { welcome: "Type `help`" } },   // l'anglais du paquet, plus votre clé
-		de: dictDe,                                 // le vôtre, écrit chez vous
+		en: { app: { welcome: "Type `help`" } },   // the package English, plus your key
+		de: dictDe,                                 // yours, written at home
 	}}
 />
 ```
 
-`t("hello.world")` lit la langue courante, retombe sur l'anglais, puis sur la
-clé elle-même. `t("lang.set", { lang: "fr" })` remplace les `{nom}` du texte.
+`t("hello.world")` reads the current language, falls back to English, then to
+the key itself. `t("lang.set", { lang: "fr" })` replaces the `{name}` slots of
+the text.
 
-**La traduction a lieu quand la commande s'exécute**, et le résultat est stocké
-tel quel. Après un `lang en`, les lignes déjà affichées restent donc dans leur
-langue d'origine ; seules les suivantes changent.
+**Translation happens when the command runs**, and the result is stored as-is.
+After a `lang en`, the lines already displayed therefore stay in their original
+language; only the following ones change.
 
-## Le thème
+## The theme
 
-Le paquet en livre huit, à la manière d'un éditeur :
+The package ships eight, in the manner of an editor:
 
-| nom | |
+| name | |
 | --- | --- |
-| `flower` | **le défaut** — feuillage sombre, une fleur pour invite |
-| `twilight` | un terminal sombre et neutre, invite `>` |
-| `parchment` | un terminal clair et neutre |
-| `dracula` | fond ardoise violette, accents saturés |
-| `nord` | fond bleu nuit, accents froids |
-| `gruvbox` | fond terreux, accents chauds |
-| `monokai` | fond olive sombre, accents francs |
-| `solarized` | fond ivoire, accents mesurés |
+| `flower` | **the default** — dark foliage, a flower for a prompt |
+| `twilight` | a dark, neutral terminal, `>` prompt |
+| `parchment` | a light, neutral terminal |
+| `dracula` | purple slate background, saturated accents |
+| `nord` | night blue background, cold accents |
+| `gruvbox` | earthy background, warm accents |
+| `monokai` | dark olive background, plain accents |
+| `solarized` | ivory background, measured accents |
 
-Chacun s'exporte sous son nom — `flowerTheme`, `twilightTheme`, `nordTheme`… —
-et `themes` les rassemble sous les clés du tableau :
+Each is exported under its own name — `flowerTheme`, `twilightTheme`,
+`nordTheme`… — and `themes` gathers them under the keys of the table:
 
 ```tsx
 import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
@@ -224,11 +235,11 @@ import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 <Shell commands={baseCommands} theme={themes.gruvbox} />
 ```
 
-Le visiteur, lui, en change à la volée : la commande `theme <nom>` accepte
-exactement les clés de `themes`, et `help theme` les liste — chacune décrite
-par la clé de dictionnaire `theme.<nom>`.
+The visitor changes it on the fly: the `theme <name>` command accepts exactly
+the keys of `themes`, and `help theme` lists them — each described by the
+`theme.<name>` dictionary key.
 
-Un thème se remplace aussi par morceaux :
+A theme can also be replaced piece by piece:
 
 ```tsx
 <Shell
@@ -243,53 +254,52 @@ Un thème se remplace aussi par morceaux :
 />
 ```
 
-Les valeurs absentes gardent celles de `defaultTheme`, y compris à
-l'intérieur d'un groupe : ne donner que `colors.background` laisse les autres
-couleurs en place.
+Absent values keep those of `defaultTheme`, inside a group included: giving
+only `colors.background` leaves the other colours in place.
 
-`container` est le style du conteneur général du terminal, un
-`CSSProperties` complet posé en inline sur lui : la marge intérieure est le
-besoin courant — elle vaut `16px` par défaut — mais un arrondi, une bordure ou
-une ombre se posent au même endroit. Ce qu'on y met recouvre le style de base
-du conteneur, propriété par propriété.
+`container` is the style of the terminal outer container, a full
+`CSSProperties` laid inline on it: the padding is the common need — it is
+`16px` by default — but a radius, a border or a shadow go in the same place.
+What you put there overrides the base style of the container, property by
+property.
 
-Les deux polices sont séparées — un terminal veut du chasse fixe, un cadre pas
-forcément — et valent `monospace` par défaut. Le cadre pose la sienne
-explicitement : sans elle, il hériterait de la page qui l'accueille.
+The two fonts are separate — a terminal wants a fixed pitch, a frame not
+necessarily — and are `monospace` by default. The frame sets its own
+explicitly: without it, it would inherit from the page holding it.
 
-## Hors composant
+## Outside the component
 
-L'état vit dans des modules, pas dans un contexte : une commande peut donc être
-jouée depuis n'importe où — une fenêtre qui se ferme, un jeu qui se termine.
+State lives in modules, not in a context: a command can therefore be played
+from anywhere — a window that closes, a game that ends.
 
 ```ts
 import { run, runRestricted, shellActions, useLang } from "flower-shell"
 
-run("help")             // comme si le visiteur l'avait tapée
-runRestricted("title")  // une commande que le visiteur ne peut pas taper
+run("help")             // as if the visitor had typed it
+runRestricted("title")  // a command the visitor cannot type
 shellActions().setLang("en")
-shellActions().reset()   // historique vide, options par defaut
+shellActions().reset()   // empty history, default options
 ```
 
-**Conséquence assumée : un shell par page.** Le registre des commandes et le
-thème sont des modules ; deux terminaux monteraient l'un sur l'autre.
+**An accepted consequence: one shell per page.** The command registry and the
+theme are modules; two terminals would mount on top of each other.
 
-## Développer
+## Developing
 
 ```sh
-npm run storybook   # le terminal seul, sans le reste du site
+npm run storybook   # the terminal alone, without the rest of the site
 ```
 
-Les stories sont sous `src/stories`, une par cas : le shell nu, avec des
-commandes personnalisées, dans une fenêtre, dans chaque langue. Chacune montre
-le code qui la produit, imports compris.
+The stories live under `src/stories`, one per case: the bare shell, with custom
+commands, in a window, in each language. Each shows the code that produces it,
+imports included.
 
-**Shell / Theme builder** est un créateur de thème : on part d'un thème du
-catalogue, on déplace les couleurs, l'aperçu suit, et le bloc du bas est la
-prop `theme` correspondante — à copier telle quelle.
+**Shell / Theme builder** is a theme maker: you start from a theme of the
+catalogue, move the colours, the preview follows, and the block at the bottom
+is the matching `theme` prop — to be copied as-is.
 
-**Markup** documente le balisage, marqueur par marqueur : les couleurs, les
-tags, l'échappement.
+**Markup** documents the markup, marker by marker: the colours, the tags, the
+escaping.
 
 ## Licence
 
