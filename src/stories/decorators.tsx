@@ -1,7 +1,7 @@
 import { useRef, useState } from "react"
 import type { Decorator } from "@storybook/react-vite"
 
-import { defaultTheme, setTheme } from "../theme"
+import { defaultTheme, setTheme, setThemes } from "../theme"
 import { shellActions } from "../state/store"
 
 /**
@@ -12,8 +12,10 @@ import { shellActions } from "../state/store"
 export const Fresh = ({ children }: { children: React.ReactNode }) => {
 	useState(() => {
 		shellActions().reset()
-		// the theme lives at module level: without a reset it would leak from
-		// one story to the next. The shell replays its own right after, on mount.
+		// the theme and its catalogue live at module level: without a reset
+		// they would leak from one story to the next — Themes mounts three of
+		// them. The shell replays its own right after, on mount.
+		setThemes()
 		setTheme(defaultTheme)
 		return true
 	})

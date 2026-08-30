@@ -13,7 +13,7 @@ import {
   useKeyboardOnFocus,
   useLang,
 } from "./state/store";
-import { setTheme, ShellThemeInput } from "./theme";
+import { setTheme, setThemes, ShellThemeInput } from "./theme";
 import { BaseCommand, BaseCommands, Dictionaries } from "./types";
 
 export type ShellProps = {
@@ -27,7 +27,17 @@ export type ShellProps = {
    * la que se met la marque : le shell, lui, n'en connait aucune.
    */
   banner?: string[];
+  /** le theme de depart ; un theme partiel garde les valeurs qu'il ne donne pas */
   theme?: ShellThemeInput;
+  /**
+   * Les themes que le visiteur peut prendre, indexes par le nom qu'il tape.
+   * Ce sont exactement ceux que `theme <nom>` accepte et que `help theme`
+   * liste. Sans elle, le catalogue du paquet en entier.
+   *
+   * Chacun se decrit par la clef `theme.<nom>` : a fournir dans votre
+   * dictionnaire pour les votres, sans quoi la clef s'affiche telle quelle.
+   */
+  themes?: Record<string, ShellThemeInput>;
   /**
    * Vos textes, par langue. Ils recouvrent ceux du paquet clef par clef, et
    * une langue absente du paquet devient utilisable par `lang <code>`.
@@ -65,6 +75,7 @@ export const Shell = ({
   commands = {},
   banner = [],
   theme,
+  themes,
   dict,
   lang,
   initialCommands = [],
@@ -77,6 +88,9 @@ export const Shell = ({
     setDict(dict);
     setCommands(commands);
     setBanner(banner);
+    // le catalogue avant le theme de depart : `help theme` et `theme <nom>`
+    // lisent le premier, et le second n'a pas a en faire partie
+    setThemes(themes);
     setTheme(theme);
     return true;
   });
@@ -101,6 +115,10 @@ export const Shell = ({
   useEffect(() => {
     setBanner(banner);
   }, [banner]);
+
+  useEffect(() => {
+    setThemes(themes);
+  }, [themes]);
 
   useEffect(() => {
     setListener(onCommand);

@@ -18,7 +18,8 @@ const App = () => <Shell commands={baseCommands} />
 | `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
 | `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
 | `banner` | commandes rejouées au démarrage **et après chaque `clear`** |
-| `theme` | couleurs, invite, polices |
+| `theme` | le thème porté au démarrage ; couleurs, invite, polices |
+| `themes` | les thèmes que le visiteur peut prendre, un par nom ; sans elle, le catalogue du paquet |
 | `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
 | `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
 | `scrollRef` | élément à faire défiler quand la sortie s'allonge |
@@ -245,21 +246,38 @@ Le paquet en livre huit, à la manière d'un éditeur :
 | `solarized` | fond ivoire, accents mesurés |
 
 Chacun s'exporte sous son nom — `flowerTheme`, `twilightTheme`, `nordTheme`… —
-et `themes` les rassemble sous les clés du tableau :
+et `themes` rassemble les huit sous les clés du tableau.
+
+Deux props, et elles répondent à deux questions différentes. `theme` est celui
+que le shell porte au démarrage. `themes` est le catalogue que le visiteur
+peut atteindre :
 
 ```tsx
 import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 
-<Shell commands={baseCommands} />                        // flowerTheme
-<Shell commands={baseCommands} theme={nordTheme} />
-<Shell commands={baseCommands} theme={themes.gruvbox} />
+<Shell commands={baseCommands} />                        // flowerTheme, all eight
+<Shell commands={baseCommands} theme={nordTheme} />      // starts on nord
+<Shell commands={baseCommands} themes={{ nord: nordTheme }} />  // and nothing else
 ```
 
-Le visiteur, lui, en change à la volée : la commande `theme <nom>` accepte
-exactement les clés de `themes`, et `help theme` les liste — chacune décrite
-par la clé de dictionnaire `theme.<nom>`.
+**Les thèmes du shell sont exactement les clés de `themes`** — rien de plus.
+`theme <nom>` n'accepte que ceux-là, et `help theme` les liste, chacun décrit
+par la clé de dictionnaire `theme.<nom>`. Sans la prop, le catalogue du paquet
+en entier.
 
-Un thème se remplace aussi par morceaux :
+Donc un shell à vous, avec un thème du paquet, un des vôtres, et aucune sortie
+hors des deux :
+
+```tsx
+<Shell
+	commands={baseCommands}
+	themes={{ nord: nordTheme, mine }}
+	theme={mine}
+	dict={{ en: { theme: { mine: "The house theme" } } }}
+/>
+```
+
+Un thème — monté ou donné à `theme` — s'écrit aussi par morceaux :
 
 ```tsx
 <Shell
@@ -276,7 +294,9 @@ Un thème se remplace aussi par morceaux :
 
 Les valeurs absentes gardent celles de `defaultTheme`, y compris à
 l'intérieur d'un groupe : ne donner que `colors.background` laisse les autres
-couleurs en place.
+couleurs en place. Un thème monté est posé sur `defaultTheme` et non sur celui
+qu'il remplace : y passer donne le même résultat quel que soit le thème qu'on
+quitte.
 
 `container` est le style du conteneur général du terminal, un
 `CSSProperties` complet posé en inline sur lui : la marge intérieure est le

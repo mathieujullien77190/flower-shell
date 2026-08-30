@@ -3,17 +3,42 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
+import { flowerTheme, nordTheme } from "../../theme"
+import type { ShellThemeInput } from "../../theme"
 import { boxed } from "../decorators"
 import { source } from "../source"
 
 /**
- * The catalogue, the way an editor offers one. Eight themes ship with the
- * package; the consumer hands one to the `theme` prop, and the visitor
- * switches at will with `theme <name>`.
+ * `themes` is the catalogue the visitor can reach: exactly what
+ * `theme <name>` accepts and what `help theme` lists. Three of them here,
+ * one of each kind — `flower`, the package default; `nord`, another one
+ * taken from the package; and `neon`, written from scratch in the story
+ * file.
  *
- * Type `help theme` for the list, then `theme nord`, `theme gruvbox`,
- * `theme solarized` — the prompt, the output and the frame follow.
+ * The shell opens on `help theme`, so the list is the first thing you read.
+ * Then try `theme neon`, `theme nord`, `theme flower` — and `theme dracula`,
+ * which is refused: the package ships it, this shell did not mount it.
  */
+
+/**
+ * Written from scratch: only the colours and the prompt. What a theme does
+ * not say keeps the value of `defaultTheme` — the window frame and the
+ * fonts, here.
+ */
+const neon: ShellThemeInput = {
+	colors: {
+		background: "#0B0F1A",
+		textColor: "#C8F7FF",
+		importantColor: "#FF2E88",
+		cmdColor: "#3BF0FF",
+		restrictedColor: "#FFD166",
+		infoColor: "#A78BFA",
+		appColor: "#3BF0FF",
+		invisible: "#0B0F1A",
+	},
+	prompt: "λ",
+}
+
 const meta: Meta<typeof Shell> = {
 	title: "Shell/Themes",
 	component: Shell,
@@ -24,22 +49,46 @@ export default meta
 
 export const Themes: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands, test, nordTheme, themes } from "flower-shell"
+import { Shell, baseCommands, test, flowerTheme, nordTheme, themes } from "flower-shell"
+import type { ShellThemeInput } from "flower-shell"
 
-// one theme, chosen up front
-<Shell commands={{ ...baseCommands, test }} theme={nordTheme} />
+// written from scratch: what it does not say keeps the default —
+// the window frame and the fonts, here
+const neon: ShellThemeInput = {
+	colors: {
+		background: "#0B0F1A",
+		textColor: "#C8F7FF",
+		importantColor: "#FF2E88",
+		cmdColor: "#3BF0FF",
+		restrictedColor: "#FFD166",
+		infoColor: "#A78BFA",
+		appColor: "#3BF0FF",
+		invisible: "#0B0F1A",
+	},
+	prompt: "λ",
+}
 
-// or the whole catalogue, indexed by the name the visitor types
-<Shell commands={{ ...baseCommands, test }} theme={themes.gruvbox} />
+// the catalogue the visitor can reach, and nothing else: the five other
+// themes of the package are not mounted, so \`theme dracula\` is refused.
+// each name describes itself through the \`theme.<name>\` key.
+<Shell
+	commands={{ ...baseCommands, test }}
+	themes={{ flower: flowerTheme, nord: nordTheme, neon }}
+	theme={flowerTheme}
+	initialCommands={["title", "help theme"]}
+	dict={{ en: { theme: { neon: "Written from scratch, in the story file" } } }}
+/>
 
-// either way, \`theme <name>\` switches live: flower, dark, light,
-// dracula, nord, gruvbox, monokai, solarized
+// or hand over the whole catalogue, and let the visitor have all eight
+<Shell commands={baseCommands} themes={themes} />
 `),
 	args: {
 		commands: { ...baseCommands, test },
-		initialCommands: ["title", "welcome"],
+		themes: { flower: flowerTheme, nord: nordTheme, neon },
+		theme: flowerTheme,
+		initialCommands: ["title", "help theme"],
 		dict: {
-			en: { welcome: { text: "Try \`theme nord\`, or \`help theme\` for the list" } },
+			en: { theme: { neon: "Written from scratch, in the story file" } },
 		},
 	},
 }

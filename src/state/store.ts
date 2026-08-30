@@ -3,7 +3,7 @@ import { useShallow } from "zustand/react/shallow"
 
 import { Command } from "@types"
 import { getBanner } from "./registry"
-import { DEFAULT_THEME_NAME, setTheme, themes } from "@theme"
+import { DEFAULT_THEME_NAME, setTheme, themeByName } from "@theme"
 
 /** le nom d'un theme du catalogue : ce que le visiteur tape */
 type ThemeName = string
@@ -65,7 +65,7 @@ export const useShellStore = create<Shell>(set => ({
 	// declenche le rendu, le premier fournit les couleurs qu'il relira.
 	// Un nom inconnu ne fait rien : la commande ne laisse pas passer.
 	setThemeName: name => {
-		const next = themes[name]
+		const next = themeByName(name)
 		if (!next) return
 
 		setTheme(next)
