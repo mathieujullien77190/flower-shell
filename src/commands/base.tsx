@@ -8,6 +8,18 @@ import { highlightFlower, plantFlowers } from "./flowers"
 import { title } from "./title"
 
 /**
+ * La taille du logo ascii, prise sur la largeur du terminal et non sur
+ * celle du navigateur : `cqw` se mesure sur le conteneur du shell, qui pose
+ * `container-type: inline-size`. En `vw` le logo restait dimensionne pour la
+ * page et debordait de tout cadre plus petit qu'elle — une fenetre, une
+ * colonne, une story.
+ *
+ * Le diviseur est celui du dessin : il fait environ 130 caracteres une fois
+ * ses marqueurs de couleur consommes.
+ */
+const LOGO_SIZE = "calc(100cqw / 130)"
+
+/**
  * L'aide d'une commande. Les descriptions sont des clefs : elles passent
  * par `t()` ici, a l'execution, quand la langue courante est connue.
  */
@@ -181,8 +193,8 @@ export const baseCommands: BaseCommands = {
 		display: {
 			hideCmd: true,
 			style: { alignItems: "center" },
-			stylePre: { fontSize: "calc(100vw/130)" },
-			highlight: text => highlightFlower(text, { fontSize: "calc(100vw/130)" }),
+			stylePre: { fontSize: LOGO_SIZE },
+			highlight: text => highlightFlower(text, { fontSize: LOGO_SIZE }),
 		},
 	},
 	unknow: {
