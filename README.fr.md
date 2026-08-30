@@ -1,4 +1,4 @@
-[English](./README.md) · **Français**
+[English](./README.md) · **Français** · [Storybook](https://mathieujullien77190.github.io/flower-shell/)
 
 # flower-shell
 
