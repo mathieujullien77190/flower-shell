@@ -21,8 +21,8 @@ export const Escaping: StoryObj = {
 	render: () => {
 		setTheme(twilightTheme)
 		const lines = [
-			"Colored: +this+ — escaped: \+this\+",
-			"Raw markers: \§ \+ \` \! \$",
+			"Colored: +this+ — escaped: \\+this\\+",
+			"Raw markers: \\§ \\+ \\` \\! \\$",
 		]
 		return (
 			<Screen>
