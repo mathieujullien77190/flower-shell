@@ -1,7 +1,7 @@
 import { makeTheme } from "./base"
 import type { ShellTheme } from "./types"
 
-/** Monokai : fond olive sombre, accents francs */
+/** Monokai: dark olive background, blunt accents */
 export const monokaiTheme: ShellTheme = makeTheme({
 	colors: {
 		background: "#272822",
@@ -12,6 +12,4 @@ export const monokaiTheme: ShellTheme = makeTheme({
 		infoColor: "#66D9EF",
 		appColor: "#AE81FF",
 	},
-	titleBar: "#F92672",
-	content: "#F8F8F2",
 })

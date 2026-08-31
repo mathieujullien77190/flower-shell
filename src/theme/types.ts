@@ -15,25 +15,9 @@ export type ShellColors = {
 	invisible: string
 }
 
-/**
- * The fonts. The one of the shell dresses the output and the input, the one
- * of the window its title bar. They are kept apart: a terminal wants a
- * monospace, a frame not necessarily.
- */
+/** the font of the shell: it dresses the output and the input alike */
 export type ShellFonts = {
 	shell: string
-	window: string
-}
-
-/** the frame of the window: title bar, border, buttons */
-export type WindowColors = {
-	titleBar: string
-	border: string
-	/** the background behind the content, visible around it */
-	content: string
-	text: string
-	button: string
-	buttonHover: string
 }
 
 export type ShellTheme = {
@@ -41,7 +25,6 @@ export type ShellTheme = {
 	/** the prompt, set before the input and before every command */
 	prompt: string
 	fonts: ShellFonts
-	window: WindowColors
 	/**
 	 * The style of the general container of the terminal, set inline on it.
 	 * Open to any CSSProperties and not to padding alone: the inner padding
@@ -61,6 +44,5 @@ export type ShellThemeInput = {
 	colors?: Partial<ShellColors>
 	prompt?: string
 	fonts?: Partial<ShellFonts>
-	window?: Partial<WindowColors>
 	container?: CSSProperties
 }

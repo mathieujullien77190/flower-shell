@@ -4,8 +4,8 @@ Online documentation: [Storybook](https://mathieujullien77190.github.io/flower-s
 
 # flower-shell
 
-A retro terminal in React: a command engine, history, autocompletion, animated
-ASCII rendering, and a window to put it in. No layout imposed.
+A retro terminal in React: a command engine, history, autocompletion and
+animated ASCII rendering. No layout imposed.
 
 ```tsx
 import { Shell, baseCommands, themes } from "flower-shell"
@@ -23,8 +23,7 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | `themes`            | the themes the visitor can reach, one per name; `themes={themes}` for the whole catalogue                                           |
 | `dict`              | the languages of the shell, one dictionary per language; without it, English alone                                                  |
 | `lang`              | starting language, among those of `dict` (`en` by default)                                                                          |
-| `window`            | puts the shell in a frame; the object holds everything the frame can do                                                             |
-| `scrollRef`         | element to scroll as the output grows; ignored with `window`                                                                        |
+| `scrollRef`         | element to scroll as the output grows: the box holding the shell                                                                    |
 | `onCommandStart`    | before the command runs; fires for an unknown one too                                                                               |
 | `onCommandDone`     | the action returned its text and the effect played; nothing on screen yet                                                           |
 | `onCommandRendered` | the text has finished being written                                                                                                 |
@@ -177,114 +176,6 @@ one language is enough.
 | `display`    | animation, styles, custom coloring                                           |
 | `restricted` | true when the visitor cannot type it; reserved for code                      |
 
-## The window
-
-For a shell in a frame, the `window` prop is all it takes. The shell then
-provides the container that bounds the movement and scrolls itself through the
-frame content, so `scrollRef` has nothing left to say:
-
-```tsx
-<Shell
-	commands={baseCommands}
-	window={{
-		title: "flower-shell",
-		start: "right-top",
-		margin: "24px",
-		move: true,
-		canExpand: true,
-		canClose: true,
-		onClose: () => console.log("closed"),
-	}}
-/>
-```
-
-| `window` key | role                                                                                                      |
-| ------------ | --------------------------------------------------------------------------------------------------------- |
-| `title`      | the text of the title bar                                                                                 |
-| `move`       | dragged by its bar; `true` by default                                                                     |
-| `start`      | the corner it opens in; `center-center` by default                                                        |
-| `margin`     | how far it is held off the edges `start` sent it to; zero by default                                      |
-| `compact`    | full and not resizable: it takes the whole container, and `start` and `margin` have nothing left to place |
-| `canExpand`  | the maximise button, and the double-click on the bar                                                      |
-| `canClose`   | the closing cross                                                                                         |
-| `open`       | open or closed, held by the caller; without it the frame holds its own                                    |
-| `onClose`    | the cross was clicked                                                                                     |
-
-`start` reads horizontal first, then vertical, out of `left | center | right`
-and `top | center | bottom` — `right-top`, `left-bottom`, `center-center`.
-
-`margin` is a CSS length — `"24px"`, `"2rem"`, `"3%"` — and it only pushes
-against the edges the frame was sent to: an axis opened on `center` is already
-between two edges and stays where it is. Without it, the frame sits flush in
-its corner.
-
-The shell only takes the size of what holds it: give that a height, the
-package imposes none.
-
-### Opening it from outside
-
-Without `open`, the frame holds its own state: it opens on mount, the cross
-closes it, and nothing reopens it. Pass `open` and that state moves out — a
-button of yours and the cross now write to the same place, and the cross has
-stopped deciding anything: it reports through `onClose` and waits for the prop
-to come back false.
-
-```tsx
-const [open, setOpen] = useState(false)
-
-;<>
-	<button onClick={() => setOpen(current => !current)}>the terminal</button>
-	<Shell
-		commands={baseCommands}
-		initialCommands={["title", "welcome"]}
-		window={{ title: "flower-shell", open, onClose: () => setOpen(false) }}
-	/>
-</>
-```
-
-Closed, the terminal is unmounted; the history is not — it lives at module
-level. Reopening finds what was written still there, posted at once rather
-than typed out again, and `initialCommands` does not play a second time.
-
-### The frame on its own
-
-`Window` is exported on its own, and it knows nothing about the shell: a retro
-frame — draggable title bar, maximise, close — around whatever you put inside.
-It takes `children`, so it holds a picture, a form, a game just as well.
-
-A shell does not go in it by hand: that is what the `window` prop is for, and
-it is the only way the two are meant to meet.
-
-```tsx
-import { Window } from "flower-shell"
-
-// container bounds the movement, the ref is the scrollable content
-const container = useRef<HTMLDivElement>(null)
-
-;<div ref={container} style={{ position: "relative", height: "100vh" }}>
-	<Window show={true} title="a frame" container={container} onClose={onClose}>
-		<YourContent />
-	</Window>
-</div>
-```
-
-| `Window` prop                                          | role                                                              |
-| ------------------------------------------------------ | ----------------------------------------------------------------- |
-| `children`                                             | what the frame holds                                              |
-| `show`                                                 | mounted or not; the frame never closes itself, `onClose` reports  |
-| `container`                                            | the frame bounds its movement to this element                     |
-| `title`                                                | the text of the bar                                               |
-| `bottomInset`                                          | height reserved at the bottom, for a taskbar                      |
-| `compact`                                              | full and not resizable                                            |
-| `move` / `start` / `margin` / `canExpand` / `canClose` | the same five as above                                            |
-| `layer`                                                | stacking floor                                                    |
-| `rank`                                                 | rank in the cascade, so as not to open on top of the previous one |
-| `onFocus` / `onClose`                                  | the window asks for the front, or closes                          |
-
-`compact` removes the maximise button and the double-click. The package sets no
-threshold: it is up to whoever displays it to decide when — small screen,
-reading mode, preference.
-
 ## Text markup
 
 Answers go through a coloring pass. Each theme color has its own marker:
@@ -417,8 +308,7 @@ type:
 const mine = {
 	colors: { background: "#212E35", importantColor: "#FFCC6A" },
 	prompt: "🌼",
-	fonts: { shell: "monospace", window: "monospace" },
-	window: { titleBar: "#ed612e", content: "#f4ebda" },
+	fonts: { shell: "monospace" },
 	container: { padding: "16px" },
 }
 
@@ -436,14 +326,13 @@ gives the same result whichever theme you are leaving.
 What you put there overrides the base style of the container, property by
 property.
 
-The two fonts are separate — a terminal wants a fixed pitch, a frame not
-necessarily — and are `monospace` by default. The frame sets its own
-explicitly: without it, it would inherit from the page holding it.
+`fonts.shell` dresses the output and the input alike, and is `monospace` by
+default: a terminal wants a fixed pitch.
 
 ## Outside the component
 
 State lives in modules, not in a context: a command can therefore be played
-from anywhere — a window that closes, a game that ends.
+from anywhere — a button of yours, a game that ends.
 
 ```ts
 import { run, runRestricted, shellActions, useLang } from "flower-shell"
@@ -464,8 +353,8 @@ npm run storybook   # the terminal alone, without the rest of the site
 ```
 
 The stories live under `src/stories`, one per case: the bare shell, with custom
-commands, in a window, in each language. Each shows the code that produces it,
-imports included.
+commands, in each language. Each shows the code that produces it, imports
+included.
 
 **Shell / Events** puts a panel beside the terminal and fills it from the four
 event props alone: one row per command, a tick under each moment it has

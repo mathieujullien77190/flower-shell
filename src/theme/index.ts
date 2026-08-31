@@ -13,7 +13,6 @@ import type {
 	ShellFonts,
 	ShellTheme,
 	ShellThemeInput,
-	WindowColors,
 } from "./types"
 
 export type {
@@ -21,7 +20,6 @@ export type {
 	ShellFonts,
 	ShellTheme,
 	ShellThemeInput,
-	WindowColors,
 } from "./types"
 
 export { twilightTheme } from "./twilight"
@@ -72,15 +70,7 @@ export const bareTheme: ShellTheme = {
 		invisible: "transparent",
 	},
 	prompt: ">",
-	fonts: { shell: "inherit", window: "inherit" },
-	window: {
-		titleBar: "transparent",
-		border: "currentColor",
-		content: "transparent",
-		text: "inherit",
-		button: "inherit",
-		buttonHover: "inherit",
-	},
+	fonts: { shell: "inherit" },
 	container: {},
 }
 
@@ -102,7 +92,6 @@ const lay = (base: ShellTheme, input: ShellThemeInput): ShellTheme => ({
 	colors: { ...base.colors, ...input.colors },
 	prompt: input.prompt || base.prompt,
 	fonts: { ...base.fonts, ...input.fonts },
-	window: { ...base.window, ...input.window },
 	container: { ...base.container, ...input.container },
 })
 
@@ -170,8 +159,6 @@ export const theme = () => current
 
 /** reading shortcut, the most frequent one in the styles */
 export const colors = (): ShellColors => current.colors
-
-export const windowColors = (): WindowColors => current.window
 
 export const fonts = (): ShellFonts => current.fonts
 

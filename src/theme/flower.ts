@@ -19,6 +19,4 @@ export const flowerTheme: ShellTheme = makeTheme({
 		infoColor: "#7FC6D9",
 		appColor: "#F2A0C4",
 	},
-	titleBar: "#ed612e",
-	content: "#f4ebda",
 })

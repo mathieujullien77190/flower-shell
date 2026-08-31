@@ -16,9 +16,4 @@ export const parchmentTheme: ShellTheme = makeTheme({
 		infoColor: "#1C7FB8",
 		appColor: "#5E8A12",
 	},
-	titleBar: "#ed612e",
-	content: "#ffffff",
-	border: "#3A3A3A",
-	button: "#dddddd",
-	buttonHover: "#bbbbbb",
 })

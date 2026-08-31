@@ -21,30 +21,30 @@ const meta: Meta<typeof Shell> = {
 	decorators: [boxed],
 	parameters: prose({
 		en: `
-A retro terminal in React: a command engine, history, autocompletion, animated
-ASCII rendering, and a window to put it in. No layout imposed.
+A retro terminal in React: a command engine, history, autocompletion and
+animated ASCII rendering. No layout imposed.
 
 **The terminal below is the real one.** Type \`help\` to see what it answers,
 \`theme nord\` to dress it differently, \`test\` to print every color of the
 theme it wears, \`flowers\` for no reason at all.
 
 Everything else in the sidebar is one case at a time, and each shows the code
-that produces it: **Shell** from the bare component to a windowed one,
-**Markup** for the markers that color the output. The globe in the toolbar
-reads these pages in French.
+that produces it: **Shell** from the bare component to the events it hands
+back, **Markup** for the markers that color the output. The globe in the
+toolbar reads these pages in French.
 `,
 		fr: `
-Un terminal rétro en React : moteur de commandes, historique, autocomplétion,
-rendu ASCII animé, et une fenêtre pour le poser. Aucune mise en page imposée.
+Un terminal rétro en React : moteur de commandes, historique, autocomplétion
+et rendu ASCII animé. Aucune mise en page imposée.
 
 **Le terminal ci-dessous est le vrai.** Tapez \`help\` pour voir ce qu'il
 répond, \`theme nord\` pour l'habiller autrement, \`test\` pour afficher toutes
 les couleurs du thème qu'il porte, \`flowers\` pour rien.
 
 Le reste de la barre latérale prend un cas à la fois, et chacun montre le code
-qui le produit : **Shell** du composant nu jusqu'à la fenêtre, **Markup** pour
-les marqueurs qui colorent la sortie. Le globe de la barre d'outils lit ces
-pages en français.
+qui le produit : **Shell** du composant nu jusqu'aux évènements qu'il rend,
+**Markup** pour les marqueurs qui colorent la sortie. Le globe de la barre
+d'outils lit ces pages en français.
 `,
 	}),
 }

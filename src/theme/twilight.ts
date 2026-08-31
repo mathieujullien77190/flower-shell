@@ -12,6 +12,4 @@ export const twilightTheme: ShellTheme = makeTheme({
 		infoColor: "#77CDF1",
 		appColor: "#90be20",
 	},
-	titleBar: "#ed612e",
-	content: "#f4ebda",
 })

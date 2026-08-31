@@ -4,8 +4,8 @@ Documentation en ligne : [Storybook](https://mathieujullien77190.github.io/flowe
 
 # flower-shell
 
-Un terminal rétro en React : moteur de commandes, historique, autocomplétion,
-rendu ASCII animé, et une fenêtre pour le poser. Aucune mise en page imposée.
+Un terminal rétro en React : moteur de commandes, historique, autocomplétion
+et rendu ASCII animé. Aucune mise en page imposée.
 
 ```tsx
 import { Shell, baseCommands, themes } from "flower-shell"
@@ -23,8 +23,7 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | `themes`            | les thèmes que le visiteur peut prendre, un par nom ; `themes={themes}` pour tout le catalogue                                   |
 | `dict`              | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul                                                     |
 | `lang`              | langue de départ, parmi celles de `dict` (`en` par défaut)                                                                       |
-| `window`            | pose le shell dans un cadre ; l'objet porte tout ce que le cadre sait faire                                                      |
-| `scrollRef`         | élément à faire défiler quand la sortie s'allonge ; ignorée avec `window`                                                        |
+| `scrollRef`         | élément à faire défiler quand la sortie s'allonge : la boîte qui tient le shell                                                  |
 | `onCommandStart`    | avant que la commande ne joue ; part aussi pour une commande inconnue                                                            |
 | `onCommandDone`     | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran                                                       |
 | `onCommandRendered` | le texte a fini de s'écrire                                                                                                      |
@@ -177,116 +176,6 @@ directement `description: "répond pong"` quand une seule langue suffit.
 | `display`    | animation, styles, coloration personnalisée                                  |
 | `restricted` | vraie si le visiteur ne peut pas la taper ; réservée au code                 |
 
-## La fenêtre
-
-Pour un shell dans un cadre, la prop `window` suffit. Le shell fournit alors
-le conteneur qui borne le déplacement et se fait défiler par le contenu du
-cadre : `scrollRef` n'a plus rien à dire.
-
-```tsx
-<Shell
-	commands={baseCommands}
-	window={{
-		title: "flower-shell",
-		start: "right-top",
-		margin: "24px",
-		move: true,
-		canExpand: true,
-		canClose: true,
-		onClose: () => console.log("closed"),
-	}}
-/>
-```
-
-| clé de `window` | rôle                                                                                                              |
-| --------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `title`         | le texte de la barre de titre                                                                                     |
-| `move`          | se déplace par sa barre ; `true` par défaut                                                                       |
-| `start`         | le coin où elle s'ouvre ; `center-center` par défaut                                                              |
-| `margin`        | de combien elle est écartée des bords où `start` l'a envoyée ; zéro par défaut                                    |
-| `compact`       | pleine et non redimensionnable : elle prend tout le conteneur, et `start` comme `margin` n'ont plus rien à placer |
-| `canExpand`     | le bouton d'agrandissement, et le double-clic sur la barre                                                        |
-| `canClose`      | la croix de fermeture                                                                                             |
-| `open`          | ouverte ou fermée, tenue par l'appelant ; sans elle le cadre tient la sienne                                      |
-| `onClose`       | la croix a été cliquée                                                                                            |
-
-`start` se lit horizontale d'abord, puis verticale, parmi
-`left | center | right` et `top | center | bottom` — `right-top`,
-`left-bottom`, `center-center`.
-
-`margin` est une longueur CSS — `"24px"`, `"2rem"`, `"3%"` — et elle ne pousse
-que contre les bords où le cadre a été envoyé : un axe ouvert sur `center` est
-déjà entre deux bords et ne bouge pas. Sans elle, le cadre se colle dans son
-coin.
-
-Le shell ne prend que la taille de ce qui le tient : donnez-lui une hauteur,
-le paquet n'en impose aucune.
-
-### L'ouvrir de l'extérieur
-
-Sans `open`, le cadre tient son état lui-même : il s'ouvre au montage, la
-croix le ferme, et rien ne le rouvre. Donnez `open` et cet état sort — un
-bouton à vous et la croix écrivent alors au même endroit, et la croix ne
-décide plus rien : elle prévient par `onClose` et attend que la prop revienne
-à faux.
-
-```tsx
-const [open, setOpen] = useState(false)
-
-;<>
-	<button onClick={() => setOpen(current => !current)}>the terminal</button>
-	<Shell
-		commands={baseCommands}
-		initialCommands={["title", "welcome"]}
-		window={{ title: "flower-shell", open, onClose: () => setOpen(false) }}
-	/>
-</>
-```
-
-Fermée, le terminal est démonté ; l'historique, non — il vit au niveau du
-module. La rouvrir retrouve ce qui y était écrit, posé d'un coup et non
-réécrit lettre par lettre, et `initialCommands` ne se rejoue pas.
-
-### Le cadre tout seul
-
-`Window` s'exporte tout seul, et il ne sait rien du shell : un cadre rétro —
-barre de titre à glisser, agrandissement, fermeture — autour de ce qu'on met
-dedans. Il prend des `children`, donc il tient aussi bien une image, un
-formulaire, un jeu.
-
-Un shell ne s'y met pas à la main : c'est le rôle de la prop `window`, et
-c'est la seule façon dont les deux sont censés se rencontrer.
-
-```tsx
-import { Window } from "flower-shell"
-
-// container borne le déplacement, la ref est le contenu défilant
-const container = useRef<HTMLDivElement>(null)
-
-;<div ref={container} style={{ position: "relative", height: "100vh" }}>
-	<Window show={true} title="a frame" container={container} onClose={onClose}>
-		<YourContent />
-	</Window>
-</div>
-```
-
-| prop de `Window`                                       | rôle                                                                 |
-| ------------------------------------------------------ | -------------------------------------------------------------------- |
-| `children`                                             | ce que le cadre contient                                             |
-| `show`                                                 | montée ou non ; le cadre ne se ferme jamais seul, `onClose` prévient |
-| `container`                                            | le cadre borne le déplacement à cet élément                          |
-| `title`                                                | le texte de la barre                                                 |
-| `bottomInset`                                          | hauteur réservée en bas, pour une barre des tâches                   |
-| `compact`                                              | pleine et non redimensionnable                                       |
-| `move` / `start` / `margin` / `canExpand` / `canClose` | les cinq mêmes que ci-dessus                                         |
-| `layer`                                                | étage d'empilement                                                   |
-| `rank`                                                 | rang dans la cascade, pour ne pas s'ouvrir sur la précédente         |
-| `onFocus` / `onClose`                                  | la fenêtre réclame le premier plan, ou se ferme                      |
-
-`compact` retire le bouton d'agrandissement et le double-clic. Le paquet ne
-fixe aucun seuil : c'est à qui l'affiche de décider quand — petit écran, mode
-lecture, préférence.
-
 ## Le balisage du texte
 
 Les réponses passent par une passe de coloration. Chaque couleur du thème a
@@ -420,8 +309,7 @@ tapera :
 const mine = {
 	colors: { background: "#212E35", importantColor: "#FFCC6A" },
 	prompt: "🌼",
-	fonts: { shell: "monospace", window: "monospace" },
-	window: { titleBar: "#ed612e", content: "#f4ebda" },
+	fonts: { shell: "monospace" },
 	container: { padding: "16px" },
 }
 
@@ -440,14 +328,13 @@ besoin courant — elle vaut `16px` par défaut — mais un arrondi, une bordure
 une ombre se posent au même endroit. Ce qu'on y met recouvre le style de base
 du conteneur, propriété par propriété.
 
-Les deux polices sont séparées — un terminal veut du chasse fixe, un cadre pas
-forcément — et valent `monospace` par défaut. Le cadre pose la sienne
-explicitement : sans elle, il hériterait de la page qui l'accueille.
+`fonts.shell` habille la sortie comme la saisie, et vaut `monospace` par
+défaut : un terminal veut du chasse fixe.
 
 ## Hors composant
 
 L'état vit dans des modules, pas dans un contexte : une commande peut donc être
-jouée depuis n'importe où — une fenêtre qui se ferme, un jeu qui se termine.
+jouée depuis n'importe où — un bouton à vous, un jeu qui se termine.
 
 ```ts
 import { run, runRestricted, shellActions, useLang } from "flower-shell"
@@ -468,8 +355,8 @@ npm run storybook   # le terminal seul, sans le reste du site
 ```
 
 Les stories sont sous `src/stories`, une par cas : le shell nu, avec des
-commandes personnalisées, dans une fenêtre, dans chaque langue. Chacune montre
-le code qui la produit, imports compris.
+commandes personnalisées, dans chaque langue. Chacune montre le code qui la
+produit, imports compris.
 
 **Shell / Events** pose un panneau à côté du terminal et le remplit avec les
 seules quatre props d'évènement : une ligne par commande, une coche sous

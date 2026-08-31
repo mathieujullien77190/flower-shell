@@ -1,7 +1,7 @@
 import { makeTheme } from "./base"
 import type { ShellTheme } from "./types"
 
-/** Nord : fond bleu nuit, accents froids et bas en saturation */
+/** Nord: midnight blue background, cold accents low on saturation */
 export const nordTheme: ShellTheme = makeTheme({
 	colors: {
 		background: "#2E3440",
@@ -12,6 +12,4 @@ export const nordTheme: ShellTheme = makeTheme({
 		infoColor: "#88C0D0",
 		appColor: "#B48EAD",
 	},
-	titleBar: "#5E81AC",
-	content: "#ECEFF4",
 })

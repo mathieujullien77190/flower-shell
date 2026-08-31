@@ -5,12 +5,12 @@ import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { shellActions } from "../../state/store"
 import { themes } from "../../theme"
-import type { ShellColors, ShellTheme, WindowColors } from "../../theme"
+import type { ShellColors, ShellTheme } from "../../theme"
 
 /**
- * The preview: a real shell, in a real window, wearing the draft. It opens
- * on `test`, which prints every color of the theme — the palette being
- * edited, rendered by the code that will render it for real.
+ * The preview: a real shell, wearing the draft. It opens on `test`, which
+ * prints every color of the theme — the palette being edited, rendered by
+ * the code that will render it for real.
  *
  * It remounts on every touch of a picker, through the `key` its parent
  * gives it. The registry and the history live at module level, so the
@@ -42,10 +42,6 @@ const Preview = ({ draft }: { draft: ShellTheme }) => {
 			// being written, not the catalogue of the package
 			themes={{ draft }}
 			initialCommands={["test"]}
-			// full: the preview is there to read a palette, and every pixel
-			// given to the terminal is one less to scroll. The margin belongs
-			// to the frame around it, not to the window
-			window={{ title: "flower-shell", canClose: false, compact: true }}
 		/>
 	)
 }
@@ -59,15 +55,6 @@ const SHELL_FIELDS: { key: keyof ShellColors; label: string }[] = [
 	{ key: "restrictedColor", label: "restricted" },
 	{ key: "infoColor", label: "info" },
 	{ key: "appColor", label: "brand" },
-]
-
-const WINDOW_FIELDS: { key: keyof WindowColors; label: string }[] = [
-	{ key: "titleBar", label: "title bar" },
-	{ key: "border", label: "border" },
-	{ key: "content", label: "content" },
-	{ key: "text", label: "title text" },
-	{ key: "button", label: "button" },
-	{ key: "buttonHover", label: "button hover" },
 ]
 
 /**
@@ -169,11 +156,6 @@ const asCode = (draft: ShellTheme) =>
 		`    invisible: "${draft.colors.background}",`,
 		"  },",
 		`  prompt: "${draft.prompt}",`,
-		"  window: {",
-		...WINDOW_FIELDS.map(
-			field => `    ${field.key}: "${draft.window[field.key]}",`
-		),
-		"  },",
 		"}",
 		"",
 		"<Shell",
@@ -217,12 +199,6 @@ export const ThemeBuilder = () => {
 				[key]: value,
 				...(key === "background" ? { invisible: value } : {}),
 			},
-		}))
-
-	const setWindowColor = (key: keyof WindowColors, value: string) =>
-		edit(current => ({
-			...current,
-			window: { ...current.window, [key]: value },
 		}))
 
 	/**
@@ -291,32 +267,20 @@ export const ThemeBuilder = () => {
 						/>
 					))}
 				</Group>
-
-				<Group title="window frame">
-					{WINDOW_FIELDS.map(({ key, label }) => (
-						<Picker
-							key={key}
-							label={label}
-							value={draft.window[key]}
-							onChange={value => setWindowColor(key, value)}
-						/>
-					))}
-				</Group>
 			</div>
 
 			<div style={{ display: "grid", gap: 20 }}>
 				<Group title="preview">
-					{/* The window takes this whole frame: it needs a height, and the
+					{/* The shell takes this whole box: it needs a height, and the
 					    package imposes none. Tall enough for `test` to hold in one
 					    block — the shell scrolls down to its last line, and it is the
-					    list of the colors that would go past the top. The margin is
-					    set here: a few pixels to set the frame apart. */}
+					    list of the colors that would go past the top. */}
 					<div
 						style={{
 							height: 700,
-							padding: 8,
 							boxSizing: "border-box",
-							background: "#84787A",
+							overflowY: "auto",
+							border: "solid 2px #000000",
 							borderRadius: 6,
 						}}
 					>

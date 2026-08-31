@@ -1,5 +1,5 @@
 export { Shell } from "./Shell"
-export type { ShellProps, ShellThemes, ShellWindowProps } from "./Shell"
+export type { ShellProps, ShellThemes } from "./Shell"
 
 export { baseCommands } from "./commands/base"
 export { highlightFlower, plantFlowers } from "./commands/flowers"
@@ -41,16 +41,6 @@ export {
 	useShellStore,
 } from "./state/store"
 
-export { default as Window } from "./window"
-export type { Mode, Pos, WindowProps, WindowStart } from "./window/types"
-export {
-	ANIM_TIME,
-	CASCADE,
-	MEDIUM_MARGIN,
-	MEDIUM_SIZE,
-	TOP_LAYER,
-} from "./window/constants"
-
 export {
 	bareTheme,
 	defaultTheme,
@@ -75,7 +65,6 @@ export type {
 	ShellFonts,
 	ShellTheme,
 	ShellThemeInput,
-	WindowColors,
 } from "./theme"
 
 export type {

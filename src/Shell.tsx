@@ -1,8 +1,6 @@
-import { RefObject, useCallback, useEffect, useRef, useState } from "react"
+import { RefObject, useCallback, useEffect, useState } from "react"
 
 import Terminal from "./render/Terminal"
-import Window from "./window"
-import type { WindowStart } from "./window/types"
 
 import { run, runRestricted, setListeners } from "./engine/send"
 import type { CommandErrorListener, CommandListener } from "./engine/send"
@@ -18,59 +16,6 @@ import {
 } from "./state/store"
 import { setThemes, ShellThemeInput, wearTheme } from "./theme"
 import { BaseCommand, BaseCommands, Dictionaries } from "./types"
-
-/**
- * What it takes to put the shell in a window without assembling one
- * yourself. The object being there is enough: the shell then renders inside
- * a `Window`, whose dragging is bounded by the container the shell puts
- * around it.
- *
- * For a frame holding something other than the shell, or living on a desktop
- * of several windows, use `Window` directly.
- */
-export type ShellWindowProps = {
-	/** the text of the title bar */
-	title?: string
-	/** it is dragged by its bar; true by default */
-	move?: boolean
-	/** the corner it opens on; `center-center` by default */
-	start?: WindowStart
-	/**
-	 * The distance to the edge, in CSS: `"24px"`, `"2rem"`, `"3%"`. It moves
-	 * the window away from the edge `start` brings it to, and so does not
-	 * apply to centered axes. Zero by default.
-	 */
-	margin?: string
-	/**
-	 * Full and not resizable: it takes the whole container, and `start` and
-	 * `margin` then have nothing left to place. The margin goes on whatever
-	 * holds it.
-	 */
-	compact?: boolean
-	/** the expand button, and the double click on the bar */
-	canExpand?: boolean
-	/** the close cross */
-	canClose?: boolean
-	/**
-	 * Open or closed. Without it, the window holds its own state: open on
-	 * mount, the cross closes it, and nothing reopens it.
-	 *
-	 * Given, the caller decides, and the window only does what it is told —
-	 * the cross closes nothing any more, it warns through `onClose` and waits
-	 * for the prop to turn false. That is what a button reopening the
-	 * terminal needs: the same state opens and closes.
-	 *
-	 * Closed, the terminal is unmounted, but the history lives at module
-	 * level: reopened, the window finds back what was written in it, and the
-	 * opening is not played again.
-	 */
-	open?: boolean
-	/**
-	 * The cross was clicked. With `open`, that is all that happens: it is up
-	 * to the caller to turn the prop false if it wants to see the window go.
-	 */
-	onClose?: () => void
-}
 
 /** a catalogue of themes, indexed by the name the visitor types */
 export type ShellThemes = Record<string, ShellThemeInput>
@@ -125,18 +70,9 @@ export type ShellProps = {
 	 */
 	initialCommands?: string[]
 	/**
-	 * Puts the shell in a window. Without it, it renders bare and fills
-	 * whatever holds it.
-	 *
-	 * The shell then provides the container bounding the dragging, and is
-	 * scrolled by the content of the frame: `scrollRef` has nothing left to
-	 * say and is ignored.
-	 */
-	window?: ShellWindowProps
-	/**
 	 * Element to scroll as the output grows: the box holding the shell, when
-	 * it has a scroll of its own. With `window`, the frame takes care of it
-	 * and this prop is ignored.
+	 * it has a scroll of its own. Without it, nothing scrolls on its own and
+	 * a long output goes past whatever holds the shell.
 	 */
 	scrollRef?: RefObject<HTMLElement | null>
 	/**
@@ -172,8 +108,11 @@ export type ShellProps = {
 /**
  * The terminal: the list of the commands played and the input line.
  *
+ * It takes the room it is given and nothing more — the height, the frame,
+ * the place on the page belong to whoever displays it.
+ *
  * The registry, the theme and the state live at module level — they serve
- * outside React too, a window being closed can play a command. Corollary,
+ * outside React too, a page that closes can play a command. Corollary,
  * knowingly: one shell per page.
  */
 export const Shell = ({
@@ -183,31 +122,12 @@ export const Shell = ({
 	dict,
 	lang,
 	initialCommands = [],
-	// `window` is also the name of the global object: renamed here so the
-	// body of the component keeps access to both
-	window: frame,
 	scrollRef,
 	onCommandStart,
 	onCommandDone,
 	onCommandRendered,
 	onCommandError,
 }: ShellProps) => {
-	/**
-	 * The frame, when the `window` prop is given. `area` bounds the dragging
-	 * of the window, `content` is what scrolls — it is the ref `Window`
-	 * exposes, and it then replaces `scrollRef`.
-	 */
-	const area = useRef<HTMLDivElement>(null)
-	const content = useRef<HTMLDivElement>(null)
-	const [framed, setFramed] = useState(true)
-
-	/**
-	 * Who holds the opening. `open` given, it is the caller: the window
-	 * follows its prop and the cross only warns. Otherwise the shell holds it
-	 * for itself, as before.
-	 */
-	const ownFrame = frame?.open === undefined
-	const shown = frame?.open ?? framed
 	// set before the first render: the terminal reads the registry as it renders
 	const [ready] = useState(() => {
 		// the dictionary first: a command played translates as it executes
@@ -259,9 +179,9 @@ export const Shell = ({
 
 	/**
 	 * The opening plays on mount, but only if the screen is empty. The shell
-	 * can be unmounted then mounted again — a window one closes and reopens —
-	 * while the history lives at module level and has survived: playing it
-	 * again would show the title twice.
+	 * can be unmounted then mounted again — a page one leaves and comes back
+	 * to — while the history lives at module level and has survived: playing
+	 * it again would show the title twice.
 	 */
 	useEffect(() => {
 		if (!ready) return
@@ -285,10 +205,8 @@ export const Shell = ({
 	}, [ready])
 
 	const scrollDown = useCallback(() => {
-		// in a frame, the frame is what scrolls: its ref replaces `scrollRef`
-		const target = frame ? content.current : scrollRef?.current
-		target?.scrollTo(0, 1000000)
-	}, [frame, scrollRef])
+		scrollRef?.current?.scrollTo(0, 1000000)
+	}, [scrollRef])
 
 	/**
 	 * The end of the writing is reported on every render for as long as the
@@ -323,7 +241,7 @@ export const Shell = ({
 		shellActions().moveCursor(direction)
 	}, [])
 
-	const terminal = (
+	return (
 		<Terminal
 			options={options}
 			commands={history}
@@ -335,36 +253,5 @@ export const Shell = ({
 			onSendNextCommand={() => moveCursor(1)}
 			onRendered={handleRendered}
 		/>
-	)
-
-	if (!frame) return terminal
-
-	/**
-	 * The container bounds the dragging of the window, and that is all the
-	 * shell imposes: it takes the room it is given. It is up to whoever
-	 * displays it to set the height, here or on what holds it.
-	 */
-	return (
-		<div ref={area} style={{ position: "relative", height: "100%" }}>
-			<Window
-				ref={content}
-				show={shown}
-				container={area}
-				title={frame.title}
-				move={frame.move}
-				start={frame.start}
-				margin={frame.margin}
-				compact={frame.compact}
-				canExpand={frame.canExpand}
-				canClose={frame.canClose}
-				// the window only goes from here if nobody else holds it
-				onClose={() => {
-					if (ownFrame) setFramed(false)
-					frame.onClose?.()
-				}}
-			>
-				{terminal}
-			</Window>
-		</div>
 	)
 }

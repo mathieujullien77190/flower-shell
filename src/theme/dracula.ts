@@ -1,7 +1,7 @@
 import { makeTheme } from "./base"
 import type { ShellTheme } from "./types"
 
-/** Dracula : fond ardoise violette, accents satures */
+/** Dracula: purple slate background, saturated accents */
 export const draculaTheme: ShellTheme = makeTheme({
 	colors: {
 		background: "#282A36",
@@ -12,6 +12,4 @@ export const draculaTheme: ShellTheme = makeTheme({
 		infoColor: "#8BE9FD",
 		appColor: "#BD93F9",
 	},
-	titleBar: "#BD93F9",
-	content: "#F8F8F2",
 })

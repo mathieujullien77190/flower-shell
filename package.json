@@ -1,7 +1,7 @@
 {
 	"name": "flower-shell",
 	"version": "0.1.0",
-	"description": "Terminal retro en React : moteur de commandes, historique, fenetre, rendu ASCII",
+	"description": "Terminal retro en React : moteur de commandes, historique, rendu ASCII",
 	"license": "MIT",
 	"type": "module",
 	"main": "./dist/index.cjs",

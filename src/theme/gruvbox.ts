@@ -1,7 +1,7 @@
 import { makeTheme } from "./base"
 import type { ShellTheme } from "./types"
 
-/** Gruvbox : fond terreux, accents chauds */
+/** Gruvbox: earthy background, warm accents */
 export const gruvboxTheme: ShellTheme = makeTheme({
 	colors: {
 		background: "#282828",
@@ -12,6 +12,4 @@ export const gruvboxTheme: ShellTheme = makeTheme({
 		infoColor: "#83A598",
 		appColor: "#D3869B",
 	},
-	titleBar: "#D65D0E",
-	content: "#FBF1C7",
 })
