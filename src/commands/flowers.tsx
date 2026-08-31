@@ -112,7 +112,7 @@ export const plantFlowers = () => {
 		.map((_, i) =>
 			baseArr
 				.map((_, j) =>
-					!flowersArr[j][i].match(/[@\(_vw\)]/gi)
+					!flowersArr[j][i].match(/[@(_vw)]/gi)
 						? `${flowersArr[j][i]}`
 						: `${colorFlowers[j]}${flowersArr[j][i]}${colorFlowers[j]}`
 				)
@@ -122,4 +122,3 @@ export const plantFlowers = () => {
 
 	return compileFlowers
 }
-

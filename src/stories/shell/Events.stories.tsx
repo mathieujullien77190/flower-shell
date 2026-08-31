@@ -28,6 +28,21 @@ const boom: BaseCommand = {
 	help: { patterns: [{ pattern: "boom", description: "throws on purpose" }] },
 }
 
+/**
+ * The mark lands on the last row still waiting for it: a name can be
+ * played twice, and the rows are in the order the commands started.
+ */
+const mark = (
+	list: Watched[],
+	event: CommandEvent,
+	key: "done" | "rendered"
+): Watched[] => {
+	const index = list.findLastIndex(row => row.name === event.name && !row[key])
+	if (index === -1) return list
+
+	return list.map((row, i) => (i === index ? { ...row, [key]: true } : row))
+}
+
 const Watcher = () => {
 	const box = useRef<HTMLDivElement>(null)
 	const [seen, setSeen] = useState<Watched[]>([])
@@ -42,25 +57,17 @@ const Watcher = () => {
 		])
 	}, [])
 
-	/**
-	 * The mark lands on the last row still waiting for it: a name can be
-	 * played twice, and the rows are in the order the commands started.
-	 */
-	const mark = (key: "done" | "rendered") => (event: CommandEvent) => {
+	const done = useCallback((event: CommandEvent) => {
 		// eslint-disable-next-line no-console
-		console.log(`[onCommand${key === "done" ? "Done" : "Rendered"}]`, event)
-		setSeen(list => {
-			const index = list.findLastIndex(
-				row => row.name === event.name && !row[key]
-			)
-			if (index === -1) return list
+		console.log("[onCommandDone]", event)
+		setSeen(list => mark(list, event, "done"))
+	}, [])
 
-			return list.map((row, i) => (i === index ? { ...row, [key]: true } : row))
-		})
-	}
-
-	const done = useCallback(mark("done"), [])
-	const rendered = useCallback(mark("rendered"), [])
+	const rendered = useCallback((event: CommandEvent) => {
+		// eslint-disable-next-line no-console
+		console.log("[onCommandRendered]", event)
+		setSeen(list => mark(list, event, "rendered"))
+	}, [])
 
 	const failed = useCallback((event: CommandErrorEvent) => {
 		// eslint-disable-next-line no-console
@@ -122,8 +129,8 @@ const Watcher = () => {
 				}}
 			>
 				<p style={{ margin: "0 0 12px", opacity: 0.75 }}>
-					Every event is logged in full to the browser console — open it to
-					read the arguments and the whole line.
+					Every event is logged in full to the browser console — open it to read
+					the arguments and the whole line.
 				</p>
 
 				<div
