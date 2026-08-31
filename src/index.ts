@@ -1,11 +1,7 @@
 export { Shell } from "./Shell"
-export type { ShellProps } from "./Shell"
-export { ShellProvider, useShell } from "./state/context"
-export type {
-	ShellHandle,
-	ShellProviderProps,
-	ShellThemes,
-} from "./state/context"
+export type { ShellProps, ShellThemes } from "./Shell"
+export { ShellProvider, useShell } from "./state/registry"
+export type { ShellControls } from "./state/registry"
 
 export { baseCommands } from "./commands/base"
 export { highlightFlower, plantFlowers } from "./commands/flowers"

@@ -1,7 +1,6 @@
 import { useState } from "react"
 
 import { Shell } from "../../Shell"
-import { ShellProvider } from "../../state/context"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { themes } from "../../theme"
@@ -27,7 +26,7 @@ import type { ShellColors, ShellTheme } from "../../theme"
  * was opened.
  */
 const Preview = ({ draft }: { draft: ShellTheme }) => (
-	<ShellProvider
+	<Shell
 		commands={{ ...baseCommands, test }}
 		theme="draft"
 		// the draft is the only reachable theme: the preview shows what is
@@ -36,9 +35,7 @@ const Preview = ({ draft }: { draft: ShellTheme }) => (
 		initialCommands={["test"]}
 		animation={false}
 		keyboardOnFocus={false}
-	>
-		<Shell />
-	</ShellProvider>
+	/>
 )
 
 /** what a picker edits: the label people read, the key the theme uses */

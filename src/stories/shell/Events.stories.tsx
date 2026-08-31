@@ -2,7 +2,6 @@ import { useCallback, useRef, useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
-import { ShellProvider } from "../../state/context"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { themes } from "../../theme"
@@ -105,17 +104,16 @@ const Watcher = () => {
 					boxShadow: "3px 2px 4px #00000041",
 				}}
 			>
-				<ShellProvider
+				<Shell
 					commands={{ ...baseCommands, test, boom }}
 					themes={themes}
 					initialCommands={["title", "welcome"]}
+					scrollRef={box}
 					onCommandStart={start}
 					onCommandDone={done}
 					onCommandRendered={rendered}
 					onCommandError={failed}
-				>
-					<Shell scrollRef={box} />
-				</ShellProvider>
+				/>
 			</div>
 
 			<div
@@ -257,7 +255,7 @@ export default meta
 export const Events: StoryObj<typeof Shell> = {
 	parameters: source(`
 import { useCallback, useRef, useState } from "react"
-import { Shell, ShellProvider, baseCommands, test, themes } from "flower-shell"
+import { Shell, baseCommands, test, themes } from "flower-shell"
 
 // a command that fails on purpose, to reach the third reason
 const boom = {
@@ -295,20 +293,18 @@ const Watcher = () => {
 
 	return (
 		<div style={{ display: "flex", gap: 16, height: "100vh" }}>
-			<ShellProvider
-				commands={{ ...baseCommands, test, boom }}
-				themes={themes}
-				initialCommands={["title", "welcome"]}
-				onCommandStart={start}
-				onCommandDone={useCallback(mark("done"), [])}
-				onCommandRendered={useCallback(mark("rendered"), [])}
-				onCommandError={failed}
-			>
-				{/* the events are set on the provider, the box on the screen */}
-				<div ref={box} style={{ flex: 1, overflowY: "auto" }}>
-					<Shell scrollRef={box} />
-				</div>
-			</ShellProvider>
+			<div ref={box} style={{ flex: 1, overflowY: "auto" }}>
+				<Shell
+					commands={{ ...baseCommands, test, boom }}
+					themes={themes}
+					initialCommands={["title", "welcome"]}
+					scrollRef={box}
+					onCommandStart={start}
+					onCommandDone={useCallback(mark("done"), [])}
+					onCommandRendered={useCallback(mark("rendered"), [])}
+					onCommandError={failed}
+				/>
+			</div>
 
 			{/* one row per command, a tick under each moment it reached */}
 			<div style={{ width: 340, overflowY: "auto" }}>{/* … */}</div>
