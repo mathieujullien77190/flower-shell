@@ -11,7 +11,7 @@ const BaseWindow = (
 		show,
 		container,
 		children,
-		title = "Sans titre",
+		title = "Untitled",
 		tutorial,
 		mark,
 		layer = TOP_LAYER,
