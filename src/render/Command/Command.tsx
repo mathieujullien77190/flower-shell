@@ -16,19 +16,19 @@ const Command = ({
 	onAnimate = () => {},
 	onClickCommand = () => {},
 }: CommandProps) => {
-	// le texte est fige : `t()` a traduit quand la commande s'est executee
+	// the text is frozen: `t()` translated when the command executed
 	const name = command.name
 	const args = command.args.map(arg => `${arg}`).join(" ")
 
 	/**
-	 * Deja ecrite une fois, elle se repose telle quelle. Le terminal peut
-	 * etre demonte puis remonte — une fenetre qu'on ferme et qu'on rouvre —
-	 * alors que l'historique, lui, vit au niveau du module : sans cela tout
-	 * se reecrirait lettre par lettre, et le logo tient vingt secondes.
+	 * Written once already, it is laid down as it is. The terminal can be
+	 * unmounted then mounted again — a window one closes and reopens — while
+	 * the history lives at module level: without this everything would be
+	 * rewritten letter by letter, and the logo takes twenty seconds.
 	 *
-	 * Cela l'emporte sur `display.animation` : une commande qui reclame son
-	 * animation la reclame pour la fois ou elle joue, pas pour les rendus
-	 * suivants d'un texte deja lu.
+	 * This wins over `display.animation`: a command asking for its animation
+	 * asks for it for the time it plays, not for the renders that follow of
+	 * a text already read.
 	 */
 	const written = command.isRendered
 

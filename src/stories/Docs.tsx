@@ -22,7 +22,7 @@ type MetaWithProse = {
 	csfFile?: { stories?: Record<string, unknown> }
 }
 
-/** ce dont la page a besoin, et que le type public du contexte ne dit pas */
+/** what the page needs, and what the public type of the context omits */
 type DocsInternals = {
 	channel?: {
 		on: (event: string, listener: () => void) => void
@@ -36,16 +36,16 @@ const isLocale = (value: unknown): value is Locale =>
 	LOCALES.includes(value as Locale)
 
 /**
- * La langue de la documentation, prise dans les globals.
+ * The language of the documentation, taken from the globals.
  *
- * `useGlobals` ne sert a rien ici : Storybook le refuse hors d'un decorateur
- * ou d'une story, et une page docs n'est ni l'un ni l'autre. L'URL de la
- * page ne les porte pas non plus — le cadre de rendu ne la voit pas. Restent
- * les globals du contexte de la story, lus a chaque rendu.
+ * `useGlobals` is of no use here: Storybook turns it down outside of a
+ * decorator or a story, and a docs page is neither. The URL of the page does
+ * not carry them either — the rendering frame does not see it. What is left
+ * are the globals of the story context, read on every render.
  *
- * Le canal ne sert qu'a provoquer ce rendu : la valeur, elle, vient toujours
- * de la lecture ci-dessous, ce qui evite d'avoir a deviner la forme de ce
- * que l'evenement transporte.
+ * The channel only serves to trigger that render: the value always comes
+ * from the reading below, which saves having to guess the shape of what the
+ * event carries.
  */
 const useGlobalsFromDocs = (
 	context: DocsInternals
@@ -73,12 +73,12 @@ const useLocale = (): Locale => {
 }
 
 /**
- * Le conteneur de la page docs, pose avec elle dans `preview.tsx`.
+ * The container of the docs page, set alongside it in `preview.tsx`.
  *
- * Il ne sert qu'a passer un theme a celui de Storybook. Le manager a le
- * sien, repose par `manager.ts` ; la page docs vit dans l'autre document
- * et lit le meme global de son cote, sans quoi la barre laterale
- * changerait de couleur et la page resterait blanche.
+ * It only serves to hand a theme to Storybook's own. The manager has its
+ * own, set again by `manager.ts`; the docs page lives in the other document
+ * and reads the same global on its side, or the sidebar would change color
+ * and the page would stay white.
  */
 export const Container = ({
 	context,
@@ -98,28 +98,28 @@ export const Container = ({
 }
 
 /**
- * La page docs de toutes les stories, posee une fois dans `preview.tsx`.
+ * The docs page of every story, set once in `preview.tsx`.
  *
- * Elle ne fait qu'une chose que la page par defaut ne fait pas : lire la
- * prose dans les parametres du meta plutot que dans son commentaire, et y
- * prendre la langue courante. Le reste — le titre, le rendu, la table des
- * props, les autres stories — sont les blocs de Storybook, dans l'ordre ou
- * la page par defaut les pose.
+ * It does one thing the default page does not: read the prose in the
+ * parameters of the meta rather than in its comment, and take the current
+ * language from there. The rest — the title, the render, the table of the
+ * props, the other stories — are Storybook's own blocks, in the order the
+ * default page lays them out.
  */
 export const DocsPage = () => {
 	const locale = useLocale()
 	const { preparedMeta, csfFile } = useOf("meta") as MetaWithProse
 	const prose = preparedMeta?.parameters?.docs?.prose
 
-	// la table des props est la meme sur toutes les pages : une seule la
-	// porte, les autres restent sur ce qu'elles ont a montrer
+	// the table of the props is the same on every page: one alone carries
+	// it, the others stay on what they have to show
 	const controls = preparedMeta?.parameters?.docs?.controls === true
 
 	/**
-	 * `Primary` rend deja la premiere story. `Stories` les rend toutes, la
-	 * premiere comprise — son `includePrimary` vaut vrai par defaut — et une
-	 * page d'une seule story l'affichait donc deux fois. Un fichier a story
-	 * unique se passe du bloc ; les autres le prennent sans la primaire.
+	 * `Primary` already renders the first story. `Stories` renders them all,
+	 * the first one included — its `includePrimary` is true by default — so a
+	 * page with a single story showed it twice. A file with one story does
+	 * without the block; the others take it without the primary.
 	 */
 	const single = Object.keys(csfFile?.stories || {}).length === 1
 
@@ -128,7 +128,7 @@ export const DocsPage = () => {
 			<Title />
 			<Subtitle />
 			{prose && <Markdown>{prose[locale] || prose.en}</Markdown>}
-			{/* la prose de la story elle-meme, quand elle est seule sur la page */}
+			{/* the prose of the story itself, when it is alone on the page */}
 			{single && <Description of="story" />}
 			<Primary />
 			{controls && <Controls />}

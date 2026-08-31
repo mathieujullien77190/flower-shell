@@ -2,9 +2,9 @@ import { BaseCommand } from "@types"
 import { t } from "@i18n/lang"
 
 /**
- * Le banc d'essai du balisage : chaque marqueur, sa source a gauche et son
- * rendu a droite. Il ne part pas avec `baseCommands` — c'est un outil de
- * mise au point, pas une commande du visiteur — et se monte a la main :
+ * The workbench of the markup: every marker, its source on the left and its
+ * rendering on the right. It does not ship with `baseCommands` — it is a
+ * tuning tool, not a command for the visitor — and is mounted by hand:
  * `commands={{ ...baseCommands, test }}`.
  */
 const MARKS: { separator: string; label: string }[] = [
@@ -16,19 +16,19 @@ const MARKS: { separator: string; label: string }[] = [
 	{ separator: "_", label: "invisible" },
 ]
 
-/** les deux antislashs de l'echappement ne comptent pas dans la largeur */
+/** the two backslashes of the escaping do not count in the width */
 const ESCAPED_WIDTH = Math.max(...MARKS.map(m => m.label.length)) + 2
 
 /**
- * La colonne de gauche, calee sur le plus long libelle. `shown` est la
- * largeur *visible* de la source : les antislashs disparaissent au rendu,
- * elle vaut donc la longueur du rendu. Deux espaces au minimum — la ligne
- * cliquable est plus large que la colonne et collerait sans eux.
+ * The left column, set on the longest label. `shown` is the *visible* width
+ * of the source: the backslashes disappear at rendering, so it is the
+ * length of the rendering. Two spaces at least — the clickable line is
+ * wider than the column and would touch it without them.
  */
 const column = (source: string, shown: number) =>
 	source + " ".repeat(Math.max(2, ESCAPED_WIDTH + 4 - shown))
 
-/** `\§important\§   §important§` : la source, puis son rendu */
+/** `\§important\§   §important§`: the source, then its rendering */
 const markLine = ({ separator, label }: (typeof MARKS)[number]) => {
 	const source = `\\${separator}${label}\\${separator}`
 	const rendered = `${separator}${label}${separator}`
@@ -44,9 +44,9 @@ const tagLine = ({ separator, label }: (typeof MARKS)[number]) => {
 }
 
 /**
- * Le marqueur cliquable, joue pour de vrai : le clic passe par `actionmap`
- * et lance `hello`. La commande visee est ecrite en clair dans la source,
- * seul le libelle se traduit.
+ * The clickable marker, played for real: the click goes through `actionmap`
+ * and runs `hello`. The command it aims at is written out in the source,
+ * only the label is translated.
  */
 const clickLine = () => {
 	const label = t("test.click")
@@ -65,7 +65,7 @@ export const test: BaseCommand = {
 			`  ${t("test.invisible")}`,
 			"",
 			`§${t("test.tags")}§`,
-			// `_` n'a pas de tag : un fond de la couleur du fond ne montre rien
+			// `_` has no tag: a background the color of the background shows nothing
 			...MARKS.filter(mark => mark.separator !== "_").map(tagLine),
 			"",
 			`§${t("test.clicked")}§`,

@@ -22,12 +22,13 @@ export const useDisplayByLetter = ({
 	useEffect(() => {
 		if (!canRendered) return
 
-		// rien a derouler : le texte est la du premier coup. Le minuteur
-		// tournait quand meme, affichant le texte entier a chaque tour pour
-		// n'annoncer la fin qu'au bout — vingt secondes pour un logo deja lu
+		// nothing to unroll: the text is there in one go. The timer used to
+		// run all the same, showing the whole text on every turn only to
+		// report the end at the last one — twenty seconds for a logo already
+		// read
 		if (!animation) {
-			// pose d'un coup, sans minuteur : le rendu en cascade est ici le
-			// seul, et c'est ce qu'on veut — le texte est deja complet
+			// set in one go, with no timer: the cascading render is the only
+			// one here, and that is what we want — the text is already whole
 			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setTextTime(baseTxt)
 			setFinish(true)
@@ -49,22 +50,22 @@ export const useDisplayByLetter = ({
 			i = i + j
 		}, stepTime)
 
-		// une fenetre qu'on ferme demonte le terminal en pleine ecriture :
-		// sans cela le minuteur continuerait de tourner dans le vide
+		// a window one closes unmounts the terminal mid-writing: without this
+		// the timer would keep running for nothing
 		return () => clearInterval(timer)
 
 		/**
-		 * `canRendered` seul, et c'est voulu : le deroule part une fois,
-		 * quand la commande passe son tour, et va jusqu'au bout. Ajouter le
-		 * texte ou les reglages relancerait le minuteur en pleine ecriture —
-		 * couper l'animation pendant qu'elle joue reecrirait la ligne depuis
-		 * la premiere lettre. Ils ne bougent pas de toute facon : ils
-		 * viennent de la commande, figee des son execution.
+		 * `canRendered` alone, and that is on purpose: the unrolling starts
+		 * once, when the command gets its turn, and runs to the end. Adding
+		 * the text or the settings would restart the timer mid-writing —
+		 * turning the animation off while it plays would rewrite the line
+		 * from its first letter. They do not move anyway: they come from the
+		 * command, frozen as it executed.
 		 */
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [canRendered])
 
-	// une fois l'animation terminee le texte affiche vaut deja baseTxt : le lire
-	// directement evite un effet de resynchro
+	// once the animation is over the text on screen is already baseTxt:
+	// reading it directly avoids an effect resyncing it
 	return { txt: finish ? baseTxt : textTime, finish }
 }

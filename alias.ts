@@ -2,10 +2,10 @@ import path from "node:path"
 
 const r = (p: string) => path.resolve(process.cwd(), p)
 
-// Racines de `src` exposees en alias. Partage par Storybook (vite.config) et
-// le build de publication (vite.lib.config) — meme point de verite que les
-// `paths` de tsconfig.json. `process.cwd()` (et non import.meta.url) car Vite
-// recompile ses configs dans un dossier temporaire.
+// Roots of `src` exposed as aliases. Shared by Storybook (vite.config) and
+// the publishing build (vite.lib.config) — the same point of truth as the
+// `paths` of tsconfig.json. `process.cwd()` (and not import.meta.url)
+// because Vite recompiles its configs in a temporary folder.
 export const alias = {
 	"@commands": r("src/commands"),
 	"@engine": r("src/engine"),

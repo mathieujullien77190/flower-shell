@@ -3,33 +3,33 @@ import { CSSProperties } from "react"
 export type ShellColors = {
 	background: string
 	textColor: string
-	/** ce qui compte dans un texte */
+	/** what counts in a text */
 	importantColor: string
-	/** le nom d'une commande jouee */
+	/** the name of a command that was played */
 	cmdColor: string
-	/** le nom d'une commande restreinte */
+	/** the name of a restricted command */
 	restrictedColor: string
 	infoColor: string
 	appColor: string
-	/** la couleur du fond : un texte pose dessus reste invisible */
+	/** the color of the background: a text laid on it stays invisible */
 	invisible: string
 }
 
 /**
- * Les polices. Celle du shell habille la sortie et la saisie, celle de la
- * fenetre sa barre de titre. Elles sont separees : un terminal veut du
- * chasse fixe, un cadre pas forcement.
+ * The fonts. The one of the shell dresses the output and the input, the one
+ * of the window its title bar. They are kept apart: a terminal wants a
+ * monospace, a frame not necessarily.
  */
 export type ShellFonts = {
 	shell: string
 	window: string
 }
 
-/** le cadre de la fenetre : barre de titre, bordure, boutons */
+/** the frame of the window: title bar, border, buttons */
 export type WindowColors = {
 	titleBar: string
 	border: string
-	/** le fond derriere le contenu, visible autour de lui */
+	/** the background behind the content, visible around it */
 	content: string
 	text: string
 	button: string
@@ -38,24 +38,24 @@ export type WindowColors = {
 
 export type ShellTheme = {
 	colors: ShellColors
-	/** l'invite, posee devant la saisie et devant chaque commande */
+	/** the prompt, set before the input and before every command */
 	prompt: string
 	fonts: ShellFonts
 	window: WindowColors
 	/**
-	 * Le style du conteneur general du terminal, pose en inline sur lui.
-	 * Ouvert a tout CSSProperties et pas au seul padding : la marge
-	 * interieure est le besoin courant, mais un arrondi, une bordure ou une
-	 * ombre se posent au meme endroit. Recouvre le style de base du
-	 * conteneur, propriete par propriete.
+	 * The style of the general container of the terminal, set inline on it.
+	 * Open to any CSSProperties and not to padding alone: the inner padding
+	 * is the everyday need, but a rounding, a border or a shadow go in the
+	 * same place. Covers the base style of the container, property by
+	 * property.
 	 */
 	container: CSSProperties
 }
 
 /**
- * Ce qu'un consommateur a le droit de donner : tout est optionnel, y
- * compris dans les sous-objets. Un Partial<ShellTheme> ne suffirait pas,
- * il exigerait les groupes de couleurs au complet.
+ * What a consumer is allowed to give: everything is optional, inside the
+ * sub-objects included. A Partial<ShellTheme> would not do, it would demand
+ * the color groups in full.
  */
 export type ShellThemeInput = {
 	colors?: Partial<ShellColors>

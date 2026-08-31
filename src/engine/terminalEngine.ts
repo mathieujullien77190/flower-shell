@@ -23,10 +23,11 @@ type CreateCommandProps = {
 }
 
 /**
- * Le rang d'arrivee, strictement croissant. Il ordonne l'affichage a la
- * place de `timestamp` : deux commandes enchainees dans la meme boucle —
- * l'ouverture — tombent sur la meme milliseconde, et le tri, stable, rendait
- * alors l'ordre des deux listes plutot que celui de la frappe.
+ * The rank of arrival, strictly increasing. It orders the display in place
+ * of `timestamp`: two commands played one after the other in the same loop
+ * — the opening — land on the same millisecond, and the sort, being stable,
+ * then returned the order of the two lists rather than the one of the
+ * typing.
  */
 let count = 0
 
@@ -70,7 +71,7 @@ export const createCommand = ({
 				pattern: commandPattern,
 				name,
 				args,
-				// sans la commande d'erreur, le dictionnaire du paquet repond
+				// without the error command, the dictionary of the package answers
 				result: error
 					? executeCommand({
 							commands,
@@ -90,10 +91,10 @@ export const createCommand = ({
 		const error = findCommand({ commands, name: "unknow", restricted: true })
 
 		/**
-		 * Un shell sans aucune commande n'a rien a redire : le registre vide
-		 * est un choix du consommateur, pas une faute du visiteur. La ligne
-		 * passe, et la suivante s'ouvre. Des qu'une commande existe, une
-		 * commande inconnue redevient une erreur.
+		 * A shell with no command at all has nothing to object to: the empty
+		 * registry is a choice of the consumer, not a mistake of the visitor.
+		 * The line goes through, and the next one opens. As soon as one
+		 * command exists, an unknown command is an error again.
 		 */
 		const bare = Object.keys(commands).length === 0
 
@@ -143,9 +144,9 @@ export const executeCommand = ({
 }
 
 /**
- * L'aide d'une commande. Elle peut etre une fonction, lue ici et pas avant :
- * `lang` s'en sert pour lister les langues montees, qui n'existent pas au
- * moment ou la commande est ecrite.
+ * The help of a command. It can be a function, read here and not before:
+ * `lang` uses that to list the mounted languages, which do not exist at the
+ * moment the command is written.
  */
 export const readHelp = (command: BaseCommand): Help | undefined =>
 	typeof command.help === "function" ? command.help() : command.help

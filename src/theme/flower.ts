@@ -2,11 +2,11 @@ import { makeTheme } from "./base"
 import type { ShellTheme } from "./types"
 
 /**
- * Le theme du paquet : la fleur qui lui donne son nom. Fond de feuillage
- * sombre, et des accents pris au 🌼 lui-meme — jaune de pollen sur ce qui
- * compte, vert de tige sur les commandes, orange de petale sur ce qui est
- * refuse. L'invite est la fleur : c'est la marque, elle se voit a chaque
- * ligne.
+ * The theme of the package: the flower it takes its name from. A background
+ * of dark foliage, and accents taken from the 🌼 itself — pollen yellow on
+ * what counts, stem green on the commands, petal orange on what is turned
+ * down. The prompt is the flower: it is the mark, and it shows on every
+ * line.
  */
 export const flowerTheme: ShellTheme = makeTheme({
 	prompt: "🌼",

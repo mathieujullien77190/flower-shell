@@ -20,158 +20,161 @@ import { setThemes, ShellThemeInput, wearTheme } from "./theme"
 import { BaseCommand, BaseCommands, Dictionaries } from "./types"
 
 /**
- * De quoi poser le shell dans une fenetre sans l'assembler soi-meme. La
- * presence de l'objet suffit : le shell se rend alors dans un `Window`,
- * qui borne son deplacement au conteneur que le shell pose autour de lui.
+ * What it takes to put the shell in a window without assembling one
+ * yourself. The object being there is enough: the shell then renders inside
+ * a `Window`, whose dragging is bounded by the container the shell puts
+ * around it.
  *
- * Pour un cadre qui tient autre chose que le shell, ou qui vit dans un
- * bureau a plusieurs fenetres, `Window` s'utilise directement.
+ * For a frame holding something other than the shell, or living on a desktop
+ * of several windows, use `Window` directly.
  */
 export type ShellWindowProps = {
-	/** le texte de la barre de titre */
+	/** the text of the title bar */
 	title?: string
-	/** elle se deplace a la souris par sa barre ; vrai par defaut */
+	/** it is dragged by its bar; true by default */
 	move?: boolean
-	/** le coin ou elle s'ouvre ; `center-center` par defaut */
+	/** the corner it opens on; `center-center` by default */
 	start?: WindowStart
 	/**
-	 * La distance au bord, en CSS : `"24px"`, `"2rem"`, `"3%"`. Elle ecarte
-	 * la fenetre du bord dont `start` la rapproche, et ne s'applique donc pas
-	 * aux axes centres. Zero par defaut.
+	 * The distance to the edge, in CSS: `"24px"`, `"2rem"`, `"3%"`. It moves
+	 * the window away from the edge `start` brings it to, and so does not
+	 * apply to centered axes. Zero by default.
 	 */
 	margin?: string
 	/**
-	 * Pleine et non redimensionnable : elle prend tout le conteneur, et
-	 * `start` comme `margin` n'ont alors plus rien a placer. La marge se
-	 * pose sur ce qui la tient.
+	 * Full and not resizable: it takes the whole container, and `start` and
+	 * `margin` then have nothing left to place. The margin goes on whatever
+	 * holds it.
 	 */
 	compact?: boolean
-	/** le bouton d'agrandissement, et le double-clic sur la barre */
+	/** the expand button, and the double click on the bar */
 	canExpand?: boolean
-	/** la croix de fermeture */
+	/** the close cross */
 	canClose?: boolean
 	/**
-	 * Ouverte ou fermee. Sans elle, la fenetre tient son etat toute seule :
-	 * ouverte au montage, la croix la ferme, et rien ne la rouvre.
+	 * Open or closed. Without it, the window holds its own state: open on
+	 * mount, the cross closes it, and nothing reopens it.
 	 *
-	 * Donnee, c'est l'appelant qui decide, et la fenetre ne fait plus que ce
-	 * qu'on lui dit — la croix ne ferme plus rien, elle previent par
-	 * `onClose` et attend que la prop passe a faux. C'est ce qu'il faut pour
-	 * un bouton qui rouvre le terminal : le meme etat ouvre et ferme.
+	 * Given, the caller decides, and the window only does what it is told —
+	 * the cross closes nothing any more, it warns through `onClose` and waits
+	 * for the prop to turn false. That is what a button reopening the
+	 * terminal needs: the same state opens and closes.
 	 *
-	 * Fermee, le terminal est demonte, mais l'historique vit au niveau du
-	 * module : rouverte, la fenetre retrouve ce qui y etait ecrit, et
-	 * l'ouverture ne se rejoue pas.
+	 * Closed, the terminal is unmounted, but the history lives at module
+	 * level: reopened, the window finds back what was written in it, and the
+	 * opening is not played again.
 	 */
 	open?: boolean
 	/**
-	 * La croix a ete cliquee. Avec `open`, c'est tout ce qui se passe : a
-	 * l'appelant de passer la prop a faux s'il veut voir la fenetre partir.
+	 * The cross was clicked. With `open`, that is all that happens: it is up
+	 * to the caller to turn the prop false if it wants to see the window go.
 	 */
 	onClose?: () => void
 }
 
-/** un catalogue de themes, indexes par le nom que le visiteur tape */
+/** a catalogue of themes, indexed by the name the visitor types */
 export type ShellThemes = Record<string, ShellThemeInput>
 
 export type ShellProps = {
 	/**
-	 * Les commandes connues : celles du paquet, plus les votres. Sans elle,
-	 * le shell se monte nu — il affiche l'invite et ne repond a rien.
+	 * The known commands: the ones shipped with the package, plus yours.
+	 * Without it, the shell mounts bare — it shows the prompt and answers
+	 * nothing.
 	 */
 	commands?: BaseCommands & { [name: string]: BaseCommand }
 	/**
-	 * Le theme de depart, par son nom : une clef de `themes`, comme `lang`
-	 * est une clef de `dict`. Sans elle, le premier du catalogue — et si
-	 * `themes` non plus n'est pas donnee, le shell ne porte rien.
+	 * The theme it starts on, by name: a key of `themes`, the way `lang` is a
+	 * key of `dict`. Without it, the first of the catalogue — and if `themes`
+	 * is not given either, the shell wears nothing.
 	 *
-	 * Un nom absent du catalogue est ignore : on ne peut pas partir sur un
-	 * theme que le visiteur ne pourrait pas retrouver.
+	 * A name absent from the catalogue is ignored: it cannot start on a theme
+	 * the visitor would have no way of finding again.
 	 */
 	theme?: string
 	/**
-	 * Les themes que le visiteur peut prendre, indexes par le nom qu'il tape.
-	 * Ce sont exactement ceux que `theme <nom>` accepte et que `help theme`
-	 * liste — rien de plus.
+	 * The themes the visitor can take, indexed by the name they type. These
+	 * are exactly the ones `theme <name>` accepts and `help theme` lists —
+	 * nothing more.
 	 *
-	 * Pour tout le catalogue du paquet d'un coup, `themes={themes}`. Sans
-	 * elle, le visiteur n'a aucun theme a prendre : `theme <nom>` ne repond
-	 * plus rien et `help theme` ne liste rien.
+	 * For the whole catalogue of the package at once, `themes={themes}`.
+	 * Without it, the visitor has no theme to take: `theme <name>` answers
+	 * nothing and `help theme` lists nothing.
 	 *
-	 * Chacun se decrit par la clef `theme.<nom>` : a fournir dans votre
-	 * dictionnaire pour les votres, sans quoi la clef s'affiche telle quelle.
+	 * Each one describes itself through the key `theme.<name>`: provide it in
+	 * your dictionary for yours, or the key shows up as it is.
 	 */
 	themes?: ShellThemes
 	/**
-	 * Vos textes, par langue. Ils recouvrent ceux du paquet clef par clef, et
-	 * une langue absente du paquet devient utilisable par `lang <code>`.
+	 * Your texts, by language. They cover the ones of the package key by key,
+	 * and a language the package does not have becomes reachable through
+	 * `lang <code>`.
 	 */
 	dict?: Dictionaries
-	/** langue de depart ; sans elle, le francais */
+	/** starting language; without it, English */
 	lang?: string
 	/**
-	 * Commandes jouees au demarrage, dans l'ordre du tableau. Chacune part
-	 * comme tapee ; les restreintes (`title`, `welcome`...) passent par le
-	 * canal restreint. C'est ici que se met l'ouverture — `["title",
-	 * "welcome"]` pour le logo puis l'accueil.
+	 * Commands played at startup, in the order of the array. Each one goes as
+	 * if typed; the restricted ones (`title`, `welcome`…) go through the
+	 * restricted channel. This is where the opening goes — `["title",
+	 * "welcome"]` for the logo then the greeting.
 	 *
-	 * Jouees une seule fois, sur un ecran vierge : un `clear` ne les rejoue
-	 * pas, il efface et rien d'autre. Les faire revenir est l'affaire du
-	 * consommateur — `onCommandDone` le previent du `clear`, `runRestricted`
-	 * lui permet de rejouer ce qu'il veut.
+	 * Played once, on a blank screen: a `clear` does not play them again, it
+	 * erases and nothing else. Bringing them back is up to the consumer —
+	 * `onCommandDone` tells it about the `clear`, `runRestricted` lets it
+	 * replay whatever it wants.
 	 */
 	initialCommands?: string[]
 	/**
-	 * Pose le shell dans une fenetre. Sans elle, il se rend nu et remplit ce
-	 * qui le tient.
+	 * Puts the shell in a window. Without it, it renders bare and fills
+	 * whatever holds it.
 	 *
-	 * Le shell fournit alors le conteneur qui borne le deplacement et se
-	 * fait defiler par le contenu du cadre : `scrollRef` n'a plus rien a
-	 * dire et est ignoree.
+	 * The shell then provides the container bounding the dragging, and is
+	 * scrolled by the content of the frame: `scrollRef` has nothing left to
+	 * say and is ignored.
 	 */
 	window?: ShellWindowProps
 	/**
-	 * Element a faire defiler quand la sortie s'allonge : la boite qui tient
-	 * le shell, quand elle a son propre defilement. Avec `window`, le cadre
-	 * s'en charge et cette prop est ignoree.
+	 * Element to scroll as the output grows: the box holding the shell, when
+	 * it has a scroll of its own. With `window`, the frame takes care of it
+	 * and this prop is ignored.
 	 */
 	scrollRef?: RefObject<HTMLElement | null>
 	/**
-	 * Avant que la commande ne joue. Le nom et les arguments sont lus sur la
-	 * ligne envoyee : a ce moment le shell ne sait pas encore s'il connait
-	 * une commande de ce nom, et ce temoin part donc aussi pour une ligne
-	 * qu'il refusera ensuite.
+	 * Before the command plays. The name and the arguments are read off the
+	 * line that was sent: at that point the shell does not yet know whether
+	 * it has a command by that name, so this one fires for a line it will
+	 * turn down afterwards too.
 	 */
 	onCommandStart?: CommandListener
 	/**
-	 * L'action a rendu son texte et l'effet a joue. La commande est faite,
-	 * mais rien n'est encore a l'ecran : l'ecriture, elle, prend le temps de
-	 * son animation. Ne part que pour une commande qui a pu jouer.
+	 * The action returned its text and the effect played. The command is
+	 * over, but nothing is on screen yet: the writing takes the time of its
+	 * animation. Only fires for a command that could play.
 	 */
 	onCommandDone?: CommandListener
 	/**
-	 * La commande a fini de s'ecrire a l'ecran. Part une fois par commande,
-	 * au passage, et jamais pour une commande qui n'a pas pu jouer.
+	 * The command has finished being written on screen. Fires once per
+	 * command, as it happens, and never for a command that could not play.
 	 */
 	onCommandRendered?: CommandListener
 	/**
-	 * La commande n'a pas joue. `reason` dit pourquoi : `unknown` quand
-	 * aucune commande ne porte ce nom, `args` quand elle existe mais que ses
-	 * arguments ne passent pas, `thrown` quand son action ou son effet a
-	 * leve — et l'erreur est alors dans `error`.
+	 * The command did not play. `reason` says why: `unknown` when no command
+	 * carries that name, `args` when it exists but its arguments do not pass,
+	 * `thrown` when its action or its effect threw — and the error is then in
+	 * `error`.
 	 *
-	 * Un shell au registre vide n'a rien a redire : il laisse passer ce
-	 * qu'on lui tape, et ne signale donc aucune erreur.
+	 * A shell with an empty registry has nothing to object to: it lets
+	 * through whatever is typed, and so reports no error.
 	 */
 	onCommandError?: CommandErrorListener
 }
 
 /**
- * Le terminal : la liste des commandes jouees et la ligne de saisie.
+ * The terminal: the list of the commands played and the input line.
  *
- * Le registre, le theme et l'etat vivent au niveau du module — ils servent
- * aussi hors React, une fenetre qui se ferme peut jouer une commande.
- * Corollaire assume : un shell par page.
+ * The registry, the theme and the state live at module level — they serve
+ * outside React too, a window being closed can play a command. Corollary,
+ * knowingly: one shell per page.
  */
 export const Shell = ({
 	commands = {},
@@ -180,8 +183,8 @@ export const Shell = ({
 	dict,
 	lang,
 	initialCommands = [],
-	// `window` est aussi le nom de l'objet global : renomme ici pour que le
-	// corps du composant garde acces a l'un comme a l'autre
+	// `window` is also the name of the global object: renamed here so the
+	// body of the component keeps access to both
 	window: frame,
 	scrollRef,
 	onCommandStart,
@@ -190,28 +193,28 @@ export const Shell = ({
 	onCommandError,
 }: ShellProps) => {
 	/**
-	 * Le cadre, quand la prop `window` est donnee. `area` borne le
-	 * deplacement de la fenetre, `content` est ce qui defile — c'est la ref
-	 * que `Window` expose, et elle remplace alors `scrollRef`.
+	 * The frame, when the `window` prop is given. `area` bounds the dragging
+	 * of the window, `content` is what scrolls — it is the ref `Window`
+	 * exposes, and it then replaces `scrollRef`.
 	 */
 	const area = useRef<HTMLDivElement>(null)
 	const content = useRef<HTMLDivElement>(null)
 	const [framed, setFramed] = useState(true)
 
 	/**
-	 * Qui tient l'ouverture. `open` donnee, c'est l'appelant : la fenetre
-	 * suit sa prop et la croix ne fait plus que prevenir. Sinon le shell la
-	 * tient pour lui, comme avant.
+	 * Who holds the opening. `open` given, it is the caller: the window
+	 * follows its prop and the cross only warns. Otherwise the shell holds it
+	 * for itself, as before.
 	 */
 	const ownFrame = frame?.open === undefined
 	const shown = frame?.open ?? framed
-	// pose avant le premier rendu : le terminal lit le registre en se rendant
+	// set before the first render: the terminal reads the registry as it renders
 	const [ready] = useState(() => {
-		// le dictionnaire d'abord : une commande jouee traduit en s'executant
+		// the dictionary first: a command played translates as it executes
 		setDict(dict)
 		setCommands(commands)
-		// le catalogue avant le theme de depart : `help theme` et `theme <nom>`
-		// lisent le premier, et le second n'a pas a en faire partie
+		// the catalogue before the starting theme: `help theme` and `theme
+		// <name>` read the first, and the second need not be part of it
 		setThemes(themes)
 		wearTheme(theme)
 		return true
@@ -247,17 +250,18 @@ export const Shell = ({
 		})
 	}, [onCommandStart, onCommandDone, onCommandError])
 
-	// apres le montage, jamais pendant le rendu : la langue du navigateur
-	// n'existe pas au prerendu, l'appliquer plus tot ferait diverger le HTML
+	// after the mount, never during the render: the language of the browser
+	// does not exist at prerender, and applying it earlier would make the HTML
+	// diverge
 	useEffect(() => {
 		if (lang) shellActions().setLang(lang)
 	}, [lang])
 
 	/**
-	 * L'ouverture se joue au montage, mais seulement si l'ecran est vide.
-	 * Le shell peut etre demonte puis remonte — une fenetre qu'on ferme et
-	 * qu'on rouvre — alors que l'historique, lui, vit au niveau du module
-	 * et a survecu : la rejouer afficherait le titre deux fois.
+	 * The opening plays on mount, but only if the screen is empty. The shell
+	 * can be unmounted then mounted again — a window one closes and reopens —
+	 * while the history lives at module level and has survived: playing it
+	 * again would show the title twice.
 	 */
 	useEffect(() => {
 		if (!ready) return
@@ -268,8 +272,9 @@ export const Shell = ({
 		)
 
 		if (!onScreen) {
-			// les commandes de depart, enchainees dans l ordre du tableau. une
-			// restreinte (title...) passe par le canal restreint, sinon comme tapee
+			// the starting commands, one after the other in the order of the
+			// array. a restricted one (title…) goes through the restricted
+			// channel, the others as if typed
 			initialCommands.forEach(pattern => {
 				const name = pattern.split(" ")[0]
 				if (getCommands()[name]?.restricted) runRestricted(pattern)
@@ -280,16 +285,17 @@ export const Shell = ({
 	}, [ready])
 
 	const scrollDown = useCallback(() => {
-		// dans un cadre, c'est lui qui defile : sa ref remplace `scrollRef`
+		// in a frame, the frame is what scrolls: its ref replaces `scrollRef`
 		const target = frame ? content.current : scrollRef?.current
 		target?.scrollTo(0, 1000000)
 	}, [frame, scrollRef])
 
 	/**
-	 * La fin d'ecriture est signalee a chaque rendu tant que la commande est
-	 * a l'ecran, pas seulement au passage : le temoin ne part donc que sur la
-	 * bascule, quand la commande n'etait pas encore marquee rendue. Sans ce
-	 * garde-fou, `onCommandRendered` repartirait a chaque rendu du terminal.
+	 * The end of the writing is reported on every render for as long as the
+	 * command is on screen, not only as it happens: so the event fires on the
+	 * flip alone, when the command was not marked rendered yet. Without that
+	 * guard, `onCommandRendered` would fire again on every render of the
+	 * terminal.
 	 */
 	const handleRendered = useCallback(
 		(id: string) => {
@@ -334,9 +340,9 @@ export const Shell = ({
 	if (!frame) return terminal
 
 	/**
-	 * Le conteneur borne le deplacement de la fenetre, et c'est tout ce que
-	 * le shell impose : il prend la place qu'on lui donne. A qui l'affiche
-	 * de poser la hauteur, ici ou sur ce qui le tient.
+	 * The container bounds the dragging of the window, and that is all the
+	 * shell imposes: it takes the room it is given. It is up to whoever
+	 * displays it to set the height, here or on what holds it.
 	 */
 	return (
 		<div ref={area} style={{ position: "relative", height: "100%" }}>
@@ -351,7 +357,7 @@ export const Shell = ({
 				compact={frame.compact}
 				canExpand={frame.canExpand}
 				canClose={frame.canClose}
-				// la fenetre ne part d'ici que si personne d'autre ne la tient
+				// the window only goes from here if nobody else holds it
 				onClose={() => {
 					if (ownFrame) setFramed(false)
 					frame.onClose?.()

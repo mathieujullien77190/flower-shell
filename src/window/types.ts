@@ -4,9 +4,9 @@ export type Pos = { x: number; y: number }
 export type Mode = "medium" | "full"
 
 /**
- * Le coin du bureau ou la fenetre s'ouvre : l'horizontale, puis la
- * verticale. `center-center` est la place par defaut, celle qu'elle a
- * toujours eue.
+ * The corner of the desktop the window opens on: the horizontal, then the
+ * vertical. `center-center` is the default place, the one it has always
+ * had.
  */
 export type WindowStart =
 	| "left-top"
@@ -23,49 +23,49 @@ export type WindowProps = {
 	show: boolean
 	container: RefObject<HTMLDivElement | null>
 	title?: string
-	/** marque de la barre de titre, visee par la visite guidee */
+	/** mark of the title bar, aimed at by the guided tour */
 	tutorial?: string
-	/** marque du cadre entier, pour poser un calque par-dessus */
+	/** mark of the whole frame, to lay a layer over it */
 	mark?: string
-	/** etage d'empilement : la fenetre au premier plan a le plus grand */
+	/** stacking floor: the window in the foreground has the highest */
 	layer?: number
-	/** rang dans la cascade, pour ne pas s'ouvrir sur la precedente */
+	/** rank in the cascade, so as not to open on top of the previous one */
 	rank?: number
 	/**
-	 * Hauteur reservee en bas du conteneur, en CSS. Le bureau y met sa
-	 * barre des taches ; sans elle, la fenetre passerait dessous.
+	 * Height kept free at the bottom of the container, in CSS. The desktop
+	 * puts its taskbar there; without it, the window would go under.
 	 */
 	bottomInset?: string
 	/**
-	 * Pleine et non redimensionnable. A qui l'affiche de decider quand :
-	 * un petit ecran, un mode lecture, une preference. Le paquet ne fixe
-	 * aucun seuil.
+	 * Full and not resizable. It is up to whoever displays it to decide
+	 * when: a small screen, a reading mode, a preference. The package sets
+	 * no threshold.
 	 */
 	compact?: boolean
-	/** elle se deplace a la souris par sa barre de titre ; vrai par defaut */
+	/** it is dragged by its title bar; true by default */
 	move?: boolean
-	/** le coin ou elle s'ouvre ; `center-center` par defaut */
+	/** the corner it opens on; `center-center` by default */
 	start?: WindowStart
 	/**
-	 * La distance au bord, en CSS : `"24px"`, `"2rem"`, `"3%"`. Elle ecarte
-	 * la fenetre du bord dont `start` la rapproche, et ne s'applique donc
-	 * pas aux axes centres, ni a la fenetre pleine. Zero par defaut.
+	 * The distance to the edge, in CSS: `"24px"`, `"2rem"`, `"3%"`. It moves
+	 * the window away from the edge `start` brings it to, and so applies
+	 * neither to centered axes nor to a full window. Zero by default.
 	 */
 	margin?: string
 	/**
-	 * Le bouton d'agrandissement, et le double-clic sur la barre. Faux le
-	 * retire et la fenetre garde son gabarit. `compact` l'emporte : pleine,
-	 * elle n'a plus rien a agrandir.
+	 * The expand button, and the double click on the bar. False takes it
+	 * away and the window keeps its size. `compact` wins: full, it has
+	 * nothing left to expand.
 	 */
 	canExpand?: boolean
-	/** la croix de fermeture ; vrai par defaut */
+	/** the close cross; true by default */
 	canClose?: boolean
 	/**
-	 * Elle ne ferme pas d'elle-meme : la croix previent, et c'est `show`
-	 * qui la fait disparaitre. A qui l'affiche de le passer a faux.
+	 * It does not close by itself: the cross warns, and it is `show` that
+	 * makes it disappear. It is up to whoever displays it to turn it false.
 	 */
 	onClose?: () => void
-	/** la fenetre reclame le premier plan */
+	/** the window asks for the foreground */
 	onFocus?: () => void
 	children: ReactNode
 }

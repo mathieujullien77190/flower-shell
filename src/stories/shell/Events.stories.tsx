@@ -174,7 +174,7 @@ const Row = ({ row }: { row: Watched }) => (
 		>
 			<strong>{row.name}</strong>{" "}
 			<span style={{ opacity: 0.6 }}>{row.args.join(" ")}</span>
-			{/* la raison, pas un moment de plus : elle tient donc au nom */}
+			{/* the reason, not a moment more: so it hangs off the name */}
 			{row.error && (
 				<span
 					title="onCommandError"

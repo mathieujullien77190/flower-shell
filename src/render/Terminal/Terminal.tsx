@@ -25,19 +25,19 @@ export const Terminal = ({
 }: TerminalProps) => {
 	const [forceFocus, setForceFocus] = useState<number>(0)
 
-	// abonnement au theme : au changement, le conteneur relit colors()
+	// subscription to the theme: on a change, the container reads colors() again
 	const themeName = useThemeName()
 
 	return (
 		<S.TerminalContainer
 			data-theme={themeName}
-			// le style du conteneur vient du theme : pose en inline, il
-			// recouvre le style de base sans que le consommateur ait a
-			// batailler avec la specificite
+			// the style of the container comes from the theme: set inline, it
+			// covers the base style without the consumer having to fight
+			// specificity
 			style={container()}
 			onClick={() => {
-				// un clic qui vient de selectionner du texte ne rend pas la main
-				// a la saisie : le focus effacerait la selection
+				// a click that has just selected text does not hand back to the
+				// input: the focus would wipe the selection out
 				if (!hasSelection()) setForceFocus(prev => prev + 1)
 			}}
 		>

@@ -8,13 +8,13 @@ import { boxed } from "./decorators"
 import { prose } from "./i18n"
 import { source } from "./source"
 
-// La page ou l'on tombe en arrivant : le paquet en marche, pas sa liste de
-// props. Elle est premiere dans le tri de `preview.tsx`, et c'est donc elle
-// que sert le site publie.
+// The page one lands on: the package running, not its list of props. It is
+// first in the sort of `preview.tsx`, and so it is the one the published
+// site serves.
 //
-// En commentaire de ligne, et non en bloc : un bloc au-dessus du meta fait
-// injecter au plugin CSF ses propres `parameters`, qui recouvrent les
-// notres — et la prose disparaitrait avec eux.
+// As line comments, and not as a block: a block above the meta makes the CSF
+// plugin inject its own `parameters`, which cover ours — and the prose would
+// disappear along with them.
 const meta: Meta<typeof Shell> = {
 	title: "flower-shell",
 	component: Shell,

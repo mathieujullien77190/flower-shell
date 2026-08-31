@@ -4,25 +4,25 @@ import { useShallow } from "zustand/react/shallow"
 import { Command } from "@types"
 import { DEFAULT_THEME_NAME, setTheme, themeByName } from "@theme"
 
-/** le nom d'un theme du catalogue : ce que le visiteur tape */
+/** the name of a theme of the catalogue: what the visitor types */
 type ThemeName = string
 
 type Shell = {
-	/** langue de rendu des textes */
+	/** language the texts are rendered in */
 	lang: string
-	/** ecriture lettre par lettre des reponses */
+	/** letter by letter writing of the answers */
 	animation: boolean
-	/** la saisie reprend le focus des qu'elle le perd */
+	/** the input takes the focus back as soon as it loses it */
 	keyboardOnFocus: boolean
-	/** le theme courant, par son nom dans le catalogue */
+	/** the current theme, by its name in the catalogue */
 	themeName: ThemeName
 
 	commands: Command[]
 	restrictedCommands: Command[]
-	/** position dans l'historique, null quand on est sur la ligne vierge */
+	/** position in the history, null when on the blank line */
 	cursor: number | null
 
-	/** vide l'historique et rend les options a leurs valeurs de depart */
+	/** empties the history and puts the options back to their starting values */
 	reset: () => void
 	setLang: (lang: string) => void
 	setAnimation: (animation: boolean) => void
@@ -60,9 +60,9 @@ export const useShellStore = create<Shell>(set => ({
 	setAnimation: animation => set({ animation }),
 	setKeyboardOnFocus: keyboardOnFocus => set({ keyboardOnFocus }),
 
-	// pose le theme module (colors() suivra) puis note son nom : le second
-	// declenche le rendu, le premier fournit les couleurs qu'il relira.
-	// Un nom inconnu ne fait rien : la commande ne laisse pas passer.
+	// sets the module theme (colors() will follow) then notes its name: the
+	// second triggers the render, the first provides the colors it will read
+	// back. An unknown name does nothing: the command does not let it through.
 	setThemeName: name => {
 		const next = themeByName(name)
 		if (!next) return
@@ -91,12 +91,12 @@ export const useShellStore = create<Shell>(set => ({
 		),
 
 	/**
-	 * La fin d'ecriture est signalee a chaque rendu tant que la commande est
-	 * a l'ecran, et pas seulement au passage. Sans ce depart anticipe, le
-	 * `map` refabriquait la liste et l'objet a chaque appel : l'etat changeait
-	 * d'identite pour une valeur identique, et le terminal se rendait a
-	 * nouveau, ce qui resignalait la fin. Marquer rendu ce qui l'est deja ne
-	 * change rien, et ne doit donc rien reveiller.
+	 * The end of the writing is reported on every render for as long as the
+	 * command is on screen, and not only as it happens. Without this early
+	 * return, the `map` rebuilt the list and the object on every call: the
+	 * state changed identity for an identical value, and the terminal
+	 * rendered again, which reported the end again. Marking rendered what
+	 * already is changes nothing, and so must wake nothing.
 	 */
 	setIsRendered: id =>
 		set(state => {
@@ -140,15 +140,15 @@ export const useShellStore = create<Shell>(set => ({
 }))
 
 /**
- * Les deux listes remises dans l'ordre d'arrivee. Le tri passe par `order`
- * et non par `timestamp` : les commandes de l'ouverture partent dans la meme
- * boucle et tombent sur la meme milliseconde, et le tri, stable, rendait
- * alors les non restreintes avant les restreintes — `help theme` avant
- * `title`, quel que soit l'ordre demande.
+ * The two lists put back in the order they arrived in. The sort goes by
+ * `order` and not by `timestamp`: the commands of the opening leave in the
+ * same loop and land on the same millisecond, and the sort, being stable,
+ * then returned the unrestricted ones before the restricted — `help theme`
+ * before `title`, whatever order was asked for.
  *
- * Le tableau est reconstruit a chaque appel, d'ou useShallow : sans lui, la
- * nouvelle reference relancerait un rendu a chaque changement du store, meme
- * sans rapport.
+ * The array is rebuilt on every call, hence useShallow: without it, the new
+ * reference would trigger a render on every change of the store, even an
+ * unrelated one.
  */
 export const useGetCommands = () =>
 	useShellStore(
@@ -168,9 +168,10 @@ export const useGetCurrentCommand = () =>
 	)
 
 /**
- * Le demarrage est fini : plus une commande restreinte en attente de rendu,
- * et le visiteur n'a encore rien tape. C'est ce que joue `initialCommands`
- * qui remplit la premiere condition, quelle qu'en soit la longueur.
+ * The startup is over: not one restricted command left waiting to be
+ * rendered, and the visitor has not typed anything yet. It is what
+ * `initialCommands` plays that fills the first condition, whatever its
+ * length.
  */
 export const useGetStart = () =>
 	useShellStore(
@@ -179,7 +180,7 @@ export const useGetStart = () =>
 			state.commands.length === 0
 	)
 
-/** derniere commande jouee par le visiteur, les restreintes exclues */
+/** last command played by the visitor, the restricted ones left out */
 export const useGetLastCommand = () =>
 	useShellStore(state => state.commands[state.commands.length - 1] || null)
 
@@ -192,5 +193,5 @@ export const useThemeName = () => useShellStore(state => state.themeName)
 export const useKeyboardOnFocus = () =>
 	useShellStore(state => state.keyboardOnFocus)
 
-/** hors composant : les commandes attaquent le store directement */
+/** outside a component: the commands attack the store directly */
 export const shellActions = () => useShellStore.getState()

@@ -1,13 +1,13 @@
 import { BaseCommands } from "@types"
 
 /**
- * Les commandes connues du shell. Elles vivent au niveau du module parce
- * que tout le monde en a besoin sans etre un composant : l'autocompletion,
- * le rendu d'une ligne, et surtout `run`, appele depuis l'exterieur — une
- * fenetre du bureau, un jeu qui se ferme. Un contexte React ne couvrirait
- * pas ce dernier cas.
+ * The commands the shell knows. They live at module level because everyone
+ * needs them without being a component: the autocompletion, the rendering
+ * of a line, and above all `run`, called from outside — a window of the
+ * desktop, a game being closed. A React context would not cover that last
+ * case.
  *
- * Corollaire assume : un shell par page.
+ * Corollary, knowingly: one shell per page.
  */
 let registry: BaseCommands = {}
 

@@ -1,6 +1,6 @@
 /**
- * Le logo du shell, en ascii. Les lettres isolees (R, I, B, G...) sont
- * des marqueurs de couleur lus par highlightFlower, pas du texte.
+ * The logo of the shell, in ascii. The lone letters (R, I, B, G…) are color
+ * markers read by highlightFlower, not text.
  */
 export const title = `
  ________   .---.       ,-----.    .--.      .--.    .-''-.  .-------.               .-'''-. .---.  .---.     .-''-.    .---.     .---.      

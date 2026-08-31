@@ -12,15 +12,15 @@ export const LIGHT = {
 
 export const ANIM_TIME = 300
 
-// gabarit de la fenetre moyenne, en pourcentage du bureau : le poser en
-// CSS evite de mesurer le bureau, et la fenetre suit le redimensionnement
+// size of the medium window, as a percentage of the desktop: setting it in
+// CSS avoids measuring the desktop, and the window follows the resizing
 export const MEDIUM_MARGIN = 15
 export const MEDIUM_SIZE = 70
 
-// decalage d'une fenetre a l'autre a l'ouverture, en pixels : sans lui
-// elles se posent au meme endroit et se masquent parfaitement
+// shift from one window to the next as they open, in pixels: without it
+// they land on the same spot and hide each other perfectly
 export const CASCADE = 26
 
-// etage de la fenetre au premier plan ; les autres descendent d'un cran
-// et restent sous les modales, qui sont a 10
+// floor of the window in the foreground; the others go one step down and
+// stay under the modals, which are at 10
 export const TOP_LAYER = 9

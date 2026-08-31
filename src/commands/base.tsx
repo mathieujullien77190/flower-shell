@@ -8,20 +8,20 @@ import { highlightFlower, plantFlowers } from "./flowers"
 import { title } from "./title"
 
 /**
- * La taille du logo ascii, prise sur la largeur du terminal et non sur
- * celle du navigateur : `cqw` se mesure sur le conteneur du shell, qui pose
- * `container-type: inline-size`. En `vw` le logo restait dimensionne pour la
- * page et debordait de tout cadre plus petit qu'elle — une fenetre, une
- * colonne, une story.
+ * The size of the ascii logo, taken off the width of the terminal and not
+ * off the one of the browser: `cqw` is measured on the container of the
+ * shell, which sets `container-type: inline-size`. In `vw` the logo stayed
+ * sized for the page and overflowed any frame smaller than it — a window, a
+ * column, a story.
  *
- * Le diviseur est celui du dessin : il fait environ 130 caracteres une fois
- * ses marqueurs de couleur consommes.
+ * The divider is the one of the drawing: it is about 130 characters wide
+ * once its color markers have been consumed.
  */
 const LOGO_SIZE = "calc(100cqw / 130)"
 
 /**
- * L'aide d'une commande. Les descriptions sont des clefs : elles passent
- * par `t()` ici, a l'execution, quand la langue courante est connue.
+ * The help of a command. The descriptions are keys: they go through `t()`
+ * here, at execution, when the current language is known.
  */
 const buildHelp = (help: Help) => {
 	const patterns = help.patterns
@@ -55,19 +55,9 @@ const commandHelp = (commands: BaseCommands, name: string): Help | null => {
 }
 
 /**
- * Le banc d'essai du balisage. Une commande, et tout ce que `highlight`
- * sait faire s'affiche d'un coup : de quoi verifier une palette, ou voir
- * la syntaxe sans ouvrir la documentation.
- *
- * Chaque ligne se lit en deux colonnes — ce qu'on ecrit a gauche, echappe
- * pour rester lisible, ce que ca donne a droite. L'echappement disparait
- * au rendu, la colonne se cale donc sur la largeur affichee et non sur
- * celle de la chaine.
- */
-/**
- * Les commandes fournies avec le shell, indexees par leur nom. Les deux
- * dernieres sont restreintes et cherchees par nom par le moteur : les
- * retirer casserait le rendu d'une commande inconnue.
+ * The commands shipped with the shell, indexed by their name. The last two
+ * are restricted and looked up by name by the engine: removing them would
+ * break the rendering of an unknown command.
  */
 export const baseCommands: BaseCommands = {
 	help: {
@@ -88,7 +78,7 @@ export const baseCommands: BaseCommands = {
 	clear: {
 		restricted: false,
 		action: () => "",
-		// l'historique est vide, mais la banniere est rejouee juste apres
+		// the history is empty, but the banner is played again right after
 		effect: () => shellActions().clear(),
 		help: {
 			patterns: [{ pattern: "clear", description: "clear.usage" }],
@@ -139,15 +129,15 @@ export const baseCommands: BaseCommands = {
 	},
 	theme: {
 		restricted: false,
-		// les themes sont ceux du catalogue : lus a la frappe, pas ici
+		// the themes are those of the catalogue: read as it is typed, not here
 		testArgs: { authorize: themeNames, empty: false },
 		action: ({ args }) => t("theme.set", { mode: args[0] }),
-		// l'effet joue apres l'action : le theme demande est pose ici
+		// the effect plays after the action: the requested theme is set here
 		effect: ({ args }) => shellActions().setThemeName(args[0]),
 		/**
-		 * Une fonction, comme pour `lang` : l'aide liste le catalogue tel
-		 * qu'il est au moment ou elle s'affiche. Chaque theme se decrit par
-		 * la clef `theme.<nom>`.
+		 * A function, as for `lang`: the help lists the catalogue as it is at
+		 * the moment it is shown. Each theme describes itself through the key
+		 * `theme.<name>`.
 		 */
 		help: () => ({
 			patterns: themeNames().map(name => ({
@@ -158,16 +148,16 @@ export const baseCommands: BaseCommands = {
 	},
 	lang: {
 		restricted: false,
-		// les langues sont celles du dictionnaire : lues a la frappe, pas ici
+		// the languages are those of the dictionary: read as it is typed, not here
 		testArgs: { authorize: langs, empty: false },
-		// l'effet joue apres l'action : la langue demandee est forcee ici
+		// the effect plays after the action: the requested language is forced here
 		action: ({ args }) => t("lang.set", { lang: args[0] }, args[0]),
 		effect: ({ args }) => shellActions().setLang(args[0]),
 		/**
-		 * Une fonction : l'aide liste les langues reellement montees, celles
-		 * du dictionnaire du consommateur. Chacune se decrit par la clef
-		 * `lang.<code>` — a lui de la fournir pour la sienne, sans quoi la
-		 * clef s'affiche telle quelle.
+		 * A function: the help lists the languages actually mounted, those of
+		 * the consumer's dictionary. Each one describes itself through the key
+		 * `lang.<code>` — up to them to provide it for theirs, or the key
+		 * shows up as it is.
 		 */
 		help: () => ({
 			patterns: langs().map(lang => ({
@@ -178,8 +168,8 @@ export const baseCommands: BaseCommands = {
 	},
 	welcome: {
 		restricted: true,
-		// une commande comme les autres : son texte est une clef du
-		// dictionnaire, que le consommateur recouvre par `dict`
+		// a command like the others: its text is a key of the dictionary,
+		// which the consumer covers through `dict`
 		action: () => t("welcome.text"),
 		help: { description: "common.restricted", patterns: [] },
 		display: {
@@ -209,10 +199,10 @@ export const baseCommands: BaseCommands = {
 		help: { description: "common.restricted", patterns: [] },
 	},
 	/**
-	 * L'aiguillage des marqueurs cliquables. `#libelle ~ cmd args#` envoie
-	 * `actionmap cmd args` : la commande n'affiche rien, son effet joue la
-	 * ligne visee. Sans elle un clic ne ferait rien — c'est ce qui rend le
-	 * marqueur utilisable sans rien ecrire.
+	 * The switchboard of the clickable markers. `#label ~ cmd args#` sends
+	 * `actionmap cmd args`: the command shows nothing, its effect plays the
+	 * line it aims at. Without it a click would do nothing — this is what
+	 * makes the marker usable without writing anything.
 	 */
 	actionmap: {
 		restricted: true,

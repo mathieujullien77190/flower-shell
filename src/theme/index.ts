@@ -34,9 +34,9 @@ export { nordTheme } from "./nord"
 export { solarizedTheme } from "./solarized"
 
 /**
- * Le catalogue du paquet, a la maniere d'un editeur. Il n'est pas monte
- * d'office : c'est la valeur par defaut de la prop `themes`, et le
- * consommateur le passe tel quel, en partie, ou pas du tout.
+ * The catalogue of the package, the way a publisher would have one. It is
+ * not mounted by default: it is what the `themes` prop takes, and the
+ * consumer passes it whole, in part, or not at all.
  */
 export const themes: Record<string, ShellTheme> = {
 	flower: flowerTheme,
@@ -49,17 +49,16 @@ export const themes: Record<string, ShellTheme> = {
 	solarized: solarizedTheme,
 }
 
-/** le nom du theme de depart, celui que `reset` retrouve */
+/** the name of the starting theme, the one `reset` finds back */
 export const DEFAULT_THEME_NAME = "flower"
 
 /**
- * Le theme de qui n'en donne aucun : rien n'est pose, tout est herite.
- * Le shell prend alors les couleurs et la police de la page qui le tient,
- * et le balisage cesse de colorer — un marqueur ne fait plus que decouper
- * le texte.
+ * The theme of whoever gives none: nothing is set, everything is inherited.
+ * The shell then takes the colors and the font of the page holding it, and
+ * the markup stops coloring — a marker only cuts the text up any more.
  *
- * `transparent` et non une couleur : un fond pose, meme blanc, recouvrirait
- * celui du consommateur. Ce qui n'est pas donne ne doit rien peindre.
+ * `transparent` and not a color: a background that is set, even white,
+ * would cover the consumer's. What is not given must paint nothing.
  */
 export const bareTheme: ShellTheme = {
 	colors: {
@@ -86,19 +85,19 @@ export const bareTheme: ShellTheme = {
 }
 
 /**
- * Le theme du paquet par defaut. `twilightTheme` et `parchmentTheme` restent
- * la pour qui veut un terminal neutre, invite `>` comprise.
+ * The default theme of the package. `twilightTheme` and `parchmentTheme`
+ * stay there for whoever wants a neutral terminal, `>` prompt included.
  */
 export const defaultTheme: ShellTheme = flowerTheme
 
 /**
- * Le theme vit au niveau du module, comme le registre des commandes : le
- * balisage est rendu par une fonction, pas par un composant, un
- * ThemeProvider ne l'atteindrait pas. Corollaire assume : un shell par page.
+ * The theme lives at module level, like the registry of the commands: the
+ * markup is rendered by a function, not by a component, and a ThemeProvider
+ * would not reach it. Corollary, knowingly: one shell per page.
  */
 let current: ShellTheme = defaultTheme
 
-/** un theme partiel pose sur un theme complet : ce qu'il tait est garde */
+/** a partial theme laid on a full one: what it leaves out is kept */
 const lay = (base: ShellTheme, input: ShellThemeInput): ShellTheme => ({
 	colors: { ...base.colors, ...input.colors },
 	prompt: input.prompt || base.prompt,
@@ -114,23 +113,23 @@ export const setTheme = (theme?: ShellThemeInput) => {
 }
 
 /**
- * Les themes que le visiteur peut prendre, indexes par le nom qu'il tape.
- * Ils vivent au niveau du module pour la meme raison que le theme courant :
- * la commande `theme` les lit hors de tout composant.
+ * The themes the visitor can take, indexed by the name they type. They live
+ * at module level for the same reason as the current theme: the `theme`
+ * command reads them outside of any component.
  *
- * Chacun est pose sur `defaultTheme` en arrivant, et non sur le theme
- * courant : un theme partiel donne toujours le meme resultat, quel que
- * soit celui qu'on quitte.
+ * Each one is laid on `defaultTheme` as it arrives, and not on the current
+ * theme: a partial theme always gives the same result, whichever one is
+ * being left.
  */
 let mounted: Record<string, ShellTheme> = {}
 
 /**
- * Les themes du shell sont exactement les clefs de ce qu'on donne ici —
- * rien de plus. `themes={{ flower: flowerTheme, mine }}` en monte deux,
- * `themes={themes}` monte le catalogue du paquet en entier.
+ * The themes of the shell are exactly the keys of what is given here —
+ * nothing more. `themes={{ flower: flowerTheme, mine }}` mounts two,
+ * `themes={themes}` mounts the whole catalogue of the package.
  *
- * Sans argument, aucun : le visiteur n'a alors rien a prendre, et c'est
- * assume. Ce qu'on ne donne pas n'existe pas.
+ * Without an argument, none: the visitor then has nothing to take, and that
+ * is on purpose. What is not given does not exist.
  */
 export const setThemes = (custom?: Record<string, ShellThemeInput>) => {
 	mounted = Object.keys(custom || {}).reduce(
@@ -140,42 +139,43 @@ export const setThemes = (custom?: Record<string, ShellThemeInput>) => {
 }
 
 /**
- * Ce que le shell porte au demarrage, dans cet ordre : le theme du
- * catalogue qui porte ce nom, sinon le premier du catalogue, sinon rien.
+ * What the shell wears at startup, in this order: the theme of the
+ * catalogue carrying that name, else the first of the catalogue, else
+ * nothing.
  *
- * Le nom, et non le theme lui-meme : `themes` dit ce qui existe, `theme`
- * lequel on porte — comme `dict` dit les langues et `lang` celle du
- * depart. Un nom qu'on ne trouve pas est ignore plutot que monte en
- * douce : partir sur un theme que le visiteur ne peut pas retrouver, ni
- * `theme <nom>` ni `help theme` ne sauraient l'expliquer.
+ * The name, and not the theme itself: `themes` says what exists, `theme`
+ * which one is worn — the way `dict` says the languages and `lang` the one
+ * to start on. A name that is not found is ignored rather than quietly
+ * mounted: starting on a theme the visitor cannot find again is something
+ * neither `theme <name>` nor `help theme` could explain.
  *
- * A appeler apres `setThemes`, dont il lit le resultat.
+ * To be called after `setThemes`, whose result it reads.
  */
 export const wearTheme = (name?: string) => {
 	current = (name && mounted[name]) || Object.values(mounted)[0] || bareTheme
 }
 
 /**
- * Les noms acceptes par la commande `theme` : ceux du catalogue monte. Une
- * fonction, et non une constante : le consommateur pose le sien bien apres
- * l'ecriture des commandes.
+ * The names the `theme` command accepts: those of the mounted catalogue. A
+ * function, and not a constant: the consumer sets theirs long after the
+ * commands have been written.
  */
 export const themeNames = (): string[] => Object.keys(mounted)
 
-/** le theme monte sous ce nom, s'il existe */
+/** the theme mounted under that name, if it exists */
 export const themeByName = (name: string): ShellTheme | undefined =>
 	mounted[name]
 
 export const theme = () => current
 
-/** raccourci de lecture, le plus frequent dans les styles */
+/** reading shortcut, the most frequent one in the styles */
 export const colors = (): ShellColors => current.colors
 
 export const windowColors = (): WindowColors => current.window
 
 export const fonts = (): ShellFonts => current.fonts
 
-/** le style pose sur le conteneur general du terminal */
+/** the style laid on the general container of the terminal */
 export const container = (): CSSProperties => current.container
 
 export type { CSSProperties }

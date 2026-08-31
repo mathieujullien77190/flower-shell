@@ -19,8 +19,8 @@ export default tseslint.config(
 		plugins: { "react-hooks": reactHooks },
 		rules: {
 			...reactHooks.configs.recommended.rules,
-			// le paquet ne parle pas dans la console du consommateur ; les
-			// stories, elles, s'en servent pour montrer les evenements
+			// the package does not talk in the consumer's console; the stories,
+			// on the other hand, use it to show the events
 			"no-console": "warn",
 			"@typescript-eslint/no-unused-vars": [
 				"warn",

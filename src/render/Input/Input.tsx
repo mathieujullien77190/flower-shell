@@ -30,23 +30,23 @@ export const Input = ({
 	const [prevValue, setPrevValue] = useState<string>(value)
 	const ref = useRef<HTMLInputElement>(null)
 
-	// un bouton de souris enfonce, c'est peut-etre une selection en cours
+	// a mouse button held down may well be a selection under way
 	const pressed = useRef<boolean>(false)
 
 	/**
-	 * L'option se lit au moment ou le focus se joue, et non quand elle
-	 * change : c'est une garde, pas un declencheur. Lue par une ref, la
-	 * poser a `true` en cours de session ne reprend pas le focus toute
-	 * seule — sur mobile, cela ouvrirait le clavier sans qu'on ait rien
-	 * touche — et les ecouteurs de souris se montent une fois pour toutes.
+	 * The option is read at the moment the focus is played, and not when it
+	 * changes: it is a guard, not a trigger. Read through a ref, turning it
+	 * `true` mid-session does not take the focus back on its own — on a
+	 * phone that would open the keyboard without anything being touched —
+	 * and the mouse listeners mount once and for all.
 	 */
 	const keyboardOnFocus = useRef<boolean>(options.keyboardOnFocus)
 	useEffect(() => {
 		keyboardOnFocus.current = options.keyboardOnFocus
 	}, [options.keyboardOnFocus])
 
-	// la saisie est locale, mais l'historique impose sa valeur : on se realigne
-	// pendant le rendu quand le parent en pousse une nouvelle
+	// the input is local, but the history imposes its value: it realigns
+	// during the render when the parent pushes a new one
 	if (prevValue !== value) {
 		setPrevValue(value)
 		setInputValue(value)
@@ -104,9 +104,9 @@ export const Input = ({
 	}, [options.keyboardOnFocus])
 
 	/**
-	 * Le focus revient au relachement du bouton, et seulement si rien n'est
-	 * selectionne : le reprendre des le blur, donc des l'appui, annulait
-	 * toute selection de texte a la souris.
+	 * The focus comes back when the button is released, and only if nothing
+	 * is selected: taking it back on the blur, so on the press, cancelled
+	 * any selection of text with the mouse.
 	 */
 	useEffect(() => {
 		const handleDown = () => {
@@ -152,7 +152,7 @@ export const Input = ({
 				autoCapitalize="off"
 				autoCorrect="off"
 				onBlur={() => {
-					// pendant un clic maintenu, le focus attend le relachement
+					// during a held click, the focus waits for the release
 					if (options.keyboardOnFocus && !pressed.current) {
 						ref?.current?.focus()
 					}

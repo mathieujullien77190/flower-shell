@@ -1,8 +1,8 @@
 import { defineConfig } from "vite"
 import { alias } from "./alias.ts"
 
-// Charge automatiquement par Storybook (react-vite) : uniquement les alias,
-// aucun reglage de build ici (sinon `build.lib` casserait Storybook).
+// Loaded automatically by Storybook (react-vite): the aliases only, no build
+// setting here (or `build.lib` would break Storybook).
 export default defineConfig({
 	resolve: { alias },
 })

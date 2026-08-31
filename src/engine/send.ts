@@ -2,28 +2,28 @@ import { getCommands } from "@state/registry"
 import { shellActions } from "@state/store"
 import { createCommand, findCommand } from "./terminalEngine"
 
-/** ce que recoit un temoin : la ligne envoyee, entiere et decoupee */
+/** what a listener receives: the line that was sent, whole and split */
 export type CommandEvent = {
-	/** le nom : le premier mot de la ligne */
+	/** the name: the first word of the line */
 	name: string
-	/** les arguments : le reste de la ligne, mot a mot */
+	/** the arguments: the rest of the line, word by word */
 	args: string[]
-	/** la ligne entiere, telle qu'elle a ete envoyee */
+	/** the whole line, as it was sent */
 	pattern: string
 }
 
-/** pourquoi la commande n'a pas joue */
+/** why the command did not play */
 export type CommandErrorReason =
-	/** aucune commande de ce nom dans le registre */
+	/** no command by that name in the registry */
 	| "unknown"
-	/** la commande existe, ses arguments ne passent pas */
+	/** the command exists, its arguments do not pass */
 	| "args"
-	/** son action ou son effet a leve */
+	/** its action or its effect threw */
 	| "thrown"
 
 export type CommandErrorEvent = CommandEvent & {
 	reason: CommandErrorReason
-	/** ce qui a ete leve, pour la seule raison `thrown` */
+	/** what was thrown, for the `thrown` reason alone */
 	error?: unknown
 }
 
@@ -33,9 +33,9 @@ export type CommandErrorListener = (event: CommandErrorEvent) => void
 const NO_LISTENER = () => {}
 
 /**
- * Les temoins que ce module peut prevenir, poses par le consommateur. Celui
- * de la fin d'ecriture appartient au rendu et vit dans le shell : ici, rien
- * ne sait ce qui est a l'ecran.
+ * The listeners this module can warn, set by the consumer. The one for the
+ * end of the writing belongs to the rendering and lives in the shell: here,
+ * nothing knows what is on screen.
  */
 let onStart: CommandListener = NO_LISTENER
 let onDone: CommandListener = NO_LISTENER
@@ -52,18 +52,18 @@ export const setListeners = (listeners: {
 }
 
 /**
- * Joue une commande : son effet de bord d'abord, puis son ajout a
- * l'historique. Le store est un module, il n'y a pas de dispatch a
- * promener, et la fonction s'appelle donc de n'importe ou.
+ * Plays a command: its side effect first, then its addition to the history.
+ * The store is a module, there is no dispatch to carry around, and so the
+ * function can be called from anywhere.
  */
 const send = (commandPattern: string, restricted: boolean) => {
 	const commands = getCommands()
 
 	/**
-	 * Le depart se signale avant `createCommand`, qui joue deja l'action :
-	 * apres, il serait trop tard pour etre un « avant ». Le nom et les
-	 * arguments viennent donc de la ligne elle-meme, et non de la commande
-	 * — a ce moment le shell ne sait pas encore s'il en connait une.
+	 * The start is reported before `createCommand`, which already plays the
+	 * action: after it, it would be too late to be a "before". So the name
+	 * and the arguments come from the line itself, and not from the command
+	 * — at that point the shell does not yet know whether it has one.
 	 */
 	const split = commandPattern.split(" ")
 	const event: CommandEvent = {
@@ -78,8 +78,8 @@ const send = (commandPattern: string, restricted: boolean) => {
 	try {
 		cmd = createCommand({ commands, commandPattern, restricted })
 	} catch (error) {
-		// l'action a leve : la commande n'existe meme pas assez pour etre
-		// ajoutee a l'historique, il n'y a que l'erreur a rendre
+		// the action threw: the command does not even exist enough to be
+		// added to the history, there is only the error left to render
 		onError({ ...event, reason: "thrown", error })
 		return
 	}
@@ -90,8 +90,8 @@ const send = (commandPattern: string, restricted: boolean) => {
 		try {
 			baseCmd.effect({ args: cmd.args })
 		} catch (error) {
-			// l'effet a leve apres que l'action a rendu son texte : la ligne
-			// s'affiche quand meme, le consommateur apprend que le reste a rate
+			// the effect threw after the action had returned its text: the line
+			// shows up all the same, the consumer learns the rest failed
 			onError({ ...event, reason: "thrown", error })
 		}
 	}
@@ -99,26 +99,26 @@ const send = (commandPattern: string, restricted: boolean) => {
 	shellActions().addCommand(cmd)
 
 	if (cmd.canExecute) {
-		// l'action a rendu son texte et l'effet a joue : la commande est faite,
-		// meme si rien n'est encore a l'ecran
+		// the action returned its text and the effect played: the command is
+		// over, even if nothing is on screen yet
 		onDone(event)
 		return
 	}
 
 	/**
-	 * Un shell sans aucune commande laisse passer ce qu'on lui tape — c'est
-	 * un choix du consommateur, pas une faute du visiteur, et rien n'est
-	 * donc a signaler. Ailleurs, la ligne n'a pas joue : soit le nom est
-	 * inconnu, soit il existe et ses arguments ne passent pas.
+	 * A shell with no command at all lets through whatever is typed — that
+	 * is a choice of the consumer, not a mistake of the visitor, and so
+	 * there is nothing to report. Elsewhere, the line did not play: either
+	 * the name is unknown, or it exists and its arguments do not pass.
 	 */
 	if (Object.keys(commands).length === 0) return
 
 	onError({ ...event, reason: baseCmd ? "args" : "unknown" })
 }
 
-/** joue une commande du visiteur */
+/** plays a command of the visitor */
 export const run = (commandPattern: string) => send(commandPattern, false)
 
-/** joue une commande interne, que le visiteur ne peut pas taper */
+/** plays an internal command, one the visitor cannot type */
 export const runRestricted = (commandPattern: string) =>
 	send(commandPattern, true)

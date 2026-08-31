@@ -3,23 +3,24 @@ import { CSSProperties } from "react"
 import type { ShellColors, ShellFonts, ShellTheme } from "./types"
 
 /**
- * Le terminal respire : sans cette marge, la sortie et la saisie collent
- * aux bords de ce qui contient le shell.
+ * The terminal breathes: without this padding, the output and the input
+ * stick to the edges of whatever holds the shell.
  */
 export const baseContainer: CSSProperties = {
 	padding: "16px",
 }
 
-/** memes polices pour tous les themes : un terminal veut du chasse fixe */
+/** same fonts for every theme: a terminal wants a monospace */
 export const baseFonts: ShellFonts = {
 	shell: "monospace",
 	window: "monospace",
 }
 
 /**
- * Un theme se resume a sa palette. Le reste ne varie pas — memes polices,
- * meme marge — et le cadre de fenetre tient en deux couleurs. Ecrire les
- * huit themes au complet aurait recopie la meme trentaine de lignes.
+ * A theme comes down to its palette. The rest does not vary — same fonts,
+ * same padding — and the frame of the window holds in two colors. Writing
+ * the eight themes in full would have copied the same thirty odd lines
+ * over.
  */
 export const makeTheme = ({
 	colors,
@@ -30,18 +31,19 @@ export const makeTheme = ({
 	button = "lightGray",
 	buttonHover = "gray",
 }: {
-	/** `invisible` en moins : il vaut toujours le fond */
+	/** `invisible` left out: it always equals the background */
 	colors: Omit<ShellColors, "invisible">
 	prompt?: string
-	/** la barre de titre du cadre : l'accent du theme */
+	/** the title bar of the frame: the accent of the theme */
 	titleBar: string
-	/** le fond derriere le contenu du cadre, visible autour de lui */
+	/** the background behind the content of the frame, visible around it */
 	content: string
 	border?: string
 	button?: string
 	buttonHover?: string
 }): ShellTheme => ({
-	// un texte pose sur `invisible` se fond dans le fond, revele a la selection
+	// a text laid on `invisible` blends into the background, revealed by
+	// selecting it
 	colors: { ...colors, invisible: colors.background },
 	prompt,
 	fonts: baseFonts,

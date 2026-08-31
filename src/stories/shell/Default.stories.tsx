@@ -9,8 +9,8 @@ const meta: Meta<typeof Shell> = {
 	title: "Shell/Default",
 	component: Shell,
 	decorators: [boxed],
-	// la seule page qui porte la table des props : elle est la meme partout,
-	// et c'est ici qu'on entre
+	// the only page carrying the table of the props: it is the same
+	// everywhere, and this is where one comes in
 	parameters: prose(
 		{
 			en: `

@@ -2,19 +2,19 @@ import { addons } from "storybook/manager-api"
 import { themes } from "storybook/theming"
 
 /**
- * Le theme du manager — la barre laterale, la barre d'outils, le cadre.
+ * The theme of the manager — the sidebar, the toolbar, the frame.
  *
- * Il ne se pose que d'ici : `preview.tsx` ne peut pas l'atteindre, les deux
- * vivent dans des documents differents. Ce qu'ils partagent, ce sont les
- * globals, et le canal les annonce.
+ * It can only be set from here: `preview.tsx` cannot reach it, the two live
+ * in different documents. What they share are the globals, and the channel
+ * announces them.
  *
- * Sans React, volontairement : un `import ... from "react"` dans une entree
- * manager fait echouer son bundle esbuild, sans un mot, et le fichier
- * entier cesse d'etre pris en compte. Le canal se suffit a lui-meme.
+ * Without React, deliberately: an `import ... from "react"` in a manager
+ * entry makes its esbuild bundle fail, without a word, and the whole file
+ * stops being taken into account. The channel is enough on its own.
  */
 const pick = (name: unknown) => (name === "dark" ? themes.dark : themes.light)
 
-// clair des le chargement, quelle que soit la preference du systeme
+// light from the moment it loads, whatever the preference of the system
 addons.setConfig({ theme: pick("light") })
 
 addons.register("flower-shell/theme", () => {

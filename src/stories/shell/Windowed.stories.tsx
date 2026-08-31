@@ -146,7 +146,7 @@ export const Fixed: StoryObj<typeof Shell> = {
 	},
 }
 
-// le bouton et la croix ecrivent le meme etat
+// the button and the cross write the same state
 const Externalised = () => {
 	const [open, setOpen] = useState(false)
 

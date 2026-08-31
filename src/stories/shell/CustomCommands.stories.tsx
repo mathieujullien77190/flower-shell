@@ -9,7 +9,7 @@ import { boxed } from "../decorators"
 import { prose } from "../i18n"
 import { source } from "../source"
 
-/** la commande de la story : ses textes sont ecrits la ou ils servent */
+/** the command of the story: its texts are written where they are used */
 const ping: BaseCommand = {
 	restricted: false,
 	action: ({ args }) =>

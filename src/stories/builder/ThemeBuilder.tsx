@@ -38,13 +38,13 @@ const Preview = ({ draft }: { draft: ShellTheme }) => {
 		<Shell
 			commands={{ ...baseCommands, test }}
 			theme="draft"
-			// le brouillon est le seul theme atteignable : l'apercu montre ce
-			// qu'on est en train d'ecrire, pas le catalogue du paquet
+			// the draft is the only reachable theme: the preview shows what is
+			// being written, not the catalogue of the package
 			themes={{ draft }}
 			initialCommands={["test"]}
-			// pleine : l'apercu sert a lire une palette, chaque pixel rendu au
-			// terminal en est un de moins a faire defiler. La marge tient au
-			// cadre autour, pas a la fenetre
+			// full: the preview is there to read a palette, and every pixel
+			// given to the terminal is one less to scroll. The margin belongs
+			// to the frame around it, not to the window
 			window={{ title: "flower-shell", canClose: false, compact: true }}
 		/>
 	)
@@ -154,9 +154,9 @@ const Group = ({
 )
 
 /**
- * Le theme, ecrit comme on le collerait chez soi : dans `themes`, sous un
- * nom, et `theme` pour partir dessus. Le nom est ce que le visiteur tapera
- * derriere `theme`, et ce que decrit la clef de dictionnaire `theme.<nom>`.
+ * The theme, written the way it would be pasted at home: in `themes`, under
+ * a name, and `theme` to start on it. The name is what the visitor will type
+ * behind `theme`, and what the dictionary key `theme.<name>` describes.
  */
 const asCode = (draft: ShellTheme) =>
 	[
@@ -184,9 +184,9 @@ const asCode = (draft: ShellTheme) =>
 	].join("\n")
 
 /**
- * Le nom que prend le brouillon des qu'on y touche : il ne sort plus du
- * catalogue, et le laisser affiche sous le nom d'un theme du paquet
- * ferait dire au selecteur quelque chose de faux.
+ * The name the draft takes as soon as it is touched: it no longer comes out
+ * of the catalogue, and leaving it shown under the name of a theme of the
+ * package would make the picker say something false.
  */
 const CUSTOM = "custom"
 
@@ -195,14 +195,14 @@ export const ThemeBuilder = () => {
 	const [draft, setDraft] = useState<ShellTheme>(themes.flower)
 
 	const pickBase = (name: string) => {
-		// `custom`, c'est deja le brouillon en cours : il n'y a rien a charger
+		// `custom` is already the draft under way: there is nothing to load
 		if (name === CUSTOM) return
 
 		setBase(name)
 		setDraft(themes[name])
 	}
 
-	/** toute retouche detache le brouillon du theme dont il est parti */
+	/** any edit detaches the draft from the theme it started from */
 	const edit = (change: (current: ShellTheme) => ShellTheme) => {
 		setBase(CUSTOM)
 		setDraft(change)
@@ -211,7 +211,7 @@ export const ThemeBuilder = () => {
 	const setColor = (key: keyof ShellColors, value: string) =>
 		edit(current => ({
 			...current,
-			// le fond et l'invisible ne font qu'un : l'un suit l'autre
+			// the background and the invisible are one: one follows the other
 			colors: {
 				...current.colors,
 				[key]: value,
@@ -226,10 +226,10 @@ export const ThemeBuilder = () => {
 		}))
 
 	/**
-	 * La signature du brouillon, donnee en `key` a l'apercu : elle change des
-	 * qu'une couleur bouge, et React remonte alors le shell. Un shell deja
-	 * monte ne rejouerait pas son ouverture, et le theme vit au niveau du
-	 * module — le remontage est ce qui fait suivre l'apercu.
+	 * The signature of the draft, handed as `key` to the preview: it changes
+	 * as soon as a color moves, and React then mounts the shell again. A
+	 * shell already mounted would not play its opening over, and the theme
+	 * lives at module level — remounting is what makes the preview follow.
 	 */
 	const signature = JSON.stringify(draft)
 
@@ -259,8 +259,8 @@ export const ThemeBuilder = () => {
 								{name}
 							</option>
 						))}
-						{/* il n'apparait qu'une fois le brouillon retouche : avant, il
-						    n'y a rien qu'il designerait */}
+						{/* it only shows up once the draft has been edited: before
+						    that, there is nothing for it to point at */}
 						{base === CUSTOM && <option value={CUSTOM}>{CUSTOM}</option>}
 					</select>
 				</Group>
@@ -306,11 +306,11 @@ export const ThemeBuilder = () => {
 
 			<div style={{ display: "grid", gap: 20 }}>
 				<Group title="preview">
-					{/* La fenetre prend tout ce cadre : il lui faut une hauteur, le
-					    paquet n'en impose aucune. Assez haute pour que `test` tienne
-					    d'un bloc — le shell descend sur sa derniere ligne, et c'est
-					    la liste des couleurs qui passerait au-dessus. La marge, elle,
-					    se pose ici : quelques pixels pour detacher le cadre. */}
+					{/* The window takes this whole frame: it needs a height, and the
+					    package imposes none. Tall enough for `test` to hold in one
+					    block — the shell scrolls down to its last line, and it is the
+					    list of the colors that would go past the top. The margin is
+					    set here: a few pixels to set the frame apart. */}
 					<div
 						style={{
 							height: 700,

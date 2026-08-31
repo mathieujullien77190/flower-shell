@@ -2,15 +2,15 @@ import { Dict, Dictionaries } from "@types"
 import { useShellStore } from "@state/store"
 import { dictEn } from "./en"
 
-/** langue de repli, quand la clef manque a la langue courante */
+/** fallback language, when the key is missing from the current one */
 export const BASE_LANG = "en"
 
 /**
- * Langue de depart, deduite du navigateur : celle que le visiteur a mise en
- * tete, si le shell la parle — c'est-a-dire si elle est dans le
- * dictionnaire monte. Sinon, la langue de repli.
+ * Starting language, read off the browser: the one the visitor put first, if
+ * the shell speaks it — that is, if it is in the mounted dictionary.
+ * Otherwise, the fallback language.
  *
- * A appeler depuis un effet : navigator n'existe pas au prerendu.
+ * To be called from an effect: navigator does not exist at prerender.
  */
 export const browserLang = (): string => {
 	if (typeof navigator === "undefined") return BASE_LANG
@@ -39,20 +39,20 @@ const merge = (base: Dict, custom: Dict): Dict => {
 	return result
 }
 
-/** l'anglais seul : le shell ne parle qu'une langue tant qu'on ne lui en donne pas */
+/** English alone: the shell speaks one language until it is given more */
 const DEFAULT_DICT: Dictionaries = { [BASE_LANG]: dictEn }
 
 let dict: Dictionaries = DEFAULT_DICT
 
 /**
- * Les langues du shell sont les clefs de ce qu'on donne ici — rien de plus.
- * `dict={{ en: dictEn, fr: dictFr }}` monte l'anglais et le francais ;
- * sans prop, l'anglais seul.
+ * The languages of the shell are the keys of what is given here — nothing
+ * more. `dict={{ en: dictEn, fr: dictFr }}` mounts English and French;
+ * without the prop, English alone.
  *
- * Chaque langue est posee sur l'anglais du paquet : une clef que le
- * dictionnaire donne ne couvre pas sort en anglais plutot qu'en clef nue,
- * et `{ en: { welcome: { text } } }` recouvre un seul texte sans perdre les
- * autres.
+ * Each language is laid on the English of the package: a key the given
+ * dictionary does not cover comes out in English rather than as a bare key,
+ * and `{ en: { welcome: { text } } }` covers a single text without losing
+ * the others.
  */
 export const setDict = (custom?: Dictionaries) => {
 	if (!custom) {
@@ -67,13 +67,13 @@ export const setDict = (custom?: Dictionaries) => {
 }
 
 /**
- * Les langues acceptees par la commande `lang` : celles du dictionnaire
- * monte. Une fonction, et non une constante : le consommateur pose son
- * dictionnaire bien apres l'ecriture des commandes.
+ * The languages the `lang` command accepts: those of the mounted
+ * dictionary. A function, and not a constant: the consumer sets their
+ * dictionary long after the commands have been written.
  */
 export const langs = (): string[] => Object.keys(dict)
 
-/** descend un chemin pointe dans un dictionnaire */
+/** walks a dotted path down a dictionary */
 const read = (source: Dict, key: string): string | null => {
 	const value = key
 		.split(".")
@@ -86,14 +86,14 @@ const read = (source: Dict, key: string): string | null => {
 }
 
 /**
- * Le texte d'une clef, dans la langue courante.
+ * The text of a key, in the current language.
  *
- * Une clef absente s'affiche telle quelle — c'est ce qui permet de passer
- * un texte brut partout ou une clef est attendue.
+ * A key that is missing shows up as it is — that is what allows a raw text
+ * to be passed anywhere a key is expected.
  *
- * Le dernier parametre force la langue. Il ne sert qu'a la commande `lang`,
- * qui annonce le changement : son effet ne joue qu'apres son action, et le
- * message sortirait dans la langue qu'on vient de quitter.
+ * The last parameter forces the language. It only serves the `lang` command,
+ * which announces the change: its effect plays after its action, and the
+ * message would come out in the language just left behind.
  */
 export const t = (
 	key: string,

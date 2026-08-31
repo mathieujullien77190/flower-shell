@@ -30,17 +30,17 @@ const BaseWindow = (
 ) => {
 	const [userMode, setUserMode] = useState<Mode>("medium")
 
-	// en mode compact la fenetre reste pleine et non redimensionnable
+	// in compact mode the window stays full and not resizable
 	const mode: Mode = compact ? "full" : userMode
 
-	// pleine, elle n'a plus rien a agrandir : `compact` l'emporte sur le choix
+	// full, it has nothing left to expand: `compact` wins over the choice
 	const expandable = canExpand && !compact
 
 	/**
-	 * Deplacement applique a la souris, en pixels, par-dessus une position
-	 * de base en pourcentage. Mesurer le bureau pour poser la fenetre
-	 * demandait un effet et un setState au montage ; le pourcentage donne
-	 * le meme placement, suit le redimensionnement, et se passe des deux.
+	 * Move applied by the mouse, in pixels, on top of a base position in
+	 * percentage. Measuring the desktop to place the window took an effect
+	 * and a setState on mount; the percentage gives the same placement,
+	 * follows the resizing, and does without both.
 	 */
 	const [drag, setDrag] = useState<Pos>(NO_DRAG)
 	const [followMouse, setFollowMouse] = useState<boolean>(false)
@@ -48,16 +48,16 @@ const BaseWindow = (
 	const boxRef = useRef<HTMLDivElement>(null)
 
 	const handleResize = () => {
-		// changer de taille remet la fenetre a sa place : le deplacement
-		// d'avant n'a plus de sens dans le nouveau gabarit
+		// changing size puts the window back in its place: the earlier move
+		// means nothing any more at the new size
 		setDrag(NO_DRAG)
 		setUserMode(prev => (prev === "full" ? "medium" : "full"))
 	}
 
 	/**
-	 * La croix previent, et rien de plus : c'est `show` qui fait disparaitre
-	 * la fenetre, et il vient de l'exterieur. Elle se remet droite au
-	 * passage — deplacee, agrandie, elle rouvrirait telle qu'on l'a laissee.
+	 * The cross warns, and nothing more: it is `show` that makes the window
+	 * disappear, and it comes from outside. It straightens itself on the way
+	 * — moved, expanded, it would reopen just as it was left.
 	 */
 	const handleClose = () => {
 		setDrag(NO_DRAG)
@@ -76,10 +76,10 @@ const BaseWindow = (
 		}
 
 		/**
-		 * Le relachement tombe rarement sur la barre de titre, souvent
-		 * hors de la page : sans ecoute au niveau du document, la fenetre
-		 * resterait collee au curseur. Le blur couvre la souris relachee
-		 * en dehors de l'onglet, qui n'emet aucun mouseup.
+		 * The release rarely lands on the title bar, often outside the page:
+		 * without a listener at document level, the window would stay stuck
+		 * to the cursor. The blur covers the mouse released outside of the
+		 * tab, which emits no mouseup.
 		 */
 		const handlerMouseup = () => {
 			setFollowMouse(false)

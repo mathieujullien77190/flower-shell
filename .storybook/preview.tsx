@@ -34,8 +34,9 @@ const preview: Preview = {
 			// toolbar. A comment above the meta could not do that — those are
 			// extracted at build time.
 			page: DocsPage,
-			// le conteneur porte le theme : le manager a le sien, la page docs
-			// vit dans l autre document et lit le meme global de son cote
+			// the container carries the theme: the manager has its own, the docs
+			// page lives in the other document and reads the same global on its
+			// side
 			container: Container,
 			// the code as written in the file, not the JSX rebuilt from args
 			source: { type: "code" },
@@ -64,13 +65,13 @@ const preview: Preview = {
 			},
 		},
 		/**
-		 * Le theme de Storybook lui-meme — pas celui du shell, qui a ses
-		 * propres props. Clair par defaut : la documentation se lit, et les
-		 * terminaux qu'elle montre sont sombres, ce qui les detache.
+		 * The theme of Storybook itself — not the one of the shell, which has
+		 * its own props. Light by default: the documentation is there to be
+		 * read, and the terminals it shows are dark, which sets them apart.
 		 *
-		 * Le manager ne se theme pas depuis ici : `manager.ts` regarde ce
-		 * global et repose sa config. La page docs, elle, le lit dans son
-		 * conteneur.
+		 * The manager is not themed from here: `manager.ts` watches this
+		 * global and sets its config again. The docs page reads it in its
+		 * container.
 		 */
 		theme: {
 			description: "Storybook theme",

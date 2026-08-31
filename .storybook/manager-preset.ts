@@ -2,16 +2,16 @@ import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 /**
- * Declare `manager.ts` a la main.
+ * Declares `manager.ts` by hand.
  *
- * Storybook le cherche tout seul — `resolveModulePath("./manager", { from:
- * configDir })` — mais sur Windows il lui passe un chemin a antislashs, que
- * le resolveur prend pour des sequences d'echappement : `\p`, `\f` et le
- * reste disparaissent, la resolution echoue, et le `catch {}` qui l'entoure
- * n'en dit rien. Le fichier est donc ignore sans un mot.
+ * Storybook looks for it on its own — `resolveModulePath("./manager", {
+ * from: configDir })` — but on Windows it hands it a path with backslashes,
+ * which the resolver takes for escape sequences: `\p`, `\f` and the rest
+ * disappear, the resolution fails, and the `catch {}` around it says
+ * nothing about it. So the file is ignored without a word.
  *
- * Le chemin part d'ici en slashs, seule forme que le resolveur traverse
- * sans l'abimer.
+ * The path leaves here in slashes, the only form the resolver goes through
+ * without damaging it.
  */
 const here = dirname(fileURLToPath(import.meta.url)).replace(/\\/g, "/")
 const entry = join(here, "manager.ts").replace(/\\/g, "/")

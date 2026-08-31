@@ -1,6 +1,6 @@
 /**
- * Du texte est selectionne dans la page. Le shell reprend le focus a la
- * moindre occasion, ce qui effacerait la selection du visiteur.
+ * Some text is selected in the page. The shell takes the focus back at the
+ * slightest chance, which would wipe out the visitor's selection.
  */
 export const hasSelection = (): boolean =>
 	typeof window !== "undefined" &&

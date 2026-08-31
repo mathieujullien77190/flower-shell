@@ -16,35 +16,35 @@ type ContainerProps = {
 	$drag: Pos
 	$followMouse: boolean
 	$layer: number
-	/** le coin du bureau ou la fenetre s'ouvre */
+	/** the corner of the desktop the window opens on */
 	$start: WindowStart
-	/** la distance au bord, en CSS */
+	/** the distance to the edge, in CSS */
 	$margin: string
 	/**
-	 * Hauteur reservee en bas du conteneur, en CSS. Le bureau y met sa
-	 * barre des taches ; sans elle, la fenetre passerait dessous.
+	 * Height kept free at the bottom of the container, in CSS. The desktop
+	 * puts its taskbar there; without it, the window would go under.
 	 */
 	$bottomInset: string
 }
 
 /**
- * Place de la fenetre, en pourcentage : aucune mesure du bureau n'est
- * necessaire, et elle suit son redimensionnement. La cascade et le
- * deplacement a la souris s'ajoutent en pixels.
+ * Place of the window, as a percentage: no measurement of the desktop is
+ * needed, and it follows its resizing. The cascade and the dragging add up
+ * in pixels.
  *
- * Elle sort en style inline, pas dans le CSS : styled-components fabrique
- * une classe par valeur interpolee, et un glisser en produirait une par
- * pixel parcouru — la console finissait par le signaler.
+ * It comes out as an inline style, not in the CSS: styled-components makes
+ * one class per interpolated value, and a drag would produce one per pixel
+ * travelled — the console ended up saying so.
  *
- * Le deplacement passe par top/left et non par un transform : un ancetre
- * transforme devient le referentiel des position: fixed qu'il contient,
- * ce qui decalait le canvas plein ecran de stux.
+ * The move goes through top/left and not through a transform: a transformed
+ * ancestor becomes the frame of reference of the position: fixed it
+ * contains, which shifted the full screen canvas of stux.
  */
 /**
- * La part du bureau laissee devant la fenetre, en pourcentage, pour chacun
- * des mots de `start`. Le gabarit moyen occupe `MEDIUM_SIZE` : centre, il
- * laisse la moitie du reste de chaque cote — c'est `MEDIUM_MARGIN`, et
- * c'est la place que la fenetre a toujours eue.
+ * The share of the desktop left in front of the window, as a percentage,
+ * for each of the words of `start`. The medium size takes `MEDIUM_SIZE`:
+ * centered, it leaves half of the rest on each side — that is
+ * `MEDIUM_MARGIN`, and that is the place the window has always had.
  */
 const ANCHOR = {
 	left: 0,
@@ -55,9 +55,9 @@ const ANCHOR = {
 } as const
 
 /**
- * La distance au bord, appliquee du cote ou la fenetre est posee : elle
- * l'ecarte du bord dont `start` la rapproche. Un axe centre n'a pas de bord
- * a fuir, elle n'y veut rien dire.
+ * The distance to the edge, applied on the side the window is set on: it
+ * moves it away from the edge `start` brings it to. A centered axis has no
+ * edge to flee, so it means nothing there.
  */
 const offset = (word: keyof typeof ANCHOR, $margin: string) => {
 	if (word === "center") return ""
@@ -103,8 +103,8 @@ export const Container = styled.div.attrs<ContainerProps>(props => ({
 	font-weight: ${FULL.fontWeight};
 	z-index: ${({ $layer }) => $layer || TOP_LAYER};
 
-	/* pendant le glisser, la transition lacherait le curseur : seules la
-	   largeur et la hauteur restent animees */
+	/* during the drag, the transition would let go of the cursor: only the
+	   width and the height stay animated */
 	transition: ${({ $followMouse }) =>
 		$followMouse
 			? `width ${ANIM_TIME / 1000}s ease-out, height ${
@@ -130,16 +130,16 @@ export const topBar = styled.div<{ $move: boolean }>`
 	display: flex;
 	align-items: center;
 	padding: ${FULL.padding};
-	/* le curseur annonce ce que la barre fait : rien, quand elle ne bouge pas */
+	/* the cursor says what the bar does: nothing, when it does not move */
 	cursor: ${({ $move }) => ($move ? "move" : "default")};
 
-	/* La barre est ce qu'on attrape pour deplacer la fenetre : sans cela le
-	   glisser selectionne le titre, qui reste surligne une fois la souris
-	   relachee. Les boutons en heritent, et il n'y a rien a copier non plus
-	   dans une croix.
+	/* The bar is what one grabs to move the window: without this the drag
+	   selects the title, which stays highlighted once the mouse is
+	   released. The buttons inherit it, and there is nothing to copy in a
+	   cross either.
 
-	   Seule la barre est visee : la sortie du terminal, elle, se selectionne
-	   — c'est meme ce qui revele le marqueur invisible. */
+	   The bar alone is aimed at: the output of the terminal does get
+	   selected — that is even what reveals the invisible marker. */
 	user-select: none;
 `
 
@@ -187,9 +187,9 @@ export const Actions = styled.div`
 `
 
 /**
- * Le contenu, a plein. Il attendait autrefois que la fenetre soit arrivee a
- * sa taille pour se montrer, en fondu : la fenetre arrive maintenant a sa
- * taille du premier coup, et il n'y a plus rien a attendre.
+ * The content, at full size. It used to wait for the window to have reached
+ * its size before showing itself, fading in: the window now reaches its
+ * size in one go, and there is nothing left to wait for.
  */
 export const Wrapper = styled.div`
 	width: 100%;

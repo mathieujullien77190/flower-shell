@@ -1,15 +1,15 @@
 import { CSSProperties } from "react"
 
-/** un dictionnaire de textes, imbrique : `t("help.desc")` en lit le chemin */
+/** a nested dictionary of texts: `t("help.desc")` reads the path in it */
 export type Dict = { [key: string]: string | Dict }
 
-/** les dictionnaires du shell, un par langue */
+/** the dictionaries of the shell, one per language */
 export type Dictionaries = Record<string, Dict>
 
 /**
- * Un texte statique : une clef du dictionnaire, ou le texte lui-meme. Le
- * shell le passe par `t()` au moment de s'en servir, et une clef inconnue
- * s'affiche telle quelle — d'ou les deux usages sous un seul type.
+ * A static text: a key of the dictionary, or the text itself. The shell puts
+ * it through `t()` when it comes to use it, and an unknown key shows up as
+ * it is — hence the two uses under a single type.
  */
 export type Text = string
 
@@ -19,9 +19,9 @@ export type Help = {
 }
 
 /**
- * L'aide d'une commande, ou de quoi la produire. La fonction est lue a
- * l'affichage : c'est ce qui permet a `lang` d'annoncer les langues
- * reellement montees, que le consommateur pose bien apres.
+ * The help of a command, or what it takes to produce it. The function is
+ * read at display time: that is what lets `lang` announce the languages
+ * actually mounted, which the consumer sets long afterwards.
  */
 export type HelpInput = Help | (() => Help)
 
@@ -38,9 +38,9 @@ export type Action = ({
 }) => string
 
 /**
- * Les arguments acceptes. `authorize` peut etre une fonction : la commande
- * `lang` doit lire les langues du dictionnaire, pose par le consommateur
- * bien apres que les commandes aient ete definies.
+ * The accepted arguments. `authorize` can be a function: the `lang` command
+ * has to read the languages of the dictionary, which the consumer sets long
+ * after the commands have been defined.
  */
 export type Args = {
 	authorize: string[] | (() => string[])
@@ -50,7 +50,7 @@ export type Args = {
 export type BaseCommand = {
 	restricted: boolean
 	action: Action
-	/** effet de bord de la commande : elle attaque le store elle-meme */
+	/** side effect of the command: it attacks the store itself */
 	effect?: ({ args }: { args: Command["args"] }) => void
 	JSX?: ({ args }: { args: Command["args"] }) => import("react").JSX.Element
 	help?: HelpInput
@@ -59,7 +59,7 @@ export type BaseCommand = {
 		hideCmd?: boolean
 		style?: CSSProperties
 		stylePre?: CSSProperties
-		/** rendu colore du resultat ; une chaine intacte est un rendu valide */
+		/** colored rendering of the result; an untouched string is a valid one */
 		highlight?: (txt: string) => import("react").ReactNode
 		reverse?: boolean
 		stepTime?: number
@@ -69,10 +69,10 @@ export type BaseCommand = {
 }
 
 /**
- * Les commandes connues, indexees par le nom qui les invoque. Celles du
- * paquet sont nommees : l'editeur les propose, et une clef mal orthographiee
- * se voit. Toutes sont facultatives — un shell peut n'en garder aucune — et
- * la signature d'index accueille les votres.
+ * The known commands, indexed by the name that invokes them. The ones of the
+ * package are named: the editor suggests them, and a misspelled key shows.
+ * All of them are optional — a shell may keep none — and the index signature
+ * takes yours.
  */
 export type BaseCommands = {
 	help?: BaseCommand
@@ -83,17 +83,17 @@ export type BaseCommands = {
 	theme?: BaseCommand
 	lang?: BaseCommand
 	/**
-	 * le banc d'essai du balisage : une commande, tout le rendu. Il ne part
-	 * pas avec `baseCommands`, il se monte a la main
+	 * the workbench of the markup: one command, the whole rendering. It does
+	 * not ship with `baseCommands`, it is mounted by hand
 	 */
 	test?: BaseCommand
-	/** le mot d'accueil et le logo : restreints, joues par la banniere */
+	/** the greeting and the logo: restricted, played by the banner */
 	welcome?: BaseCommand
 	title?: BaseCommand
-	/** restreintes aussi, cherchees par nom quand la saisie ne passe pas */
+	/** restricted too, looked up by name when the input does not pass */
 	unknow?: BaseCommand
 	argumenterror?: BaseCommand
-	/** restreinte : l'aiguillage des marqueurs cliquables `#libelle ~ cmd#` */
+	/** restricted: the switchboard of the clickable markers `#label ~ cmd#` */
 	actionmap?: BaseCommand
 	[name: string]: BaseCommand | undefined
 }
@@ -102,15 +102,15 @@ export type Command = {
 	pattern: string
 	name: string
 	args: string[]
-	/** le texte affiche, deja traduit : `t()` a joue a l'execution */
+	/** the text on screen, already translated: `t()` played at execution */
 	result: string
 	restricted: boolean
 	visible?: boolean
 	timestamp?: number
 	/**
-	 * Le rang d'arrivee dans la session, strictement croissant. C'est lui qui
-	 * ordonne l'affichage, et non `timestamp` : deux commandes enchainees dans
-	 * la meme boucle tombent sur la meme milliseconde.
+	 * The rank of arrival in the session, strictly increasing. It is what
+	 * orders the display, and not `timestamp`: two commands played one after
+	 * the other in the same loop land on the same millisecond.
 	 */
 	order?: number
 	id: string

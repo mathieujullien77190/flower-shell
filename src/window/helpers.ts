@@ -1,10 +1,10 @@
 import { Pos } from "./types"
 
 /**
- * Corrige le deplacement pour ramener la fenetre dans le bureau.
+ * Corrects the move to bring the window back inside the desktop.
  *
- * Une fenetre lachee a moitie dehors garde sa barre de titre hors de
- * portee : elle devient impossible a rattraper.
+ * A window released half outside keeps its title bar out of reach: it
+ * becomes impossible to grab again.
  */
 export const clampDrag = (drag: Pos, box: DOMRect, area: DOMRect): Pos => {
 	const out = (before: number, after: number) =>

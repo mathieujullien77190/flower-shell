@@ -5,26 +5,27 @@ import { colors } from "@theme"
 import uniqid from "uniqid"
 
 /**
- * Echappement facon antislash : `\+` affiche le marqueur tel quel au lieu
- * de colorer. Un antislash sans marqueur derriere reste affiche tel quel,
- * il n'y a donc pas besoin de l'echapper lui-meme.
+ * Backslash style escaping: `\+` shows the marker as it is instead of
+ * coloring. A backslash with no marker behind it stays on screen as it is,
+ * so there is no need to escape it in turn.
  */
 const ESCAPE = "\\"
 
 /**
- * Le marqueur echappe est range sous un caractere de la zone privee
- * Unicode le temps de la passe de couleur : sans cela il ferait paire
- * avec le marqueur suivant et colorerait tout ce qui les separe.
+ * The escaped marker is put away under a character of the Unicode private
+ * area for the time of the coloring pass: without that it would pair up
+ * with the next marker and color everything between them.
  */
 const hidden = (index: number) => String.fromCharCode(0xe000 + index)
 
-/** protege un caractere pour l'inserer dans une expression reguliere */
+/** protects a character so it can go into a regular expression */
 const rx = (char: string) => char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 
 /**
- * Sur un fond de tag, le texte se lit en blanc ou en noir selon la clarte
- * du fond (luminance relative WCAG). Les couleurs vives du theme sombre
- * appellent du noir, les couleurs assombries du theme clair du blanc.
+ * On the background of a tag, the text reads white or black depending on
+ * how light the background is (WCAG relative luminance). The bright colors
+ * of the dark theme call for black, the darkened colors of the light theme
+ * for white.
  */
 const readableOn = (hex: string) => {
 	const channel = (i: number) => {
@@ -43,7 +44,7 @@ export const highlight = (
 ) => {
 	let result: string | ReactNode[] = text
 
-	// couleurs lues a chaque rendu : elles suivent le theme courant
+	// colors read on every render: they follow the current theme
 	const list: {
 		separator: string
 		color: string
@@ -54,19 +55,19 @@ export const highlight = (
 		{ separator: "`", color: colors().cmdColor },
 		{ separator: "!", color: colors().restrictedColor },
 		{ separator: "$", color: colors().appColor },
-		// couleur du fond : le texte se fond dedans, revele a la selection
+		// color of the background: the text blends in, revealed by selecting it
 		{ separator: "_", color: colors().invisible },
-		// cliquable : le clic joue la commande `actionmap`
+		// clickable: the click plays the `actionmap` command
 		{ separator: "#", color: colors().importantColor, command: "actionmap" },
 	]
 
-	// le libelle affiche, et les arguments passes au clic apres un `~`
+	// the label on screen, and the arguments passed to the click after a `~`
 	const parse = (raw: string) => {
 		if (raw.indexOf("~") === -1) return { label: raw, args: [] as string[] }
 		const [label, rest] = raw.split("~")
-		// `#libelle ~ commande#` s'ecrit avec des espaces autour du `~` : sans
-		// ce trim ils partiraient dans le libelle, et le soulignement du lien
-		// depasserait le dernier mot
+		// `#label ~ command#` is written with spaces around the `~`: without
+		// this trim they would end up in the label, and the underline of the
+		// link would run past the last word
 		return { label: label.trim(), args: rest.trim().split(/\s+/) }
 	}
 
@@ -86,7 +87,7 @@ export const highlight = (
 				}
 			: { color: item.color }
 
-		// un marqueur cliquable se signale comme un lien
+		// a clickable marker announces itself as a link
 		if (item.command) style.textDecoration = "underline"
 
 		return (
@@ -102,15 +103,15 @@ export const highlight = (
 		)
 	}
 
-	// 1) les marqueurs echappes partent en zone privee, hors de portee
+	// 1) the escaped markers go off to the private area, out of reach
 	list.forEach((item, index) => {
 		result = (result as string)
 			.split(`${ESCAPE}${item.separator}`)
 			.join(hidden(index))
 	})
 
-	// 2) les tags `[<sep>...<sep>]` d'abord : sinon la passe inline mangerait
-	//    la paire interne et laisserait les crochets orphelins
+	// 2) the tags `[<sep>...<sep>]` first: otherwise the inline pass would eat
+	//    the inner pair and leave the brackets orphaned
 	list.forEach(item => {
 		const s = rx(item.separator)
 		result = reactStringReplace(
@@ -120,7 +121,7 @@ export const highlight = (
 		)
 	})
 
-	// 3) les marqueurs inline `<sep>...<sep>`
+	// 3) the inline markers `<sep>...<sep>`
 	list.forEach(item => {
 		const s = rx(item.separator)
 		result = reactStringReplace(
@@ -130,7 +131,7 @@ export const highlight = (
 		)
 	})
 
-	// 4) les marqueurs echappes reprennent leur place, sans style
+	// 4) the escaped markers take their place back, with no style
 	list.forEach((item, index) => {
 		result = reactStringReplace(result, hidden(index), () => item.separator)
 	})

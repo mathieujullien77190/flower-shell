@@ -3,9 +3,9 @@ import { defineConfig } from "vite"
 import dts from "vite-plugin-dts"
 import { alias } from "./alias.ts"
 
-// Build de publication : bundle `src` en resolvant les alias (le paquet livre
-// n'a donc plus aucun `@...`), puis emet les `.d.ts`. peers et deps runtime
-// restent externes : c'est le consommateur qui les installe.
+// Publishing build: bundles `src` resolving the aliases (so the package that
+// ships carries no `@...` any more), then emits the `.d.ts`. Peers and
+// runtime deps stay external: it is the consumer who installs them.
 export default defineConfig({
 	resolve: { alias },
 	plugins: [dts({ include: ["src"], exclude: ["src/stories/**"] })],
