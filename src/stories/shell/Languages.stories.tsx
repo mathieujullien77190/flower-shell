@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
-import { themes } from "../../theme"
+import { flowerTheme } from "../../theme"
 import { dictEn } from "../../i18n/en"
 import { dictFr } from "../../i18n/fr"
 import { Dict } from "../../types"
@@ -15,6 +15,9 @@ import { source } from "../source"
  * A language the package does not know: nothing lives underneath, so the
  * dictionary must cover the base commands itself. This is the pattern to
  * follow for any other language.
+ *
+ * Only `theme.flower` is described here, because only `flower` is mounted: a
+ * theme that cannot be reached has no help line to translate.
  */
 const dictDe: Dict = {
 	common: {
@@ -47,13 +50,6 @@ const dictDe: Dict = {
 	},
 	theme: {
 		flower: "Das Thema des Pakets: dunkles Laub, eine Blume als Eingabe",
-		twilight: "Ein neutrales dunkles Terminal",
-		parchment: "Ein neutrales helles Terminal",
-		dracula: "Violetter Schiefer, gesättigte Akzente",
-		nord: "Nachtblau, kühle Akzente",
-		gruvbox: "Erdiger Grund, warme Akzente",
-		monokai: "Dunkles Oliv, klare Akzente",
-		solarized: "Elfenbein, gedämpfte Akzente",
 		set: "Thema: {mode}",
 	},
 	lang: {
@@ -107,13 +103,13 @@ export default meta
 /** the package ships it: `dictFr` beside `dictEn`, and both answer */
 export const French: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands, test, themes, dictEn, dictFr } from "flower-shell"
+import { Shell, baseCommands, test, flowerTheme, dictEn, dictFr } from "flower-shell"
 
 // the shell's languages are the keys of dict, so both answer:
 // lang fr and lang en. help lang lists exactly those.
 <Shell
 	commands={{ ...baseCommands, test }}
-	themes={themes}
+	themes={{ flower: flowerTheme }}
 	lang="fr"
 	dict={{ en: dictEn, fr: dictFr }}
 	initialCommands={["help lang"]}
@@ -121,7 +117,7 @@ import { Shell, baseCommands, test, themes, dictEn, dictFr } from "flower-shell"
 `),
 	args: {
 		commands: { ...baseCommands, test },
-		themes,
+		themes: { flower: flowerTheme },
 		lang: "fr",
 		dict: { en: dictEn, fr: dictFr },
 		initialCommands: ["help lang"],
@@ -131,13 +127,14 @@ import { Shell, baseCommands, test, themes, dictEn, dictFr } from "flower-shell"
 /** written outside the package: the dictionary covers the base commands */
 export const German: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { Shell, baseCommands, test, themes } from "flower-shell"
+import { Shell, baseCommands, test, flowerTheme } from "flower-shell"
 import type { Dict } from "flower-shell"
 
 // the package does not know German: nothing lives underneath, so the
 // dictionary must cover the base commands itself. Every key below has to
 // be there — this is the whole surface, and the pattern for any other
-// language.
+// language. Only theme.flower is described, because only flower is
+// mounted: a theme that cannot be reached has no help line to translate.
 const dictDe: Dict = {
 	common: {
 		restricted: "Dies ist ein gesperrter Befehl, du kannst ihn nicht benutzen",
@@ -168,13 +165,6 @@ const dictDe: Dict = {
 	},
 	theme: {
 		flower: "Das Thema des Pakets: dunkles Laub, eine Blume als Eingabe",
-		twilight: "Ein neutrales dunkles Terminal",
-		parchment: "Ein neutrales helles Terminal",
-		dracula: "Violetter Schiefer, gesättigte Akzente",
-		nord: "Nachtblau, kühle Akzente",
-		gruvbox: "Erdiger Grund, warme Akzente",
-		monokai: "Dunkles Oliv, klare Akzente",
-		solarized: "Elfenbein, gedämpfte Akzente",
 		set: "Thema: {mode}",
 	},
 	lang: {
@@ -192,7 +182,7 @@ const dictDe: Dict = {
 // help lang opens the shell on the list of what is mounted: de and en
 <Shell
 	commands={{ ...baseCommands, test }}
-	themes={themes}
+	themes={{ flower: flowerTheme }}
 	lang="de"
 	dict={{
 		// the package English does not know German: lang.de is added here,
@@ -205,7 +195,7 @@ const dictDe: Dict = {
 `),
 	args: {
 		commands: { ...baseCommands, test },
-		themes,
+		themes: { flower: flowerTheme },
 		lang: "de",
 		dict: {
 			// the package English does not know German: `lang.de` is added here,
