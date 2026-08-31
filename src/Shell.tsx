@@ -186,11 +186,7 @@ export const Shell = ({
 	useEffect(() => {
 		if (!registry || !id) return
 
-		registry.set(id, instance)
-
-		return () => {
-			registry.delete(id)
-		}
+		return registry.register(id, instance)
 	}, [registry, id, instance])
 
 	return (

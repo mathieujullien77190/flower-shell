@@ -1,11 +1,72 @@
-import { createContext, useContext, useMemo, useState } from "react"
+import { createContext, useContext, useState } from "react"
 
 import { createRunners } from "@engine/send"
 import type { ShellInstance } from "./instance"
 import type { ShellState } from "./store"
 
-/** the terminals that can be commanded, by the `id` each one was given */
-export type ShellRegistry = Map<string, ShellInstance>
+/** what commands a terminal: the id first, since that is what is aimed at */
+export type ShellControls = {
+	/** plays a line on that shell, as if the visitor had typed it */
+	run: (id: string, commandPattern: string) => void
+	/** plays a line the visitor cannot type */
+	runRestricted: (id: string, commandPattern: string) => void
+	/** the state of that shell, read fresh: history, cursor, options */
+	actions: (id: string) => ShellState
+}
+
+/**
+ * What the provider holds: a way in for the terminals, and a way out for
+ * whoever commands them. Both close over the same list, built once.
+ */
+export type ShellRegistry = {
+	/** signs a terminal in, and gives back the way to sign it out */
+	register: (id: string, instance: ShellInstance) => () => void
+	controls: ShellControls
+}
+
+const createRegistry = (): ShellRegistry => {
+	const shells = new Map<string, ShellInstance>()
+
+	const find = (id: string) => {
+		const instance = shells.get(id)
+
+		if (!instance) {
+			const mounted = [...shells.keys()]
+
+			throw new Error(
+				`No shell is mounted under the id "${id}". ` +
+					(mounted.length
+						? `Mounted right now: ${mounted.map(name => `"${name}"`).join(", ")}.`
+						: "None is: a shell only enters the registry if it was given an `id`.")
+			)
+		}
+
+		return instance
+	}
+
+	return {
+		register: (id, instance) => {
+			shells.set(id, instance)
+
+			return () => {
+				// only if it is still this one: a shell that took the id over
+				// keeps it, and its predecessor leaving must not clear it
+				if (shells.get(id) === instance) shells.delete(id)
+			}
+		},
+
+		controls: {
+			run: (id, commandPattern) => createRunners(find(id)).run(commandPattern),
+			runRestricted: (id, commandPattern) =>
+				createRunners(find(id)).runRestricted(commandPattern),
+			actions: id => {
+				const instance = find(id)
+
+				return { ...instance.data(), ...instance.actions }
+			},
+		},
+	}
+}
 
 const RegistryContext = createContext<ShellRegistry | null>(null)
 
@@ -18,7 +79,9 @@ const RegistryContext = createContext<ShellRegistry | null>(null)
  * terminal was meant.
  */
 export const ShellProvider = ({ children }: { children: React.ReactNode }) => {
-	const [registry] = useState<ShellRegistry>(() => new Map())
+	// built once and never rebuilt: what `useShell()` hands out is the same
+	// object for the whole tree, stable by construction
+	const [registry] = useState(createRegistry)
 
 	return (
 		<RegistryContext.Provider value={registry}>
@@ -31,23 +94,13 @@ export const ShellProvider = ({ children }: { children: React.ReactNode }) => {
 export const useRegistry = (): ShellRegistry | null =>
 	useContext(RegistryContext)
 
-/** what commands a terminal: the id first, since that is what is being aimed at */
-export type ShellControls = {
-	/** plays a line on that shell, as if the visitor had typed it */
-	run: (id: string, commandPattern: string) => void
-	/** plays a line the visitor cannot type */
-	runRestricted: (id: string, commandPattern: string) => void
-	/** the state of that shell, read fresh: history, cursor, options */
-	actions: (id: string) => ShellState
-}
-
 /**
  * The terminals under the provider, addressed by their `id`.
  *
- * The id is read when the method is called, not when the hook runs: a toolbar
- * placed before the shell in the tree renders before it exists, and by the
- * time anyone clicks, the shell is there. Nothing to subscribe to, nothing to
- * wait for.
+ * The id is read when the method is called, not when this hook runs: a
+ * toolbar placed before the shell in the tree renders before it exists, and
+ * by the time anyone clicks, the shell is there. Nothing to subscribe to,
+ * nothing to wait for.
  */
 export const useShell = (): ShellControls => {
 	const registry = useContext(RegistryContext)
@@ -56,32 +109,5 @@ export const useShell = (): ShellControls => {
 		throw new Error("useShell() only reads inside a <ShellProvider>.")
 	}
 
-	return useMemo(() => {
-		const find = (id: string) => {
-			const instance = registry.get(id)
-
-			if (!instance) {
-				const mounted = [...registry.keys()]
-				throw new Error(
-					`No shell is mounted under the id "${id}". ` +
-						(mounted.length
-							? `Mounted right now: ${mounted.map(name => `"${name}"`).join(", ")}.`
-							: "None is: a shell only enters the registry if it was given an `id`.")
-				)
-			}
-
-			return instance
-		}
-
-		return {
-			run: (id, commandPattern) => createRunners(find(id)).run(commandPattern),
-			runRestricted: (id, commandPattern) =>
-				createRunners(find(id)).runRestricted(commandPattern),
-			actions: id => {
-				const instance = find(id)
-
-				return { ...instance.data(), ...instance.actions }
-			},
-		}
-	}, [registry])
+	return registry.controls
 }
