@@ -33,7 +33,7 @@ export const Fresh = ({ children }: { children: React.ReactNode }) => {
 export const Boxed = ({
 	children,
 }: {
-	children: (box: React.RefObject<HTMLDivElement>) => React.ReactNode
+	children: (box: React.RefObject<HTMLDivElement | null>) => React.ReactNode
 }) => {
 	const box = useRef<HTMLDivElement>(null)
 

@@ -35,23 +35,24 @@ const buildHelp = (help: Help) => {
 
 const buildAllHelp = (commands: BaseCommands) =>
 	Object.entries(commands)
-		.filter(
-			([name, command]) =>
-				!command.restricted && command.help && name !== "help"
+		.flatMap(([name, command]) =>
+			command && !command.restricted && command.help && name !== "help"
+				? [{ name, help: readHelp(command) }]
+				: []
 		)
-		.sort(([a], [b]) => a.localeCompare(b))
+		.sort((a, b) => a.name.localeCompare(b.name))
 		.map(
-			([name, command]) =>
-				`+${name}+\n${readHelp(command)
-					.patterns.map(
-						pattern => `\t${pattern.pattern} : ${t(pattern.description)}\n`
-					)
+			({ name, help }) =>
+				`+${name}+\n${(help?.patterns ?? [])
+					.map(pattern => `\t${pattern.pattern} : ${t(pattern.description)}\n`)
 					.join("")}\n`
 		)
 		.join("")
 
-const commandHelp = (commands: BaseCommands, name: string): Help | null =>
-	commands[name] ? readHelp(commands[name]) || null : null
+const commandHelp = (commands: BaseCommands, name: string): Help | null => {
+	const command = commands[name]
+	return command ? readHelp(command) || null : null
+}
 
 /**
  * Le banc d'essai du balisage. Une commande, et tout ce que `highlight`

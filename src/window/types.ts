@@ -21,7 +21,7 @@ export type WindowStart =
 
 export type WindowProps = {
 	show: boolean
-	container: RefObject<HTMLDivElement>
+	container: RefObject<HTMLDivElement | null>
 	title?: string
 	/** marque de la barre de titre, visee par la visite guidee */
 	tutorial?: string

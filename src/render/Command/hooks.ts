@@ -4,9 +4,9 @@ type useDisplayByLetterProps = {
 	baseTxt: string
 	canRendered: boolean
 	animation: boolean
-	reverse: boolean
-	stepTime: number
-	stepSize: number
+	reverse?: boolean
+	stepTime?: number
+	stepSize?: number
 }
 
 export const useDisplayByLetter = ({
@@ -26,6 +26,9 @@ export const useDisplayByLetter = ({
 		// tournait quand meme, affichant le texte entier a chaque tour pour
 		// n'annoncer la fin qu'au bout — vingt secondes pour un logo deja lu
 		if (!animation) {
+			// pose d'un coup, sans minuteur : le rendu en cascade est ici le
+			// seul, et c'est ce qu'on veut — le texte est deja complet
+			// eslint-disable-next-line react-hooks/set-state-in-effect
 			setTextTime(baseTxt)
 			setFinish(true)
 			return
@@ -35,7 +38,9 @@ export const useDisplayByLetter = ({
 		let i = 0
 
 		const timer = setInterval(() => {
-			setTextTime(!reverse ? baseTxt.substr(0, i + 1) : baseTxt.substr(-(i + 1)))
+			setTextTime(
+				!reverse ? baseTxt.substr(0, i + 1) : baseTxt.substr(-(i + 1))
+			)
 
 			if (i > baseTxt.length - 1) {
 				clearInterval(timer)

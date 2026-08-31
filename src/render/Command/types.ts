@@ -2,7 +2,7 @@ import { BaseCommand, Command } from "@types"
 
 export type CommandProps = {
 	command: Command
-	baseCommand: BaseCommand
+	baseCommand: BaseCommand | null
 	animation: boolean
 	canRendered: boolean
 	onRendered?: () => void

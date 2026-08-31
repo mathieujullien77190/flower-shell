@@ -20,7 +20,7 @@ type Shell = {
 	commands: Command[]
 	restrictedCommands: Command[]
 	/** position dans l'historique, null quand on est sur la ligne vierge */
-	cursor: number
+	cursor: number | null
 
 	/** vide l'historique et rend les options a leurs valeurs de depart */
 	reset: () => void
@@ -48,7 +48,7 @@ const INITIAL = {
 
 	commands: [] as Command[],
 	restrictedCommands: [] as Command[],
-	cursor: null as number,
+	cursor: null as number | null,
 }
 
 export const useShellStore = create<Shell>(set => ({
@@ -80,14 +80,14 @@ export const useShellStore = create<Shell>(set => ({
 							{ ...command, visible: true },
 						],
 						cursor: null,
-				  }
+					}
 				: {
 						commands: [
 							...state.commands,
 							{ ...command, visible: command.name !== "clear" },
 						],
 						cursor: null,
-				  }
+					}
 		),
 
 	/**
@@ -156,14 +156,16 @@ export const useGetCommands = () =>
 			[
 				...state.commands.filter(command => command.visible),
 				...state.restrictedCommands.filter(command => command.visible),
-			].sort((a, b) => a.order - b.order)
+			].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
 		)
 	)
 
 export const useGetCursor = () => useShellStore(state => state.cursor)
 
 export const useGetCurrentCommand = () =>
-	useShellStore(state => state.commands[state.cursor] || null)
+	useShellStore(state =>
+		state.cursor === null ? null : state.commands[state.cursor] || null
+	)
 
 /**
  * Le demarrage est fini : plus une commande restreinte en attente de rendu,

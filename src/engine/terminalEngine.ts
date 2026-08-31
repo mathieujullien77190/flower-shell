@@ -77,7 +77,7 @@ export const createCommand = ({
 							name: "argumenterror",
 							command: error,
 							args: [name],
-					  })
+						})
 					: t("error.args"),
 				timestamp,
 				order,
@@ -105,13 +105,13 @@ export const createCommand = ({
 			result: bare
 				? ""
 				: error
-				? executeCommand({
-						commands,
-						name: "unknow",
-						command: error,
-						args: [name],
-				  })
-				: t("error.unknown", { name }),
+					? executeCommand({
+							commands,
+							name: "unknow",
+							command: error,
+							args: [name],
+						})
+					: t("error.unknown", { name }),
 			timestamp,
 			order,
 			id: `${timestamp}-${name}-${order}`,
@@ -181,7 +181,7 @@ export const autocompleteCommand = ({
 	if (startCommand === "") return ""
 
 	const find = Object.keys(commands).filter(
-		name => !commands[name].restricted && name.indexOf(startCommand) === 0
+		name => !commands[name]?.restricted && name.indexOf(startCommand) === 0
 	)
 	if ((find[0] || "").length === startCommand.length) return ""
 	return find[0] || ""
