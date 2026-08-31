@@ -81,9 +81,12 @@ export const bareTheme: ShellTheme = {
 export const defaultTheme: ShellTheme = flowerTheme
 
 /**
- * The theme lives at module level, like the registry of the commands: the
- * markup is rendered by a function, not by a component, and a ThemeProvider
- * would not reach it. Corollary, knowingly: one shell per page.
+ * The theme lives at module level: the markup is rendered by a function, not
+ * by a component, and a ThemeProvider would not reach it.
+ *
+ * It is therefore the one thing several terminals on the same page share.
+ * Their history, their cursor and their options belong to each; the palette
+ * does not, and switching it in one repaints the others.
  */
 let current: ShellTheme = defaultTheme
 

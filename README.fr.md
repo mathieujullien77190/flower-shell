@@ -23,7 +23,10 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | `themes`            | les thèmes que le visiteur peut prendre, un par nom ; `themes={themes}` pour tout le catalogue                                   |
 | `dict`              | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul                                                     |
 | `lang`              | langue de départ, parmi celles de `dict` (`en` par défaut)                                                                       |
+| `animation`         | écriture lettre par lettre des réponses (`true` par défaut)                                                                      |
+| `keyboardOnFocus`   | la saisie reprend le focus dès qu'elle le perd (`true` par défaut)                                                               |
 | `scrollRef`         | élément à faire défiler quand la sortie s'allonge : la boîte qui tient le shell                                                  |
+| `ref`               | le handle sur ce terminal : `run`, `runRestricted`, `actions()`                                                                  |
 | `onCommandStart`    | avant que la commande ne joue ; part aussi pour une commande inconnue                                                            |
 | `onCommandDone`     | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran                                                       |
 | `onCommandRendered` | le texte a fini de s'écrire                                                                                                      |
@@ -93,8 +96,8 @@ mettre vos mots, recouvrez cette clé comme n'importe quelle autre :
 
 `initialCommands` ne joue qu'une fois, sur un écran vierge : un `clear` ne les
 rejoue pas. `clear` efface l'écran et rien d'autre — faire revenir quelque
-chose après lui est à vous de l'écrire, depuis `onCommandDone` et
-`runRestricted`.
+chose après lui est à vous de l'écrire, depuis `onCommandDone` et le handle
+du shell.
 
 ## Suivre les commandes
 
@@ -338,22 +341,48 @@ pour dire autre chose.
 `fonts.shell` habille la sortie comme la saisie, et vaut `monospace` par
 défaut : un terminal veut du chasse fixe.
 
-## Hors composant
+## Plusieurs terminaux, et le handle
 
-L'état vit dans des modules, pas dans un contexte : une commande peut donc être
-jouée depuis n'importe où — un bouton à vous, un jeu qui se termine.
+Chaque shell porte son historique, son curseur et ses options : plusieurs
+peuvent donc vivre sur la même page sans jamais se croiser. Deux terminaux
+côte à côte gardent deux historiques et peuvent répondre en deux langues,
+depuis le même `dict`.
 
-```ts
-import { run, runRestricted, shellActions, useLang } from "flower-shell"
+Une ligne atteint l'un d'eux depuis l'extérieur de React par sa `ref` :
 
-run("help") // comme si le visiteur l'avait tapée
-runRestricted("title") // une commande que le visiteur ne peut pas taper
-shellActions().setLang("en")
-shellActions().reset() // historique vide, options par defaut
+```tsx
+import { useRef } from "react"
+import { Shell, baseCommands } from "flower-shell"
+import type { ShellHandle } from "flower-shell"
+
+const terminal = useRef<ShellHandle>(null)
+
+;<>
+	<button onClick={() => terminal.current?.run("help")}>help</button>
+	<Shell ref={terminal} commands={baseCommands} />
+</>
 ```
 
-**Conséquence assumée : un shell par page.** Le registre des commandes et le
-thème sont des modules ; deux terminaux monteraient l'un sur l'autre.
+| handle          | rôle                                              |
+| --------------- | ------------------------------------------------- |
+| `run`           | joue une ligne comme si le visiteur l'avait tapée |
+| `runRestricted` | joue une ligne que le visiteur ne peut pas taper  |
+| `actions()`     | l'état de ce shell : historique, curseur, options |
+
+`actions()` relit à chaque appel, et porte les setters dont les commandes se
+servent — `setLang`, `setAnimation`, `reset`, et les autres.
+
+**Ce qui reste partagé, et pourquoi.** Le thème et les dictionnaires restent
+dans des modules, communs à tous les terminaux de la page : le balisage est
+coloré par `highlight`, une fonction et non un composant, qu'un provider
+n'atteindrait pas. Donc `theme nord` tapé dans un shell repeint les autres,
+tandis que la langue, l'historique et les options appartiennent à chacun.
+
+Une commande atteint son propre shell sans avoir à le demander : dans une
+`action` ou un `effect`, `t()` parle la langue du shell en train de jouer et
+`shellActions()` rend son état. Cela tient le temps que la commande joue, qui
+est synchrone — un `effect` qui attend quelque chose et touche l'état ensuite
+est hors de cette fenêtre et doit passer par le handle.
 
 ## Développer
 

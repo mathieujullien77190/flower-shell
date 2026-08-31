@@ -23,7 +23,10 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | `themes`            | the themes the visitor can reach, one per name; `themes={themes}` for the whole catalogue                                           |
 | `dict`              | the languages of the shell, one dictionary per language; without it, English alone                                                  |
 | `lang`              | starting language, among those of `dict` (`en` by default)                                                                          |
+| `animation`         | letter by letter writing of the answers (`true` by default)                                                                         |
+| `keyboardOnFocus`   | the input takes the focus back as soon as it loses it (`true` by default)                                                           |
 | `scrollRef`         | element to scroll as the output grows: the box holding the shell                                                                    |
+| `ref`               | the handle on this terminal: `run`, `runRestricted`, `actions()`                                                                    |
 | `onCommandStart`    | before the command runs; fires for an unknown one too                                                                               |
 | `onCommandDone`     | the action returned its text and the effect played; nothing on screen yet                                                           |
 | `onCommandRendered` | the text has finished being written                                                                                                 |
@@ -93,8 +96,8 @@ put your own words there, override that key like any other:
 
 `initialCommands` only plays once, on a blank screen: a `clear` does not
 replay them. `clear` wipes the screen and does nothing else — bringing
-something back after it is yours to write, from `onCommandDone` and
-`runRestricted`.
+something back after it is yours to write, from `onCommandDone` and the
+handle of the shell.
 
 ## Watching the commands
 
@@ -336,22 +339,47 @@ own to say otherwise.
 `fonts.shell` dresses the output and the input alike, and is `monospace` by
 default: a terminal wants a fixed pitch.
 
-## Outside the component
+## Several terminals, and the handle
 
-State lives in modules, not in a context: a command can therefore be played
-from anywhere — a button of yours, a game that ends.
+Each shell owns its history, its cursor and its options, so several can live
+on the same page and never meet. Two of them side by side keep two histories
+and can answer in two languages, out of the same `dict`.
 
-```ts
-import { run, runRestricted, shellActions, useLang } from "flower-shell"
+A line reaches one of them from outside React through its `ref`:
 
-run("help") // as if the visitor had typed it
-runRestricted("title") // a command the visitor cannot type
-shellActions().setLang("en")
-shellActions().reset() // empty history, default options
+```tsx
+import { useRef } from "react"
+import { Shell, baseCommands } from "flower-shell"
+import type { ShellHandle } from "flower-shell"
+
+const terminal = useRef<ShellHandle>(null)
+
+;<>
+	<button onClick={() => terminal.current?.run("help")}>help</button>
+	<Shell ref={terminal} commands={baseCommands} />
+</>
 ```
 
-**An accepted consequence: one shell per page.** The command registry and the
-theme are modules; two terminals would mount on top of each other.
+| handle          | role                                              |
+| --------------- | ------------------------------------------------- |
+| `run`           | plays a line as if the visitor had typed it       |
+| `runRestricted` | plays a line the visitor cannot type              |
+| `actions()`     | the state of that shell: history, cursor, options |
+
+`actions()` reads fresh on every call, and carries the setters the commands
+use — `setLang`, `setAnimation`, `reset`, and the rest.
+
+**What is shared, and why.** The theme and the dictionaries stay in modules,
+common to every terminal on the page: the markup is coloured by `highlight`,
+a function and not a component, and a provider would not reach it. So
+`theme nord` typed in one shell repaints the others, while the language,
+the history and the options belong to each.
+
+A command reaches its own shell without asking: inside an `action` or an
+`effect`, `t()` speaks the language of the shell in play and
+`shellActions()` returns its state. That holds for as long as the command
+runs, which is synchronous — an `effect` that awaits something and touches
+the state afterwards is outside that window and needs the handle.
 
 ## Developing
 
@@ -360,8 +388,8 @@ npm run storybook   # the terminal alone, without the rest of the site
 ```
 
 The stories live under `src/stories`, one per case: the bare shell, with custom
-commands, in each language. Each shows the code that produces it, imports
-included.
+commands, two of them side by side, in each language. Each shows the code that
+produces it, imports included.
 
 **Shell / Events** puts a panel beside the terminal and fills it from the four
 event props alone: one row per command, a tick under each moment it has
