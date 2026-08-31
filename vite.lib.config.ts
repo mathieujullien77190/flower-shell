@@ -21,7 +21,6 @@ export default defineConfig({
 				/^react($|\/)/,
 				/^react-dom($|\/)/,
 				"styled-components",
-				/^zustand($|\/)/,
 				"react-device-detect",
 				"react-string-replace",
 				"uniqid",
