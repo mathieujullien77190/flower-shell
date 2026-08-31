@@ -8,49 +8,36 @@ Un terminal rétro en React : moteur de commandes, historique, autocomplétion
 et rendu ASCII animé. Aucune mise en page imposée.
 
 ```tsx
-import { Shell, ShellProvider, baseCommands, themes } from "flower-shell"
+import { Shell, baseCommands, themes } from "flower-shell"
 
-const App = () => (
-	<ShellProvider commands={baseCommands} themes={themes}>
-		<Shell />
-	</ShellProvider>
-)
+const App = () => <Shell commands={baseCommands} themes={themes} />
 ```
 
-## Les deux pièces
+## Le composant
 
-`<ShellProvider>` dit ce qu'est un terminal — ses commandes, ses thèmes, ses
-langues, les évènements qu'il rend. `<Shell />` le dessine. Tout ce qui se
-règle vit sur le provider ; l'écran qui est dessous ne prend que ce qui
-regarde son propre rendu.
-
-| prop de `ShellProvider` | rôle                                                                                                                             |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `commands`              | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative                                   |
-| `initialCommands`       | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture                                                  |
-| `theme`                 | le nom du thème de départ, une clé de `themes` ; sans elle, le premier d'entre eux — et sans `themes` non plus, rien n'est peint |
-| `themes`                | les thèmes que le visiteur peut prendre, un par nom ; `themes={themes}` pour tout le catalogue                                   |
-| `dict`                  | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul                                                     |
-| `lang`                  | langue de départ, parmi celles de `dict` (`en` par défaut)                                                                       |
-| `animation`             | écriture lettre par lettre des réponses (`true` par défaut)                                                                      |
-| `keyboardOnFocus`       | la saisie reprend le focus dès qu'elle le perd (`true` par défaut)                                                               |
-| `onCommandStart`        | avant que la commande ne joue ; part aussi pour une commande inconnue                                                            |
-| `onCommandDone`         | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran                                                       |
-| `onCommandRendered`     | le texte a fini de s'écrire                                                                                                      |
-| `onCommandError`        | la commande n'a pas joué ; `reason` dit pourquoi                                                                                 |
-
-| prop de `Shell` | rôle                                                                            |
-| --------------- | ------------------------------------------------------------------------------- |
-| `scrollRef`     | élément à faire défiler quand la sortie s'allonge : la boîte qui tient le shell |
-| `ref`           | le handle sur ce terminal : `run`, `runRestricted`, `actions()`                 |
+| prop                | rôle                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `commands`          | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative                                   |
+| `initialCommands`   | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture                                                  |
+| `theme`             | le nom du thème de départ, une clé de `themes` ; sans elle, le premier d'entre eux — et sans `themes` non plus, rien n'est peint |
+| `themes`            | les thèmes que le visiteur peut prendre, un par nom ; `themes={themes}` pour tout le catalogue                                   |
+| `dict`              | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul                                                     |
+| `lang`              | langue de départ, parmi celles de `dict` (`en` par défaut)                                                                       |
+| `animation`         | écriture lettre par lettre des réponses (`true` par défaut)                                                                      |
+| `keyboardOnFocus`   | la saisie reprend le focus dès qu'elle le perd (`true` par défaut)                                                               |
+| `scrollRef`         | élément à faire défiler quand la sortie s'allonge : la boîte qui tient le shell                                                  |
+| `id`                | le nom sous lequel un `<ShellProvider>` le trouve, pour que `useShell()` le commande                                             |
+| `onCommandStart`    | avant que la commande ne joue ; part aussi pour une commande inconnue                                                            |
+| `onCommandDone`     | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran                                                       |
+| `onCommandRendered` | le texte a fini de s'écrire                                                                                                      |
+| `onCommandError`    | la commande n'a pas joué ; `reason` dit pourquoi                                                                                 |
 
 Toutes les props sont facultatives, et ce qu'on ne donne pas n'existe
-simplement pas. `<Shell />` tout seul se fait son propre provider et se monte
-sur rien : registre vide, donc une ligne tapée passe à la suivante sans
-message d'erreur, et aucun thème, donc rien n'est peint — le shell prend les
-couleurs et la police de la page qui le tient, l'invite retombe sur `>`, et le
-balisage cesse de colorer. Dès qu'une commande existe, une commande inconnue
-redevient une erreur.
+simplement pas. `<Shell />` se monte sur rien : registre vide, donc une ligne
+tapée passe à la suivante sans message d'erreur, et aucun thème, donc rien
+n'est peint — le shell prend les couleurs et la police de la page qui le
+tient, l'invite retombe sur `>`, et le balisage cesse de colorer. Dès qu'une
+commande existe, une commande inconnue redevient une erreur.
 
 ## Les commandes de base
 
@@ -60,11 +47,9 @@ redevient une erreur.
 c'est un banc d'essai, pas quelque chose que vos visiteurs ont à trouver.
 
 ```tsx
-import { Shell, ShellProvider, baseCommands, test } from "flower-shell"
+import { Shell, baseCommands, test } from "flower-shell"
 
-;<ShellProvider commands={{ ...baseCommands, test }}>
-	<Shell />
-</ShellProvider>
+;<Shell commands={{ ...baseCommands, test }} />
 ```
 
 Il affiche toutes les couleurs du thème, la source à gauche et son rendu à
@@ -93,30 +78,26 @@ Le shell démarre nu. Le logo et le mot d'accueil sont deux commandes, jouées
 comme les autres :
 
 ```tsx
-<ShellProvider commands={baseCommands} initialCommands={["title", "welcome"]}>
-	<Shell />
-</ShellProvider>
+<Shell commands={baseCommands} initialCommands={["title", "welcome"]} />
 ```
 
 `welcome` affiche la clé `welcome.text`, que le paquet porte déjà. Pour y
 mettre vos mots, recouvrez cette clé comme n'importe quelle autre :
 
 ```tsx
-<ShellProvider
+<Shell
 	commands={baseCommands}
 	initialCommands={["title", "welcome"]}
 	dict={{
 		en: { welcome: { text: "Welcome to $acme$ — type `help` to look around" } },
 	}}
->
-	<Shell />
-</ShellProvider>
+/>
 ```
 
 `initialCommands` ne joue qu'une fois, sur un écran vierge : un `clear` ne les
 rejoue pas. `clear` efface l'écran et rien d'autre — faire revenir quelque
-chose après lui est à vous de l'écrire, depuis `onCommandDone` et le handle
-du shell.
+chose après lui est à vous de l'écrire, depuis `onCommandDone` et un shell
+nommé, atteint par `useShell()`.
 
 ## Suivre les commandes
 
@@ -124,15 +105,13 @@ Quatre props, quatre moments. Chacune reçoit un objet, de la même forme d'un
 bout à l'autre :
 
 ```tsx
-<ShellProvider
+<Shell
 	commands={baseCommands}
 	onCommandStart={event => console.log("about to run", event.pattern)}
 	onCommandDone={event => console.log("ran", event.name, event.args)}
 	onCommandRendered={event => console.log("written out", event.name)}
 	onCommandError={event => console.error(event.reason, event.pattern)}
->
-	<Shell />
-</ShellProvider>
+/>
 ```
 
 | champ     |                                               |
@@ -230,14 +209,10 @@ fichier chacun — mais n'en monte **qu'un seul par défaut : l'anglais**. Les
 langues du shell sont exactement les clés de la prop `dict` :
 
 ```tsx
-import { Shell, ShellProvider, baseCommands, dictEn, dictFr } from "flower-shell"
+import { Shell, baseCommands, dictEn, dictFr } from "flower-shell"
 
-// English alone
-<ShellProvider commands={baseCommands}><Shell /></ShellProvider>
-
-<ShellProvider commands={baseCommands} lang="fr" dict={{ en: dictEn, fr: dictFr }}>
-	<Shell />
-</ShellProvider>
+<Shell commands={baseCommands} />                                            // en
+<Shell commands={baseCommands} lang="fr" dict={{ en: dictEn, fr: dictFr }} />
 ```
 
 `lang` choisit celle du départ ; la commande `lang` n'accepte que celles qui
@@ -250,16 +225,14 @@ dictionnaire ne couvre pas sort en anglais plutôt qu'en clé nue, et vous pouve
 n'ajouter qu'un texte sans perdre les autres.
 
 ```tsx
-<ShellProvider
+<Shell
 	commands={commands}
 	lang="de"
 	dict={{
 		en: { welcome: { text: "Type `help`" } }, // l'anglais du paquet, une clé recouverte
 		de: dictDe, // le vôtre, écrit chez vous
 	}}
->
-	<Shell />
-</ShellProvider>
+/>
 ```
 
 `t("hello.world")` lit la langue courante, retombe sur l'anglais, puis sur la
@@ -291,19 +264,19 @@ Deux props, et elles se lisent comme `dict` et `lang`. `themes` dit quels
 thèmes existent ; `theme` nomme celui du départ, une clé de `themes` :
 
 ```tsx
-import { Shell, ShellProvider, baseCommands, nordTheme, themes } from "flower-shell"
+import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 
 // the whole catalogue: all eight, worn on the first of them
-<ShellProvider commands={baseCommands} themes={themes}><Shell /></ShellProvider>
+<Shell commands={baseCommands} themes={themes} />
 
 // one of them, and nothing else to switch to
-<ShellProvider commands={baseCommands} themes={{ nord: nordTheme }}><Shell /></ShellProvider>
+<Shell commands={baseCommands} themes={{ nord: nordTheme }} />
 
 // the catalogue to reach, and the name it starts on
-<ShellProvider commands={baseCommands} themes={themes} theme="nord"><Shell /></ShellProvider>
+<Shell commands={baseCommands} themes={themes} theme="nord" />
 
 // neither: nothing to switch to, and nothing painted
-<ShellProvider commands={baseCommands}><Shell /></ShellProvider>
+<Shell commands={baseCommands} />
 ```
 
 **Les thèmes du shell sont exactement les clés de `themes`** — rien de plus.
@@ -324,14 +297,12 @@ Donc un shell à vous, avec un thème du paquet, un des vôtres, et aucune sorti
 hors des deux :
 
 ```tsx
-<ShellProvider
+<Shell
 	commands={baseCommands}
 	themes={{ nord: nordTheme, mine }}
 	theme="mine"
 	dict={{ en: { theme: { mine: "The house theme" } } }}
->
-	<Shell />
-</ShellProvider>
+/>
 ```
 
 Un thème s'écrit par morceaux, et se monte sous le nom que le visiteur
@@ -345,9 +316,7 @@ const mine = {
 	container: { padding: "16px" },
 }
 
-<ShellProvider commands={commands} themes={{ mine }} theme="mine">
-	<Shell />
-</ShellProvider>
+<Shell commands={commands} themes={{ mine }} theme="mine" />
 ```
 
 Les valeurs absentes gardent celles de `defaultTheme`, y compris à
@@ -372,49 +341,61 @@ pour dire autre chose.
 `fonts.shell` habille la sortie comme la saisie, et vaut `monospace` par
 défaut : un terminal veut du chasse fixe.
 
-## Plusieurs terminaux, et le handle
+## Plusieurs terminaux, et comment en commander un
 
 Chaque shell porte son historique, son curseur et ses options : plusieurs
 peuvent donc vivre sur la même page sans jamais se croiser. Deux terminaux
 côte à côte gardent deux historiques et peuvent répondre en deux langues,
 depuis le même `dict`.
 
-Tout ce qui est sous le provider atteint son terminal par `useShell()` — un
-bouton à côté de l'écran n'a besoin ni d'une ref ni d'une prop qu'on fait
-descendre :
+**Pas d'id, pas de pilotage.** Un terminal ne s'atteint que s'il a été nommé,
+et `<ShellProvider>` est l'endroit où ces noms se retrouvent. Rien n'a à
+deviner de quel shell on parle, puisqu'un shell qui ne dit rien n'est pas
+adressable du tout.
 
 ```tsx
 import { Shell, ShellProvider, useShell, baseCommands } from "flower-shell"
 
-// sous le provider, donc il atteint le terminal d'à côté
 const Toolbar = () => {
 	const shell = useShell()
 
-	return <button onClick={() => shell.run("help")}>help</button>
+	return (
+		<>
+			<button onClick={() => shell.run("left", "help")}>help, left</button>
+			<button onClick={() => shell.run("right", "flowers")}>
+				flowers, right
+			</button>
+		</>
+	)
 }
 
-;<ShellProvider commands={baseCommands}>
+;<ShellProvider>
 	<Toolbar />
-	<Shell />
+	<Shell id="left" commands={baseCommands} lang="en" />
+	<Shell id="right" commands={baseCommands} lang="fr" />
 </ShellProvider>
 ```
 
-| handle          | rôle                                              |
-| --------------- | ------------------------------------------------- |
-| `run`           | joue une ligne comme si le visiteur l'avait tapée |
-| `runRestricted` | joue une ligne que le visiteur ne peut pas taper  |
-| `actions()`     | l'état de ce shell : historique, curseur, options |
+| `useShell()`                 | rôle                                              |
+| ---------------------------- | ------------------------------------------------- |
+| `run(id, pattern)`           | joue une ligne comme si le visiteur l'avait tapée |
+| `runRestricted(id, pattern)` | joue une ligne que le visiteur ne peut pas taper  |
+| `actions(id)`                | l'état de ce shell : historique, curseur, options |
 
-`actions()` relit à chaque appel, et porte les setters dont les commandes se
+`actions(id)` relit à chaque appel, et porte les setters dont les commandes se
 servent — `setLang`, `setAnimation`, `reset`, et les autres.
 
-Hors de React il n'y a pas de provider à lire : les trois mêmes sortent alors
-de `<Shell ref>` — un jeu qui se termine, un minuteur, tout ce qui n'est pas
-un composant.
+L'id est lu quand la méthode est appelée, pas quand le hook s'exécute : une
+barre de boutons placée avant les terminaux dans l'arbre se rend avant qu'ils
+existent, et au moment où l'on clique ils sont là. Un id qui n'est pas monté
+lève, en disant lesquels le sont.
+
+Hors de React il n'y a pas de hook à appeler : prenez `useShell()` dans un
+composant à vous et rangez les méthodes où il vous les faut.
 
 **Ce qui reste partagé, et pourquoi.** Le thème et les dictionnaires restent
 dans des modules, communs à tous les terminaux de la page : le balisage est
-coloré par `highlight`, une fonction et non un composant, qu'un provider
+coloré par `highlight`, une fonction et non un composant, qu'un contexte
 n'atteindrait pas. Donc `theme nord` tapé dans un shell repeint les autres,
 tandis que la langue, l'historique et les options appartiennent à chacun.
 
@@ -422,7 +403,7 @@ Une commande atteint son propre shell sans avoir à le demander : dans une
 `action` ou un `effect`, `t()` parle la langue du shell en train de jouer et
 `shellActions()` rend son état. Cela tient le temps que la commande joue, qui
 est synchrone — un `effect` qui attend quelque chose et touche l'état ensuite
-est hors de cette fenêtre et doit passer par le handle.
+est hors de cette fenêtre, et a besoin de `useShell()` et d'un id.
 
 ## Développer
 
@@ -431,8 +412,8 @@ npm run storybook   # le terminal seul, sans le reste du site
 ```
 
 Les stories sont sous `src/stories`, une par cas : le shell nu, avec des
-commandes personnalisées, dans chaque langue. Chacune montre le code qui la
-produit, imports compris.
+commandes personnalisées, deux pilotés par une même barre, dans chaque langue.
+Chacune montre le code qui la produit, imports compris.
 
 **Shell / Events** pose un panneau à côté du terminal et le remplit avec les
 seules quatre props d'évènement : une ligne par commande, une coche sous
