@@ -27,7 +27,10 @@ export const Tags: StoryObj = {
 				))}
 				<Row
 					source="Mixed: +text+ and a [$tag$] within the sentence"
-					nodes={highlight("Mixed: +text+ and a [$tag$] within the sentence", noop)}
+					nodes={highlight(
+						"Mixed: +text+ and a [$tag$] within the sentence",
+						noop
+					)}
 				/>
 			</Screen>
 		)

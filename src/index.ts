@@ -22,13 +22,7 @@ export {
 	readHelp,
 } from "./engine/terminalEngine"
 
-export {
-	BASE_LANG,
-	browserLang,
-	langs,
-	setDict,
-	t,
-} from "./i18n/lang"
+export { BASE_LANG, browserLang, langs, setDict, t } from "./i18n/lang"
 export { dictEn } from "./i18n/en"
 export { dictFr } from "./i18n/fr"
 

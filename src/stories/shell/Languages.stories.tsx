@@ -42,7 +42,8 @@ const dictDe: Dict = {
 		usage: "Zeigt alle Farben des Themas, geschrieben und gerendert",
 		colors: "Farben",
 		tags: "Tags",
-		invisible: "die Zeile darüber endet mit einem unsichtbaren Wort — markiere es",
+		invisible:
+			"die Zeile darüber endet mit einem unsichtbaren Wort — markiere es",
 	},
 	theme: {
 		flower: "Das Thema des Pakets: dunkles Laub, eine Blume als Eingabe",

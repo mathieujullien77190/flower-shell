@@ -31,7 +31,8 @@ export const dictFr: Dict = {
 		usage: "Affiche toutes les couleurs du thème, écrites et rendues",
 		colors: "couleurs",
 		tags: "tags",
-		invisible: "la ligne au-dessus finit par un mot invisible — sélectionnez-le",
+		invisible:
+			"la ligne au-dessus finit par un mot invisible — sélectionnez-le",
 		clicked: "cliquable",
 		click: "cliquez pour jouer hello",
 	},

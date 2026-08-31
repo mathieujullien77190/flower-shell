@@ -93,7 +93,6 @@ export const Container = styled.div.attrs<ContainerProps>(props => ({
 		`
 	}}
 
-
 	border-style: solid;
 	border-width: ${FULL.borderSize};
 	border-color: ${() => windowColors().border};

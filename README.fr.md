@@ -15,20 +15,20 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 
 ## Le composant
 
-| prop | rôle |
-| --- | --- |
-| `commands` | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative |
-| `initialCommands` | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture |
-| `theme` | le nom du thème de départ, une clé de `themes` ; sans elle, le premier d'entre eux — et sans `themes` non plus, rien n'est peint |
-| `themes` | les thèmes que le visiteur peut prendre, un par nom ; `themes={themes}` pour tout le catalogue |
-| `dict` | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul |
-| `lang` | langue de départ, parmi celles de `dict` (`en` par défaut) |
-| `window` | pose le shell dans un cadre ; l'objet porte tout ce que le cadre sait faire |
-| `scrollRef` | élément à faire défiler quand la sortie s'allonge ; ignorée avec `window` |
-| `onCommandStart` | avant que la commande ne joue ; part aussi pour une commande inconnue |
-| `onCommandDone` | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran |
-| `onCommandRendered` | le texte a fini de s'écrire |
-| `onCommandError` | la commande n'a pas joué ; `reason` dit pourquoi |
+| prop                | rôle                                                                                                                             |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `commands`          | les commandes connues, indexées par leur nom : celles du paquet, plus les vôtres ; facultative                                   |
+| `initialCommands`   | commandes jouées au démarrage, une seule fois ; c'est là que se met l'ouverture                                                  |
+| `theme`             | le nom du thème de départ, une clé de `themes` ; sans elle, le premier d'entre eux — et sans `themes` non plus, rien n'est peint |
+| `themes`            | les thèmes que le visiteur peut prendre, un par nom ; `themes={themes}` pour tout le catalogue                                   |
+| `dict`              | les langues du shell, un dictionnaire par langue ; sans elle, l'anglais seul                                                     |
+| `lang`              | langue de départ, parmi celles de `dict` (`en` par défaut)                                                                       |
+| `window`            | pose le shell dans un cadre ; l'objet porte tout ce que le cadre sait faire                                                      |
+| `scrollRef`         | élément à faire défiler quand la sortie s'allonge ; ignorée avec `window`                                                        |
+| `onCommandStart`    | avant que la commande ne joue ; part aussi pour une commande inconnue                                                            |
+| `onCommandDone`     | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran                                                       |
+| `onCommandRendered` | le texte a fini de s'écrire                                                                                                      |
+| `onCommandError`    | la commande n'a pas joué ; `reason` dit pourquoi                                                                                 |
 
 Toutes les props sont facultatives, et ce qu'on ne donne pas n'existe
 simplement pas. `<Shell />` se monte sur rien : registre vide, donc une ligne
@@ -47,7 +47,7 @@ c'est un banc d'essai, pas quelque chose que vos visiteurs ont à trouver.
 ```tsx
 import { Shell, baseCommands, test } from "flower-shell"
 
-<Shell commands={{ ...baseCommands, test }} />
+;<Shell commands={{ ...baseCommands, test }} />
 ```
 
 Il affiche toutes les couleurs du thème, la source à gauche et son rendu à
@@ -86,7 +86,9 @@ mettre vos mots, recouvrez cette clé comme n'importe quelle autre :
 <Shell
 	commands={baseCommands}
 	initialCommands={["title", "welcome"]}
-	dict={{ en: { welcome: { text: "Welcome to $acme$ — type `help` to look around" } } }}
+	dict={{
+		en: { welcome: { text: "Welcome to $acme$ — type `help` to look around" } },
+	}}
 />
 ```
 
@@ -110,10 +112,10 @@ bout à l'autre :
 />
 ```
 
-| champ | |
-| --- | --- |
-| `name` | le premier mot de la ligne |
-| `args` | le reste, mot à mot |
+| champ     |                                               |
+| --------- | --------------------------------------------- |
+| `name`    | le premier mot de la ligne                    |
+| `args`    | le reste, mot à mot                           |
 | `pattern` | la ligne entière, telle qu'elle a été envoyée |
 
 `onCommandStart` part avant que quoi que ce soit ne joue, lu sur cette ligne.
@@ -131,11 +133,11 @@ lettre. Il part une fois par commande, au passage.
 `onCommandError` part **à la place de** `onCommandDone` quand la commande n'a
 pas joué, et ajoute `reason` à l'objet :
 
-| `reason` | |
-| --- | --- |
-| `unknown` | aucune commande de ce nom dans le registre |
-| `args` | la commande existe, ses arguments ne passent pas |
-| `thrown` | son action ou son effet a levé ; ce qui a été levé est dans `error` |
+| `reason`  |                                                                     |
+| --------- | ------------------------------------------------------------------- |
+| `unknown` | aucune commande de ce nom dans le registre                          |
+| `args`    | la commande existe, ses arguments ne passent pas                    |
+| `thrown`  | son action ou son effet a levé ; ce qui a été levé est dans `error` |
 
 Un shell au registre vide n'a rien à redire — il laisse passer ce qu'on lui
 tape, exprès — et ne signale donc aucune erreur.
@@ -165,15 +167,15 @@ vous écrivez **la clé** et le shell la traduit au moment de s'en servir. Une
 clé absente du dictionnaire s'affiche telle quelle, ce qui permet d'écrire
 directement `description: "répond pong"` quand une seule langue suffit.
 
-| champ | rôle |
-| --- | --- |
-| `action` | le texte affiché, déjà traduit |
-| `effect` | l'effet de bord ; la commande attaque votre état elle-même |
-| `JSX` | rendu React sous la sortie, pour une commande qui affiche mieux qu'un texte |
-| `help` | l'aide ; une fonction si elle dépend de l'état, comme celle de `lang` |
-| `testArgs` | arguments acceptés (`authorize`, `empty`) ; `authorize` accepte une fonction |
-| `display` | animation, styles, coloration personnalisée |
-| `restricted` | vraie si le visiteur ne peut pas la taper ; réservée au code |
+| champ        | rôle                                                                         |
+| ------------ | ---------------------------------------------------------------------------- |
+| `action`     | le texte affiché, déjà traduit                                               |
+| `effect`     | l'effet de bord ; la commande attaque votre état elle-même                   |
+| `JSX`        | rendu React sous la sortie, pour une commande qui affiche mieux qu'un texte  |
+| `help`       | l'aide ; une fonction si elle dépend de l'état, comme celle de `lang`        |
+| `testArgs`   | arguments acceptés (`authorize`, `empty`) ; `authorize` accepte une fonction |
+| `display`    | animation, styles, coloration personnalisée                                  |
+| `restricted` | vraie si le visiteur ne peut pas la taper ; réservée au code                 |
 
 ## La fenêtre
 
@@ -196,17 +198,17 @@ cadre : `scrollRef` n'a plus rien à dire.
 />
 ```
 
-| clé de `window` | rôle |
-| --- | --- |
-| `title` | le texte de la barre de titre |
-| `move` | se déplace par sa barre ; `true` par défaut |
-| `start` | le coin où elle s'ouvre ; `center-center` par défaut |
-| `margin` | de combien elle est écartée des bords où `start` l'a envoyée ; zéro par défaut |
-| `compact` | pleine et non redimensionnable : elle prend tout le conteneur, et `start` comme `margin` n'ont plus rien à placer |
-| `canExpand` | le bouton d'agrandissement, et le double-clic sur la barre |
-| `canClose` | la croix de fermeture |
-| `open` | ouverte ou fermée, tenue par l'appelant ; sans elle le cadre tient la sienne |
-| `onClose` | la croix a été cliquée |
+| clé de `window` | rôle                                                                                                              |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `title`         | le texte de la barre de titre                                                                                     |
+| `move`          | se déplace par sa barre ; `true` par défaut                                                                       |
+| `start`         | le coin où elle s'ouvre ; `center-center` par défaut                                                              |
+| `margin`        | de combien elle est écartée des bords où `start` l'a envoyée ; zéro par défaut                                    |
+| `compact`       | pleine et non redimensionnable : elle prend tout le conteneur, et `start` comme `margin` n'ont plus rien à placer |
+| `canExpand`     | le bouton d'agrandissement, et le double-clic sur la barre                                                        |
+| `canClose`      | la croix de fermeture                                                                                             |
+| `open`          | ouverte ou fermée, tenue par l'appelant ; sans elle le cadre tient la sienne                                      |
+| `onClose`       | la croix a été cliquée                                                                                            |
 
 `start` se lit horizontale d'abord, puis verticale, parmi
 `left | center | right` et `top | center | bottom` — `right-top`,
@@ -268,18 +270,18 @@ const container = useRef<HTMLDivElement>(null)
 </div>
 ```
 
-| prop de `Window` | rôle |
-| --- | --- |
-| `children` | ce que le cadre contient |
-| `show` | montée ou non ; le cadre ne se ferme jamais seul, `onClose` prévient |
-| `container` | le cadre borne le déplacement à cet élément |
-| `title` | le texte de la barre |
-| `bottomInset` | hauteur réservée en bas, pour une barre des tâches |
-| `compact` | pleine et non redimensionnable |
-| `move` / `start` / `margin` / `canExpand` / `canClose` | les cinq mêmes que ci-dessus |
-| `layer` | étage d'empilement |
-| `rank` | rang dans la cascade, pour ne pas s'ouvrir sur la précédente |
-| `onFocus` / `onClose` | la fenêtre réclame le premier plan, ou se ferme |
+| prop de `Window`                                       | rôle                                                                 |
+| ------------------------------------------------------ | -------------------------------------------------------------------- |
+| `children`                                             | ce que le cadre contient                                             |
+| `show`                                                 | montée ou non ; le cadre ne se ferme jamais seul, `onClose` prévient |
+| `container`                                            | le cadre borne le déplacement à cet élément                          |
+| `title`                                                | le texte de la barre                                                 |
+| `bottomInset`                                          | hauteur réservée en bas, pour une barre des tâches                   |
+| `compact`                                              | pleine et non redimensionnable                                       |
+| `move` / `start` / `margin` / `canExpand` / `canClose` | les cinq mêmes que ci-dessus                                         |
+| `layer`                                                | étage d'empilement                                                   |
+| `rank`                                                 | rang dans la cascade, pour ne pas s'ouvrir sur la précédente         |
+| `onFocus` / `onClose`                                  | la fenêtre réclame le premier plan, ou se ferme                      |
 
 `compact` retire le bouton d'agrandissement et le double-clic. Le paquet ne
 fixe aucun seuil : c'est à qui l'affiche de décider quand — petit écran, mode
@@ -290,14 +292,14 @@ lecture, préférence.
 Les réponses passent par une passe de coloration. Chaque couleur du thème a
 son marqueur :
 
-| marqueur | effet |
-| --- | --- |
-| `§texte§` | couleur d'accent |
-| `+texte+` | couleur d'information |
-| `` `texte` `` | couleur des commandes |
-| `!texte!` | couleur du restreint |
-| `$texte$` | couleur de marque |
-| `_texte_` | la couleur du fond : invisible jusqu'à la sélection |
+| marqueur               | effet                                                         |
+| ---------------------- | ------------------------------------------------------------- |
+| `§texte§`              | couleur d'accent                                              |
+| `+texte+`              | couleur d'information                                         |
+| `` `texte` ``          | couleur des commandes                                         |
+| `!texte!`              | couleur du restreint                                          |
+| `$texte$`              | couleur de marque                                             |
+| `_texte_`              | la couleur du fond : invisible jusqu'à la sélection           |
 | `#libellé ~ cmd args#` | cliquable et souligné : le clic joue `cmd` avec ses arguments |
 
 Un marqueur entre crochets — `[+texte+]` — devient un tag : un fond plein au
@@ -335,8 +337,8 @@ n'ajouter qu'un texte sans perdre les autres.
 	commands={commands}
 	lang="de"
 	dict={{
-		en: { welcome: { text: "Type `help`" } },   // l'anglais du paquet, une clé recouverte
-		de: dictDe,                                  // le vôtre, écrit chez vous
+		en: { welcome: { text: "Type `help`" } }, // l'anglais du paquet, une clé recouverte
+		de: dictDe, // le vôtre, écrit chez vous
 	}}
 />
 ```
@@ -352,16 +354,16 @@ langue d'origine ; seules les suivantes changent.
 
 Le paquet en livre huit, à la manière d'un éditeur :
 
-| nom | |
-| --- | --- |
-| `flower` | **le défaut** — feuillage sombre, une fleur pour invite |
-| `twilight` | un terminal sombre et neutre, invite `>` |
-| `parchment` | un terminal clair et neutre |
-| `dracula` | fond ardoise violette, accents saturés |
-| `nord` | fond bleu nuit, accents froids |
-| `gruvbox` | fond terreux, accents chauds |
-| `monokai` | fond olive sombre, accents francs |
-| `solarized` | fond ivoire, accents mesurés |
+| nom         |                                                         |
+| ----------- | ------------------------------------------------------- |
+| `flower`    | **le défaut** — feuillage sombre, une fleur pour invite |
+| `twilight`  | un terminal sombre et neutre, invite `>`                |
+| `parchment` | un terminal clair et neutre                             |
+| `dracula`   | fond ardoise violette, accents saturés                  |
+| `nord`      | fond bleu nuit, accents froids                          |
+| `gruvbox`   | fond terreux, accents chauds                            |
+| `monokai`   | fond olive sombre, accents francs                       |
+| `solarized` | fond ivoire, accents mesurés                            |
 
 Chacun s'exporte sous son nom — `flowerTheme`, `twilightTheme`, `nordTheme`… —
 et `themes` rassemble les huit sous les clés du tableau.
@@ -450,10 +452,10 @@ jouée depuis n'importe où — une fenêtre qui se ferme, un jeu qui se termine
 ```ts
 import { run, runRestricted, shellActions, useLang } from "flower-shell"
 
-run("help")             // comme si le visiteur l'avait tapée
-runRestricted("title")  // une commande que le visiteur ne peut pas taper
+run("help") // comme si le visiteur l'avait tapée
+runRestricted("title") // une commande que le visiteur ne peut pas taper
 shellActions().setLang("en")
-shellActions().reset()   // historique vide, options par defaut
+shellActions().reset() // historique vide, options par defaut
 ```
 
 **Conséquence assumée : un shell par page.** Le registre des commandes et le

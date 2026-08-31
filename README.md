@@ -15,20 +15,20 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 
 ## The component
 
-| prop | role |
-| --- | --- |
-| `commands` | the known commands, indexed by name: the ones shipped with the package, plus yours; optional |
-| `initialCommands` | commands played at startup, once; this is where the opening goes |
-| `theme` | the name of the theme it starts on, a key of `themes`; without it, the first of them — and without those either, nothing is painted |
-| `themes` | the themes the visitor can reach, one per name; `themes={themes}` for the whole catalogue |
-| `dict` | the languages of the shell, one dictionary per language; without it, English alone |
-| `lang` | starting language, among those of `dict` (`en` by default) |
-| `window` | puts the shell in a frame; the object holds everything the frame can do |
-| `scrollRef` | element to scroll as the output grows; ignored with `window` |
-| `onCommandStart` | before the command runs; fires for an unknown one too |
-| `onCommandDone` | the action returned its text and the effect played; nothing on screen yet |
-| `onCommandRendered` | the text has finished being written |
-| `onCommandError` | the command did not play; `reason` says why |
+| prop                | role                                                                                                                                |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `commands`          | the known commands, indexed by name: the ones shipped with the package, plus yours; optional                                        |
+| `initialCommands`   | commands played at startup, once; this is where the opening goes                                                                    |
+| `theme`             | the name of the theme it starts on, a key of `themes`; without it, the first of them — and without those either, nothing is painted |
+| `themes`            | the themes the visitor can reach, one per name; `themes={themes}` for the whole catalogue                                           |
+| `dict`              | the languages of the shell, one dictionary per language; without it, English alone                                                  |
+| `lang`              | starting language, among those of `dict` (`en` by default)                                                                          |
+| `window`            | puts the shell in a frame; the object holds everything the frame can do                                                             |
+| `scrollRef`         | element to scroll as the output grows; ignored with `window`                                                                        |
+| `onCommandStart`    | before the command runs; fires for an unknown one too                                                                               |
+| `onCommandDone`     | the action returned its text and the effect played; nothing on screen yet                                                           |
+| `onCommandRendered` | the text has finished being written                                                                                                 |
+| `onCommandError`    | the command did not play; `reason` says why                                                                                         |
 
 Every prop is optional, and what is left out simply does not exist. `<Shell />`
 mounts on nothing: an empty registry, so a typed line moves on to the next with
@@ -47,7 +47,7 @@ is a workbench, not something a visitor of yours needs to find.
 ```tsx
 import { Shell, baseCommands, test } from "flower-shell"
 
-<Shell commands={{ ...baseCommands, test }} />
+;<Shell commands={{ ...baseCommands, test }} />
 ```
 
 It prints every color of the theme, the source on the left and its render on
@@ -86,7 +86,9 @@ put your own words there, override that key like any other:
 <Shell
 	commands={baseCommands}
 	initialCommands={["title", "welcome"]}
-	dict={{ en: { welcome: { text: "Welcome to $acme$ — type `help` to look around" } } }}
+	dict={{
+		en: { welcome: { text: "Welcome to $acme$ — type `help` to look around" } },
+	}}
 />
 ```
 
@@ -110,10 +112,10 @@ throughout:
 />
 ```
 
-| field | |
-| --- | --- |
-| `name` | the first word of the line |
-| `args` | the rest of it, word by word |
+| field     |                                |
+| --------- | ------------------------------ |
+| `name`    | the first word of the line     |
+| `args`    | the rest of it, word by word   |
 | `pattern` | the whole line, as it was sent |
 
 `onCommandStart` fires before anything runs, off that line. At that point the
@@ -131,11 +133,11 @@ letter by letter. It fires once per command, on the crossing.
 `onCommandError` fires **instead of** `onCommandDone` when the command did not
 play, and adds `reason` to the object:
 
-| `reason` | |
-| --- | --- |
-| `unknown` | no command of that name in the registry |
-| `args` | the command exists, its arguments do not pass |
-| `thrown` | its action or its effect threw; the throw itself is in `error` |
+| `reason`  |                                                                |
+| --------- | -------------------------------------------------------------- |
+| `unknown` | no command of that name in the registry                        |
+| `args`    | the command exists, its arguments do not pass                  |
+| `thrown`  | its action or its effect threw; the throw itself is in `error` |
 
 A shell with an empty registry has nothing to object to — it lets a typed line
 through on purpose — so it reports no error at all.
@@ -165,15 +167,15 @@ the shell translates it when it uses it. A key missing from the dictionary
 shows as-is, which lets you write `description: "answers pong"` directly when
 one language is enough.
 
-| field | role |
-| --- | --- |
-| `action` | the text displayed, already translated |
-| `effect` | the side effect; the command reaches your state itself |
-| `JSX` | React render under the output, for a command that shows better than it tells |
-| `help` | the help; a function when it depends on state, like the one of `lang` |
-| `testArgs` | accepted arguments (`authorize`, `empty`); `authorize` accepts a function |
-| `display` | animation, styles, custom coloring |
-| `restricted` | true when the visitor cannot type it; reserved for code |
+| field        | role                                                                         |
+| ------------ | ---------------------------------------------------------------------------- |
+| `action`     | the text displayed, already translated                                       |
+| `effect`     | the side effect; the command reaches your state itself                       |
+| `JSX`        | React render under the output, for a command that shows better than it tells |
+| `help`       | the help; a function when it depends on state, like the one of `lang`        |
+| `testArgs`   | accepted arguments (`authorize`, `empty`); `authorize` accepts a function    |
+| `display`    | animation, styles, custom coloring                                           |
+| `restricted` | true when the visitor cannot type it; reserved for code                      |
 
 ## The window
 
@@ -196,17 +198,17 @@ frame content, so `scrollRef` has nothing left to say:
 />
 ```
 
-| `window` key | role |
-| --- | --- |
-| `title` | the text of the title bar |
-| `move` | dragged by its bar; `true` by default |
-| `start` | the corner it opens in; `center-center` by default |
-| `margin` | how far it is held off the edges `start` sent it to; zero by default |
-| `compact` | full and not resizable: it takes the whole container, and `start` and `margin` have nothing left to place |
-| `canExpand` | the maximise button, and the double-click on the bar |
-| `canClose` | the closing cross |
-| `open` | open or closed, held by the caller; without it the frame holds its own |
-| `onClose` | the cross was clicked |
+| `window` key | role                                                                                                      |
+| ------------ | --------------------------------------------------------------------------------------------------------- |
+| `title`      | the text of the title bar                                                                                 |
+| `move`       | dragged by its bar; `true` by default                                                                     |
+| `start`      | the corner it opens in; `center-center` by default                                                        |
+| `margin`     | how far it is held off the edges `start` sent it to; zero by default                                      |
+| `compact`    | full and not resizable: it takes the whole container, and `start` and `margin` have nothing left to place |
+| `canExpand`  | the maximise button, and the double-click on the bar                                                      |
+| `canClose`   | the closing cross                                                                                         |
+| `open`       | open or closed, held by the caller; without it the frame holds its own                                    |
+| `onClose`    | the cross was clicked                                                                                     |
 
 `start` reads horizontal first, then vertical, out of `left | center | right`
 and `top | center | bottom` — `right-top`, `left-bottom`, `center-center`.
@@ -266,18 +268,18 @@ const container = useRef<HTMLDivElement>(null)
 </div>
 ```
 
-| `Window` prop | role |
-| --- | --- |
-| `children` | what the frame holds |
-| `show` | mounted or not; the frame never closes itself, `onClose` reports |
-| `container` | the frame bounds its movement to this element |
-| `title` | the text of the bar |
-| `bottomInset` | height reserved at the bottom, for a taskbar |
-| `compact` | full and not resizable |
-| `move` / `start` / `margin` / `canExpand` / `canClose` | the same five as above |
-| `layer` | stacking floor |
-| `rank` | rank in the cascade, so as not to open on top of the previous one |
-| `onFocus` / `onClose` | the window asks for the front, or closes |
+| `Window` prop                                          | role                                                              |
+| ------------------------------------------------------ | ----------------------------------------------------------------- |
+| `children`                                             | what the frame holds                                              |
+| `show`                                                 | mounted or not; the frame never closes itself, `onClose` reports  |
+| `container`                                            | the frame bounds its movement to this element                     |
+| `title`                                                | the text of the bar                                               |
+| `bottomInset`                                          | height reserved at the bottom, for a taskbar                      |
+| `compact`                                              | full and not resizable                                            |
+| `move` / `start` / `margin` / `canExpand` / `canClose` | the same five as above                                            |
+| `layer`                                                | stacking floor                                                    |
+| `rank`                                                 | rank in the cascade, so as not to open on top of the previous one |
+| `onFocus` / `onClose`                                  | the window asks for the front, or closes                          |
 
 `compact` removes the maximise button and the double-click. The package sets no
 threshold: it is up to whoever displays it to decide when — small screen,
@@ -287,14 +289,14 @@ reading mode, preference.
 
 Answers go through a coloring pass. Each theme color has its own marker:
 
-| marker | effect |
-| --- | --- |
-| `§text§` | accent color |
-| `+text+` | info color |
-| `` `text` `` | command color |
-| `!text!` | restricted color |
-| `$text$` | brand color |
-| `_text_` | the background color: invisible until selected |
+| marker               | effect                                                             |
+| -------------------- | ------------------------------------------------------------------ |
+| `§text§`             | accent color                                                       |
+| `+text+`             | info color                                                         |
+| `` `text` ``         | command color                                                      |
+| `!text!`             | restricted color                                                   |
+| `$text$`             | brand color                                                        |
+| `_text_`             | the background color: invisible until selected                     |
 | `#label ~ cmd args#` | clickable and underlined: the click plays `cmd` with its arguments |
 
 A marker in brackets — `[+text+]` — becomes a tag: a solid background instead
@@ -331,8 +333,8 @@ you can add a single text without losing the others.
 	commands={commands}
 	lang="de"
 	dict={{
-		en: { welcome: { text: "Type `help`" } },   // the package English, one key overridden
-		de: dictDe,                                  // yours, written at home
+		en: { welcome: { text: "Type `help`" } }, // the package English, one key overridden
+		de: dictDe, // yours, written at home
 	}}
 />
 ```
@@ -349,16 +351,16 @@ language; only the following ones change.
 
 The package ships eight, in the manner of an editor:
 
-| name | |
-| --- | --- |
-| `flower` | **the default** — dark foliage, a flower for a prompt |
-| `twilight` | a dark, neutral terminal, `>` prompt |
-| `parchment` | a light, neutral terminal |
-| `dracula` | purple slate background, saturated accents |
-| `nord` | night blue background, cold accents |
-| `gruvbox` | earthy background, warm accents |
-| `monokai` | dark olive background, plain accents |
-| `solarized` | ivory background, measured accents |
+| name        |                                                       |
+| ----------- | ----------------------------------------------------- |
+| `flower`    | **the default** — dark foliage, a flower for a prompt |
+| `twilight`  | a dark, neutral terminal, `>` prompt                  |
+| `parchment` | a light, neutral terminal                             |
+| `dracula`   | purple slate background, saturated accents            |
+| `nord`      | night blue background, cold accents                   |
+| `gruvbox`   | earthy background, warm accents                       |
+| `monokai`   | dark olive background, plain accents                  |
+| `solarized` | ivory background, measured accents                    |
 
 Each is exported under its own name — `flowerTheme`, `twilightTheme`,
 `nordTheme`… — and `themes` gathers all eight under the keys of the table.
@@ -446,10 +448,10 @@ from anywhere — a window that closes, a game that ends.
 ```ts
 import { run, runRestricted, shellActions, useLang } from "flower-shell"
 
-run("help")             // as if the visitor had typed it
-runRestricted("title")  // a command the visitor cannot type
+run("help") // as if the visitor had typed it
+runRestricted("title") // a command the visitor cannot type
 shellActions().setLang("en")
-shellActions().reset()   // empty history, default options
+shellActions().reset() // empty history, default options
 ```
 
 **An accepted consequence: one shell per page.** The command registry and the

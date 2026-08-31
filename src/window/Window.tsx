@@ -135,9 +135,7 @@ const BaseWindow = (
 						</S.Actions>
 					</S.topBar>
 					<S.Content ref={ref}>
-						<S.Wrapper>
-							{children}
-						</S.Wrapper>
+						<S.Wrapper>{children}</S.Wrapper>
 					</S.Content>
 				</S.Container>
 			)}

@@ -12,7 +12,8 @@ import { source } from "../source"
 /** la commande de la story : ses textes sont ecrits la ou ils servent */
 const ping: BaseCommand = {
 	restricted: false,
-	action: ({ args }) => (args.length === 0 ? "pong!" : `pong ${args.join(" ")}`),
+	action: ({ args }) =>
+		args.length === 0 ? "pong!" : `pong ${args.join(" ")}`,
 	help: {
 		patterns: [{ pattern: "ping [text]", description: "answers pong" }],
 	},
