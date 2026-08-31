@@ -48,7 +48,7 @@ const Command = ({
 	useEffect(() => {
 		if (displayResult.finish) onRendered()
 		onAnimate()
-	}, [displayResult, onRendered])
+	}, [displayResult, onRendered, onAnimate])
 
 	return (
 		<>

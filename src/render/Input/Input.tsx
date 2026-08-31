@@ -33,6 +33,18 @@ export const Input = ({
 	// un bouton de souris enfonce, c'est peut-etre une selection en cours
 	const pressed = useRef<boolean>(false)
 
+	/**
+	 * L'option se lit au moment ou le focus se joue, et non quand elle
+	 * change : c'est une garde, pas un declencheur. Lue par une ref, la
+	 * poser a `true` en cours de session ne reprend pas le focus toute
+	 * seule — sur mobile, cela ouvrirait le clavier sans qu'on ait rien
+	 * touche — et les ecouteurs de souris se montent une fois pour toutes.
+	 */
+	const keyboardOnFocus = useRef<boolean>(options.keyboardOnFocus)
+	useEffect(() => {
+		keyboardOnFocus.current = options.keyboardOnFocus
+	}, [options.keyboardOnFocus])
+
 	// la saisie est locale, mais l'historique impose sa valeur : on se realigne
 	// pendant le rendu quand le parent en pousse une nouvelle
 	if (prevValue !== value) {
@@ -104,7 +116,7 @@ export const Input = ({
 		const handleUp = () => {
 			pressed.current = false
 
-			if (!options.keyboardOnFocus) return
+			if (!keyboardOnFocus.current) return
 			if (document.activeElement === ref.current) return
 			if (hasSelection()) return
 
@@ -118,10 +130,10 @@ export const Input = ({
 			document.removeEventListener("mousedown", handleDown)
 			document.removeEventListener("mouseup", handleUp)
 		}
-	}, [options.keyboardOnFocus])
+	}, [])
 
 	useEffect(() => {
-		if (options.keyboardOnFocus) ref?.current?.focus()
+		if (keyboardOnFocus.current) ref?.current?.focus()
 	}, [forceFocus])
 
 	const predictDisplay = `( ${predict}? appuyez sur [${

@@ -52,6 +52,16 @@ export const useDisplayByLetter = ({
 		// une fenetre qu'on ferme demonte le terminal en pleine ecriture :
 		// sans cela le minuteur continuerait de tourner dans le vide
 		return () => clearInterval(timer)
+
+		/**
+		 * `canRendered` seul, et c'est voulu : le deroule part une fois,
+		 * quand la commande passe son tour, et va jusqu'au bout. Ajouter le
+		 * texte ou les reglages relancerait le minuteur en pleine ecriture —
+		 * couper l'animation pendant qu'elle joue reecrirait la ligne depuis
+		 * la premiere lettre. Ils ne bougent pas de toute facon : ils
+		 * viennent de la commande, figee des son execution.
+		 */
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [canRendered])
 
 	// une fois l'animation terminee le texte affiche vaut deja baseTxt : le lire
