@@ -1,12 +1,11 @@
 export { Shell } from "./Shell"
-export type { ShellProps, ShellThemes } from "./Shell"
+export type { ShellHandle, ShellProps, ShellThemes } from "./Shell"
 
 export { baseCommands } from "./commands/base"
 export { highlightFlower, plantFlowers } from "./commands/flowers"
 export { test } from "./commands/test"
 export { title } from "./commands/title"
 
-export { run, runRestricted } from "./engine/send"
 export type {
 	CommandErrorEvent,
 	CommandErrorListener,
@@ -28,18 +27,7 @@ export { dictFr } from "./i18n/fr"
 
 export { highlight } from "./render/Command/helpers"
 
-export {
-	shellActions,
-	useAnimation,
-	useGetCommands,
-	useGetCurrentCommand,
-	useGetCursor,
-	useGetLastCommand,
-	useGetStart,
-	useKeyboardOnFocus,
-	useLang,
-	useShellStore,
-} from "./state/store"
+export type { ShellState } from "./state/store"
 
 export {
 	bareTheme,

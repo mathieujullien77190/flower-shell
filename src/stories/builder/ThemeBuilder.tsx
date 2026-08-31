@@ -3,7 +3,6 @@ import { useState } from "react"
 import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
-import { shellActions } from "../../state/store"
 import { themes } from "../../theme"
 import type { ShellColors, ShellTheme } from "../../theme"
 
@@ -13,9 +12,9 @@ import type { ShellColors, ShellTheme } from "../../theme"
  * the code that will render it for real.
  *
  * It remounts on every touch of a picker, through the `key` its parent
- * gives it. The registry and the history live at module level, so the
- * remount has to start from an empty screen: without the reset, the shell
- * would find the previous lines on screen and skip `initialCommands`.
+ * gives it. A remounted shell is a new shell — the store comes with the
+ * instance — so it starts on an empty screen and plays `initialCommands`
+ * again, which is what makes the preview follow.
  *
  * Animation off, and only here: replaying `test` letter by letter at every
  * keystroke would show the palette a second after the color changed.
@@ -26,25 +25,18 @@ import type { ShellColors, ShellTheme } from "../../theme"
  * a form around it, and a picker or a select would be closed the instant it
  * was opened.
  */
-const Preview = ({ draft }: { draft: ShellTheme }) => {
-	useState(() => {
-		shellActions().reset()
-		shellActions().setAnimation(false)
-		shellActions().setKeyboardOnFocus(false)
-		return true
-	})
-
-	return (
-		<Shell
-			commands={{ ...baseCommands, test }}
-			theme="draft"
-			// the draft is the only reachable theme: the preview shows what is
-			// being written, not the catalogue of the package
-			themes={{ draft }}
-			initialCommands={["test"]}
-		/>
-	)
-}
+const Preview = ({ draft }: { draft: ShellTheme }) => (
+	<Shell
+		commands={{ ...baseCommands, test }}
+		theme="draft"
+		// the draft is the only reachable theme: the preview shows what is
+		// being written, not the catalogue of the package
+		themes={{ draft }}
+		initialCommands={["test"]}
+		animation={false}
+		keyboardOnFocus={false}
+	/>
+)
 
 /** what a picker edits: the label people read, the key the theme uses */
 const SHELL_FIELDS: { key: keyof ShellColors; label: string }[] = [

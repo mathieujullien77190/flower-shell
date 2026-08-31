@@ -5,8 +5,7 @@ import { TerminalProps } from "./types"
 import Input, { hasSelection } from "@render/Input"
 import Command from "@render/Command"
 
-import { getCommands } from "@state/registry"
-import { useThemeName } from "@state/store"
+import { useCommands, useThemeName } from "@state/context"
 import { container } from "@theme"
 import { findCommand } from "@engine/terminalEngine"
 
@@ -27,6 +26,7 @@ export const Terminal = ({
 
 	// subscription to the theme: on a change, the container reads colors() again
 	const themeName = useThemeName()
+	const known = useCommands()
 
 	return (
 		<S.TerminalContainer
@@ -46,7 +46,7 @@ export const Terminal = ({
 				.map((command, i, all) => {
 					const prevIsRendered = i === 0 ? true : all[i - 1].isRendered
 					const baseCommand = findCommand({
-						commands: getCommands(),
+						commands: known,
 						name: command.name,
 						restricted: command.restricted,
 					})

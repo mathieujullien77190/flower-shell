@@ -1,5 +1,5 @@
-import { getCommands } from "@state/registry"
-import { shellActions } from "@state/store"
+import type { ShellInstance } from "@state/instance"
+import { playingInstance, withInstance } from "@state/instance"
 import { createCommand, findCommand } from "./terminalEngine"
 
 /** what a listener receives: the line that was sent, whole and split */
@@ -30,95 +30,110 @@ export type CommandErrorEvent = CommandEvent & {
 export type CommandListener = (event: CommandEvent) => void
 export type CommandErrorListener = (event: CommandErrorEvent) => void
 
-const NO_LISTENER = () => {}
-
 /**
- * The listeners this module can warn, set by the consumer. The one for the
- * end of the writing belongs to the rendering and lives in the shell: here,
- * nothing knows what is on screen.
+ * Plays a command on one shell: its side effect first, then its addition to
+ * the history.
+ *
+ * The instance travels with the line rather than being looked up, so two
+ * terminals on the same page never play into each other. It is posted as the
+ * playing one for the whole call, which is what lets an `action` reach `t()`
+ * and an `effect` reach `shellActions()` without taking either as an
+ * argument.
  */
-let onStart: CommandListener = NO_LISTENER
-let onDone: CommandListener = NO_LISTENER
-let onError: CommandErrorListener = NO_LISTENER
+const send = (
+	instance: ShellInstance,
+	commandPattern: string,
+	restricted: boolean
+) =>
+	withInstance(instance, () => {
+		const commands = instance.commands()
+		const listeners = instance.listeners()
+		const store = instance.store
 
-export const setListeners = (listeners: {
-	start?: CommandListener
-	done?: CommandListener
-	error?: CommandErrorListener
-}) => {
-	onStart = listeners.start || NO_LISTENER
-	onDone = listeners.done || NO_LISTENER
-	onError = listeners.error || NO_LISTENER
-}
-
-/**
- * Plays a command: its side effect first, then its addition to the history.
- * The store is a module, there is no dispatch to carry around, and so the
- * function can be called from anywhere.
- */
-const send = (commandPattern: string, restricted: boolean) => {
-	const commands = getCommands()
-
-	/**
-	 * The start is reported before `createCommand`, which already plays the
-	 * action: after it, it would be too late to be a "before". So the name
-	 * and the arguments come from the line itself, and not from the command
-	 * — at that point the shell does not yet know whether it has one.
-	 */
-	const split = commandPattern.split(" ")
-	const event: CommandEvent = {
-		name: split[0],
-		args: split.slice(1),
-		pattern: commandPattern,
-	}
-
-	onStart(event)
-
-	let cmd
-	try {
-		cmd = createCommand({ commands, commandPattern, restricted })
-	} catch (error) {
-		// the action threw: the command does not even exist enough to be
-		// added to the history, there is only the error left to render
-		onError({ ...event, reason: "thrown", error })
-		return
-	}
-
-	const baseCmd = findCommand({ commands, name: cmd.name, restricted })
-
-	if (baseCmd?.effect && cmd.canExecute) {
-		try {
-			baseCmd.effect({ args: cmd.args })
-		} catch (error) {
-			// the effect threw after the action had returned its text: the line
-			// shows up all the same, the consumer learns the rest failed
-			onError({ ...event, reason: "thrown", error })
+		/**
+		 * The start is reported before `createCommand`, which already plays the
+		 * action: after it, it would be too late to be a "before". So the name
+		 * and the arguments come from the line itself, and not from the command
+		 * — at that point the shell does not yet know whether it has one.
+		 */
+		const split = commandPattern.split(" ")
+		const event: CommandEvent = {
+			name: split[0],
+			args: split.slice(1),
+			pattern: commandPattern,
 		}
+
+		listeners.start?.(event)
+
+		let cmd
+		try {
+			cmd = createCommand({ commands, commandPattern, restricted })
+		} catch (error) {
+			// the action threw: the command does not even exist enough to be
+			// added to the history, there is only the error left to render
+			listeners.error?.({ ...event, reason: "thrown", error })
+			return
+		}
+
+		const baseCmd = findCommand({ commands, name: cmd.name, restricted })
+
+		if (baseCmd?.effect && cmd.canExecute) {
+			try {
+				baseCmd.effect({ args: cmd.args })
+			} catch (error) {
+				// the effect threw after the action had returned its text: the line
+				// shows up all the same, the consumer learns the rest failed
+				listeners.error?.({ ...event, reason: "thrown", error })
+			}
+		}
+
+		store.getState().addCommand(cmd)
+
+		if (cmd.canExecute) {
+			// the action returned its text and the effect played: the command is
+			// over, even if nothing is on screen yet
+			listeners.done?.(event)
+			return
+		}
+
+		/**
+		 * A shell with no command at all lets through whatever is typed — that
+		 * is a choice of the consumer, not a mistake of the visitor, and so
+		 * there is nothing to report. Elsewhere, the line did not play: either
+		 * the name is unknown, or it exists and its arguments do not pass.
+		 */
+		if (Object.keys(commands).length === 0) return
+
+		listeners.error?.({ ...event, reason: baseCmd ? "args" : "unknown" })
+	})
+
+/**
+ * Plays a line on the shell a command is playing for. It is what a command's
+ * `effect` uses to reach its own terminal — `actionmap` does, to play the
+ * line a clickable marker points at — and it only means something inside a
+ * command: outside one, no shell is in play, and there is a handle to take
+ * instead.
+ */
+export const runHere = (commandPattern: string) => {
+	const instance = playingInstance()
+
+	if (!instance) {
+		throw new Error(
+			"runHere() is only reachable while a command plays. Outside of one, use the handle of the shell you mean."
+		)
 	}
 
-	shellActions().addCommand(cmd)
-
-	if (cmd.canExecute) {
-		// the action returned its text and the effect played: the command is
-		// over, even if nothing is on screen yet
-		onDone(event)
-		return
-	}
-
-	/**
-	 * A shell with no command at all lets through whatever is typed — that
-	 * is a choice of the consumer, not a mistake of the visitor, and so
-	 * there is nothing to report. Elsewhere, the line did not play: either
-	 * the name is unknown, or it exists and its arguments do not pass.
-	 */
-	if (Object.keys(commands).length === 0) return
-
-	onError({ ...event, reason: baseCmd ? "args" : "unknown" })
+	send(instance, commandPattern, false)
 }
 
-/** plays a command of the visitor */
-export const run = (commandPattern: string) => send(commandPattern, false)
-
-/** plays an internal command, one the visitor cannot type */
-export const runRestricted = (commandPattern: string) =>
-	send(commandPattern, true)
+/**
+ * The two ways in, bound to one shell. This is what a handle hands out, and
+ * the only way a line reaches a terminal from outside React.
+ */
+export const createRunners = (instance: ShellInstance) => ({
+	/** plays a command of the visitor */
+	run: (commandPattern: string) => send(instance, commandPattern, false),
+	/** plays an internal command, one the visitor cannot type */
+	runRestricted: (commandPattern: string) =>
+		send(instance, commandPattern, true),
+})

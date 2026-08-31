@@ -1,9 +1,9 @@
 import { BaseCommands, Help } from "@types"
 import { langs, t } from "@i18n/lang"
 import { readHelp } from "@engine/terminalEngine"
-import { run } from "@engine/send"
+import { runHere } from "@engine/send"
 import { colors, themeNames } from "@theme"
-import { shellActions } from "@state/store"
+import { shellActions } from "@state/instance"
 import { highlightFlower, plantFlowers } from "./flowers"
 import { title } from "./title"
 
@@ -207,7 +207,7 @@ export const baseCommands: BaseCommands = {
 	actionmap: {
 		restricted: true,
 		action: () => "",
-		effect: ({ args = [] }) => run(args.join(" ")),
+		effect: ({ args = [] }) => runHere(args.join(" ")),
 		display: { hideCmd: true },
 	},
 }

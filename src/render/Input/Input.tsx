@@ -10,7 +10,7 @@ import { isMobile } from "react-device-detect"
 
 import { theme } from "@theme"
 
-import { getCommands } from "@state/registry"
+import { useCommands } from "@state/context"
 import { autocompleteCommand } from "@engine/terminalEngine"
 
 import * as S from "./UI"
@@ -29,6 +29,9 @@ export const Input = ({
 	const [nbsLetters, setNbsLetters] = useState<number>(0)
 	const [prevValue, setPrevValue] = useState<string>(value)
 	const ref = useRef<HTMLInputElement>(null)
+
+	// the commands of this shell, for the autocompletion alone
+	const known = useCommands()
 
 	// a mouse button held down may well be a selection under way
 	const pressed = useRef<boolean>(false)
@@ -57,7 +60,7 @@ export const Input = ({
 		(e: KeyboardEvent<HTMLInputElement>) => {
 			const commandPattern = cleanCommand(e.currentTarget.value)
 			const autocomplete = autocompleteCommand({
-				commands: getCommands(),
+				commands: known,
 				startCommand: commandPattern,
 			})
 
@@ -81,7 +84,7 @@ export const Input = ({
 				setPredict("")
 			}
 		},
-		[onValidate]
+		[onValidate, known]
 	)
 
 	const handleKeyDown = useCallback(

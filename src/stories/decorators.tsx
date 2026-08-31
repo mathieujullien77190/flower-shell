@@ -2,20 +2,18 @@ import { useRef, useState } from "react"
 import type { Decorator } from "@storybook/react-vite"
 
 import { setThemes, wearTheme } from "../theme"
-import { shellActions } from "../state/store"
 
 /**
- * The shell state lives in a module: without this, one story's history would
- * carry into the next. The reset happens while the decorator renders, so
- * before the shell mounts and plays its opening.
+ * The theme and its catalogue live at module level, shared by every shell:
+ * without a reset they would leak from one story to the next — Themes
+ * mounts three of them. Back to nothing mounted and nothing worn, which is
+ * what a shell with no theme prop is; each story declares its own on mount.
+ *
+ * The history needs nothing here: each `<Shell>` owns its store, so a new
+ * story is a new terminal.
  */
 export const Fresh = ({ children }: { children: React.ReactNode }) => {
 	useState(() => {
-		shellActions().reset()
-		// the theme and its catalogue live at module level: without a reset
-		// they would leak from one story to the next — Themes mounts three of
-		// them. Back to nothing mounted and nothing worn, which is what a
-		// shell with no theme prop is; each story declares its own on mount.
 		setThemes()
 		wearTheme()
 		return true

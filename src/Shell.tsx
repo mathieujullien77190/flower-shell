@@ -1,32 +1,55 @@
-import { RefObject, useCallback, useEffect, useState } from "react"
+import {
+	Ref,
+	RefObject,
+	useCallback,
+	useEffect,
+	useImperativeHandle,
+	useState,
+} from "react"
 
 import Terminal from "./render/Terminal"
 
-import { run, runRestricted, setListeners } from "./engine/send"
+import { createRunners } from "./engine/send"
 import type { CommandErrorListener, CommandListener } from "./engine/send"
 import { setDict } from "./i18n/lang"
-import { getCommands, setCommands } from "./state/registry"
+import { createInstance } from "./state/instance"
 import {
-	shellActions,
+	ShellProvider,
 	useAnimation,
 	useGetCommands,
 	useGetCurrentCommand,
 	useKeyboardOnFocus,
 	useLang,
-} from "./state/store"
+} from "./state/context"
+import type { ShellState } from "./state/store"
 import { setThemes, ShellThemeInput, wearTheme } from "./theme"
-import { BaseCommand, BaseCommands, Dictionaries } from "./types"
+import { BaseCommands, Dictionaries } from "./types"
 
 /** a catalogue of themes, indexed by the name the visitor types */
 export type ShellThemes = Record<string, ShellThemeInput>
 
+/**
+ * The hold on one terminal, handed through `ref`. It is how a line reaches a
+ * shell from outside React — a button of yours, a game that ends — and, with
+ * several terminals on the page, the only thing that says which one.
+ */
+export type ShellHandle = {
+	/** plays a command as if the visitor had typed it */
+	run: (commandPattern: string) => void
+	/** plays a restricted command, one the visitor cannot type */
+	runRestricted: (commandPattern: string) => void
+	/** the state of this shell, read fresh: history, cursor, options */
+	actions: () => ShellState
+}
+
 export type ShellProps = {
+	ref?: Ref<ShellHandle>
 	/**
 	 * The known commands: the ones shipped with the package, plus yours.
 	 * Without it, the shell mounts bare — it shows the prompt and answers
 	 * nothing.
 	 */
-	commands?: BaseCommands & { [name: string]: BaseCommand }
+	commands?: BaseCommands
 	/**
 	 * The theme it starts on, by name: a key of `themes`, the way `lang` is a
 	 * key of `dict`. Without it, the first of the catalogue — and if `themes`
@@ -34,6 +57,9 @@ export type ShellProps = {
 	 *
 	 * A name absent from the catalogue is ignored: it cannot start on a theme
 	 * the visitor would have no way of finding again.
+	 *
+	 * The theme is shared by every terminal on the page: two shells cannot
+	 * wear two, and switching it in one repaints the other.
 	 */
 	theme?: string
 	/**
@@ -53,10 +79,17 @@ export type ShellProps = {
 	 * Your texts, by language. They cover the ones of the package key by key,
 	 * and a language the package does not have becomes reachable through
 	 * `lang <code>`.
+	 *
+	 * The dictionaries are shared by every terminal on the page; the language
+	 * each one speaks is not.
 	 */
 	dict?: Dictionaries
 	/** starting language; without it, English */
 	lang?: string
+	/** letter by letter writing of the answers; true by default */
+	animation?: boolean
+	/** the input takes the focus back as soon as it loses it; true by default */
+	keyboardOnFocus?: boolean
 	/**
 	 * Commands played at startup, in the order of the array. Each one goes as
 	 * if typed; the restricted ones (`title`, `welcome`…) go through the
@@ -65,8 +98,8 @@ export type ShellProps = {
 	 *
 	 * Played once, on a blank screen: a `clear` does not play them again, it
 	 * erases and nothing else. Bringing them back is up to the consumer —
-	 * `onCommandDone` tells it about the `clear`, `runRestricted` lets it
-	 * replay whatever it wants.
+	 * `onCommandDone` tells it about the `clear`, the handle lets it replay
+	 * whatever it wants.
 	 */
 	initialCommands?: string[]
 	/**
@@ -111,16 +144,20 @@ export type ShellProps = {
  * It takes the room it is given and nothing more — the height, the frame,
  * the place on the page belong to whoever displays it.
  *
- * The registry, the theme and the state live at module level — they serve
- * outside React too, a page that closes can play a command. Corollary,
- * knowingly: one shell per page.
+ * Each one owns its history, its cursor and its options, so several can live
+ * on the same page. The theme and the dictionaries stay shared: the markup
+ * is coloured by a function, not by a component, and a provider would not
+ * reach it.
  */
 export const Shell = ({
+	ref,
 	commands = {},
 	theme,
 	themes,
 	dict,
 	lang,
+	animation,
+	keyboardOnFocus,
 	initialCommands = [],
 	scrollRef,
 	onCommandStart,
@@ -128,17 +165,82 @@ export const Shell = ({
 	onCommandRendered,
 	onCommandError,
 }: ShellProps) => {
-	// set before the first render: the terminal reads the registry as it renders
-	const [ready] = useState(() => {
+	/**
+	 * This shell, and nothing of anyone else's: its store, its commands, its
+	 * listeners. Built before the first render, because the terminal reads
+	 * the registry as it renders.
+	 */
+	const [instance] = useState(() => {
+		const created = createInstance({ lang, animation, keyboardOnFocus })
+
 		// the dictionary first: a command played translates as it executes
 		setDict(dict)
-		setCommands(commands)
+		created.setCommands(commands)
 		// the catalogue before the starting theme: `help theme` and `theme
 		// <name>` read the first, and the second need not be part of it
 		setThemes(themes)
 		wearTheme(theme)
-		return true
+		return created
 	})
+
+	const [runners] = useState(() => createRunners(instance))
+
+	useImperativeHandle(
+		ref,
+		() => ({ ...runners, actions: () => instance.store.getState() }),
+		[instance, runners]
+	)
+
+	return (
+		<ShellProvider value={instance}>
+			<Screen
+				commands={commands}
+				theme={theme}
+				themes={themes}
+				dict={dict}
+				lang={lang}
+				animation={animation}
+				keyboardOnFocus={keyboardOnFocus}
+				initialCommands={initialCommands}
+				scrollRef={scrollRef}
+				onCommandStart={onCommandStart}
+				onCommandDone={onCommandDone}
+				onCommandRendered={onCommandRendered}
+				onCommandError={onCommandError}
+				instance={instance}
+				runners={runners}
+			/>
+		</ShellProvider>
+	)
+}
+
+type ScreenProps = Omit<ShellProps, "ref"> & {
+	instance: ReturnType<typeof createInstance>
+	runners: ReturnType<typeof createRunners>
+}
+
+/**
+ * The terminal itself, inside the provider: the hooks below read the store
+ * of the instance above, which is why this is a component of its own.
+ */
+const Screen = ({
+	commands = {},
+	theme,
+	themes,
+	dict,
+	lang,
+	animation,
+	keyboardOnFocus,
+	initialCommands = [],
+	scrollRef,
+	onCommandStart,
+	onCommandDone,
+	onCommandRendered,
+	onCommandError,
+	instance,
+	runners,
+}: ScreenProps) => {
+	const { run, runRestricted } = runners
 
 	const history = useGetCommands()
 	const currentCommand = useGetCurrentCommand()
@@ -154,39 +256,48 @@ export const Shell = ({
 	}, [dict])
 
 	useEffect(() => {
-		setCommands(commands)
-	}, [commands])
+		instance.setCommands(commands)
+	}, [instance, commands])
 
 	useEffect(() => {
 		setThemes(themes)
 		wearTheme(theme)
 	}, [themes, theme])
 
+	// the listeners belong to this shell: two terminals warn two consumers
 	useEffect(() => {
-		setListeners({
+		instance.setListeners({
 			start: onCommandStart,
 			done: onCommandDone,
 			error: onCommandError,
 		})
-	}, [onCommandStart, onCommandDone, onCommandError])
+	}, [instance, onCommandStart, onCommandDone, onCommandError])
 
 	// after the mount, never during the render: the language of the browser
 	// does not exist at prerender, and applying it earlier would make the HTML
 	// diverge
 	useEffect(() => {
-		if (lang) shellActions().setLang(lang)
-	}, [lang])
+		if (lang) instance.store.getState().setLang(lang)
+	}, [instance, lang])
+
+	useEffect(() => {
+		if (animation !== undefined)
+			instance.store.getState().setAnimation(animation)
+	}, [instance, animation])
+
+	useEffect(() => {
+		if (keyboardOnFocus !== undefined)
+			instance.store.getState().setKeyboardOnFocus(keyboardOnFocus)
+	}, [instance, keyboardOnFocus])
 
 	/**
 	 * The opening plays on mount, but only if the screen is empty. The shell
 	 * can be unmounted then mounted again — a page one leaves and comes back
-	 * to — while the history lives at module level and has survived: playing
-	 * it again would show the title twice.
+	 * to — and a story or a route may hand it a store that has already
+	 * played: playing it again would show the title twice.
 	 */
 	useEffect(() => {
-		if (!ready) return
-
-		const { commands: played, restrictedCommands } = shellActions()
+		const { commands: played, restrictedCommands } = instance.store.getState()
 		const onScreen = [...played, ...restrictedCommands].some(
 			command => command.visible
 		)
@@ -197,12 +308,12 @@ export const Shell = ({
 			// channel, the others as if typed
 			initialCommands.forEach(pattern => {
 				const name = pattern.split(" ")[0]
-				if (getCommands()[name]?.restricted) runRestricted(pattern)
+				if (instance.commands()[name]?.restricted) runRestricted(pattern)
 				else run(pattern)
 			})
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ready])
+	}, [instance])
 
 	const scrollDown = useCallback(() => {
 		scrollRef?.current?.scrollTo(0, 1000000)
@@ -217,13 +328,13 @@ export const Shell = ({
 	 */
 	const handleRendered = useCallback(
 		(id: string) => {
-			const { commands: played, restrictedCommands } = shellActions()
-			const done = [...played, ...restrictedCommands].find(
+			const actions = instance.store.getState()
+			const done = [...actions.commands, ...actions.restrictedCommands].find(
 				command => command.id === id
 			)
 			const first = !!done && !done.isRendered
 
-			shellActions().setIsRendered(id)
+			actions.setIsRendered(id)
 			scrollDown()
 
 			if (first && done.canExecute) {
@@ -234,12 +345,15 @@ export const Shell = ({
 				})
 			}
 		},
-		[scrollDown, onCommandRendered]
+		[instance, scrollDown, onCommandRendered]
 	)
 
-	const moveCursor = useCallback((direction: number) => {
-		shellActions().moveCursor(direction)
-	}, [])
+	const moveCursor = useCallback(
+		(direction: number) => {
+			instance.store.getState().moveCursor(direction)
+		},
+		[instance]
+	)
 
 	return (
 		<Terminal

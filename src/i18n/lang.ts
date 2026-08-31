@@ -1,5 +1,5 @@
 import { Dict, Dictionaries } from "@types"
-import { useShellStore } from "@state/store"
+import { playingInstance } from "@state/instance"
 import { dictEn } from "./en"
 
 /** fallback language, when the key is missing from the current one */
@@ -86,7 +86,10 @@ const read = (source: Dict, key: string): string | null => {
 }
 
 /**
- * The text of a key, in the current language.
+ * The text of a key, in the language of the shell the command is playing
+ * for. The dictionaries are shared by every terminal on the page; the
+ * language is not, so it is read off the shell in play — outside of a
+ * command there is none, and the fallback language answers.
  *
  * A key that is missing shows up as it is — that is what allows a raw text
  * to be passed anywhere a key is expected.
@@ -100,7 +103,7 @@ export const t = (
 	vars?: Record<string, string | number>,
 	force?: string
 ) => {
-	const current = force || useShellStore.getState().lang
+	const current = force || playingInstance()?.store.getState().lang || BASE_LANG
 
 	const text =
 		read(dict[current] || {}, key) || read(dict[BASE_LANG] || {}, key) || key
