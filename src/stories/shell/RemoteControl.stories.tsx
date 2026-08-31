@@ -234,14 +234,7 @@ const Remote = () => {
 			>
 				<Remote />
 
-				<div
-					style={{
-						overflowY: "auto",
-						minHeight: 0,
-						border: "solid 2px #000000",
-						borderRadius: 4,
-					}}
-				>
+				<div style={{ overflowY: "auto", minHeight: 0 }}>
 					<Shell
 						id={TERMINAL}
 						commands={{ ...baseCommands, test }}

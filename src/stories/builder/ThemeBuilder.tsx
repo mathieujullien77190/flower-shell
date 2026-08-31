@@ -268,13 +268,7 @@ export const ThemeBuilder = () => {
 					    block — the shell scrolls down to its last line, and it is the
 					    list of the colors that would go past the top. */}
 					<div
-						style={{
-							height: 700,
-							boxSizing: "border-box",
-							overflowY: "auto",
-							border: "solid 2px #000000",
-							borderRadius: 6,
-						}}
+						style={{ height: 700, boxSizing: "border-box", overflowY: "auto" }}
 					>
 						<Preview key={signature} draft={draft} />
 					</div>

@@ -31,16 +31,7 @@ const Toolbar = () => {
 }
 
 const Box = ({ children }: { children: React.ReactNode }) => (
-	<div
-		style={{
-			overflowY: "auto",
-			minHeight: 0,
-			border: "solid 2px #000000",
-			borderRadius: 4,
-		}}
-	>
-		{children}
-	</div>
+	<div style={{ overflowY: "auto", minHeight: 0 }}>{children}</div>
 )
 
 const meta: Meta<typeof Shell> = {

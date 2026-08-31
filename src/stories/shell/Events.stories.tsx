@@ -94,16 +94,7 @@ const Watcher = () => {
 				padding: 32,
 			}}
 		>
-			<div
-				ref={box}
-				style={{
-					flex: 1,
-					overflowY: "auto",
-					border: "solid 2px #000000",
-					borderRadius: 4,
-					boxShadow: "3px 2px 4px #00000041",
-				}}
-			>
+			<div ref={box} style={{ flex: 1, overflowY: "auto" }}>
 				<Shell
 					commands={{ ...baseCommands, test, boom }}
 					themes={themes}

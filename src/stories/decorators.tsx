@@ -43,9 +43,6 @@ export const Boxed = ({
 					style={{
 						height: "100%",
 						overflowY: "auto",
-						border: "solid 2px #000000",
-						borderRadius: 4,
-						boxShadow: "3px 2px 4px #00000041",
 					}}
 				>
 					{children(box)}
