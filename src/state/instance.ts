@@ -11,6 +11,8 @@ import {
 export type ShellListeners = {
 	start?: CommandListener
 	done?: CommandListener
+	/** the writing is over: reported by the terminal, not by the engine */
+	rendered?: CommandListener
 	error?: CommandErrorListener
 }
 

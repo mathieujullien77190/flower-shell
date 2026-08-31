@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { Shell } from "../../Shell"
+import { ShellProvider } from "../../state/context"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { flowerTheme, nordTheme } from "../../theme"
 import type { ShellThemeInput } from "../../theme"
-import { boxed } from "../decorators"
+import { boxed, inProvider } from "../decorators"
 import { prose } from "../i18n"
 import { source } from "../source"
 
@@ -28,9 +28,9 @@ const neon: ShellThemeInput = {
 	prompt: "λ",
 }
 
-const meta: Meta<typeof Shell> = {
+const meta: Meta<typeof ShellProvider> = {
 	title: "Shell/Themes",
-	component: Shell,
+	component: ShellProvider,
 	decorators: [boxed],
 	parameters: prose({
 		en: `
@@ -59,9 +59,10 @@ monté.
 
 export default meta
 
-export const Themes: StoryObj<typeof Shell> = {
+export const Themes: StoryObj<typeof ShellProvider> = {
+	render: inProvider,
 	parameters: source(`
-import { Shell, baseCommands, test, flowerTheme, nordTheme, themes } from "flower-shell"
+import { Shell, ShellProvider, baseCommands, test, flowerTheme, nordTheme, themes } from "flower-shell"
 import type { ShellThemeInput } from "flower-shell"
 
 // written from scratch: what it does not say keeps the default —
@@ -83,16 +84,20 @@ const neon: ShellThemeInput = {
 // the catalogue the visitor can reach, and nothing else: the five other
 // themes of the package are not mounted, so \`theme dracula\` is refused.
 // each name describes itself through the \`theme.<name>\` key.
-<Shell
+<ShellProvider
 	commands={{ ...baseCommands, test }}
 	themes={{ flower: flowerTheme, nord: nordTheme, neon }}
 	theme="nord"
 	initialCommands={["title", "help theme"]}
 	dict={{ en: { theme: { neon: "Written from scratch, in the story file" } } }}
-/>
+>
+	<Shell />
+</ShellProvider>
 
 // or hand over the whole catalogue, and let the visitor have all eight
-<Shell commands={baseCommands} themes={themes} />
+<ShellProvider commands={baseCommands} themes={themes}>
+	<Shell />
+</ShellProvider>
 `),
 	args: {
 		commands: { ...baseCommands, test },

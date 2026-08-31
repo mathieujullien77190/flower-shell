@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { Shell } from "../../Shell"
-import { boxed } from "../decorators"
+import { ShellProvider } from "../../state/context"
+import { boxed, inProvider } from "../decorators"
 import { prose } from "../i18n"
 import { source } from "../source"
 
-const meta: Meta<typeof Shell> = {
+const meta: Meta<typeof ShellProvider> = {
 	title: "Shell/Default",
-	component: Shell,
+	component: ShellProvider,
 	decorators: [boxed],
 	// the only page carrying the table of the props: it is the same
 	// everywhere, and this is where one comes in
@@ -44,7 +44,8 @@ s'habille.
 
 export default meta
 
-export const Default: StoryObj<typeof Shell> = {
+export const Default: StoryObj<typeof ShellProvider> = {
+	render: inProvider,
 	parameters: source(`
 import { Shell } from "flower-shell"
 

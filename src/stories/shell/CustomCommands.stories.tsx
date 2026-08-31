@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { Shell } from "../../Shell"
+import { ShellProvider } from "../../state/context"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { themes } from "../../theme"
 import { BaseCommand } from "../../types"
-import { boxed } from "../decorators"
+import { boxed, inProvider } from "../decorators"
 import { prose } from "../i18n"
 import { source } from "../source"
 
@@ -19,9 +19,9 @@ const ping: BaseCommand = {
 	},
 }
 
-const meta: Meta<typeof Shell> = {
+const meta: Meta<typeof ShellProvider> = {
 	title: "Shell/Custom commands",
-	component: Shell,
+	component: ShellProvider,
 	decorators: [boxed],
 	parameters: prose({
 		en: `
@@ -42,10 +42,11 @@ même commande doit parler plus d'une langue.
 export default meta
 
 /** a custom command is added to the object, the rest stays put */
-export const CustomCommands: StoryObj<typeof Shell> = {
+export const CustomCommands: StoryObj<typeof ShellProvider> = {
 	name: "Custom commands",
+	render: inProvider,
 	parameters: source(`
-import { Shell, baseCommands, test, themes } from "flower-shell"
+import { Shell, ShellProvider, baseCommands, test, themes } from "flower-shell"
 import type { BaseCommand } from "flower-shell"
 
 // the texts are written where they are used: no dictionary, no keys.
@@ -60,11 +61,13 @@ const ping: BaseCommand = {
 
 // the command is added to the object, the rest stays put.
 // help ping opens the shell on what the help block above produces.
-<Shell
+<ShellProvider
 	commands={{ ...baseCommands, test, ping }}
 	themes={themes}
 	initialCommands={["help ping"]}
-/>
+>
+	<Shell />
+</ShellProvider>
 `),
 	args: {
 		commands: { ...baseCommands, test, ping },

@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { Shell } from "../../Shell"
+import { ShellProvider } from "../../state/context"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { flowerTheme } from "../../theme"
 import { dictEn } from "../../i18n/en"
 import { dictFr } from "../../i18n/fr"
 import { Dict } from "../../types"
-import { boxed } from "../decorators"
+import { boxed, inProvider } from "../decorators"
 import { prose } from "../i18n"
 import { source } from "../source"
 
@@ -64,9 +64,9 @@ const dictDe: Dict = {
 	},
 }
 
-const meta: Meta<typeof Shell> = {
+const meta: Meta<typeof ShellProvider> = {
 	title: "Shell/Languages",
-	component: Shell,
+	component: ShellProvider,
 	decorators: [boxed],
 	parameters: prose({
 		en: `
@@ -101,19 +101,22 @@ l'aide afficherait cette clé nue une fois le visiteur revenu à l'anglais.
 export default meta
 
 /** the package ships it: `dictFr` beside `dictEn`, and both answer */
-export const French: StoryObj<typeof Shell> = {
+export const French: StoryObj<typeof ShellProvider> = {
+	render: inProvider,
 	parameters: source(`
-import { Shell, baseCommands, test, flowerTheme, dictEn, dictFr } from "flower-shell"
+import { Shell, ShellProvider, baseCommands, test, flowerTheme, dictEn, dictFr } from "flower-shell"
 
 // the shell's languages are the keys of dict, so both answer:
 // lang fr and lang en. help lang lists exactly those.
-<Shell
+<ShellProvider
 	commands={{ ...baseCommands, test }}
 	themes={{ flower: flowerTheme }}
 	lang="fr"
 	dict={{ en: dictEn, fr: dictFr }}
 	initialCommands={["help lang"]}
-/>
+>
+	<Shell />
+</ShellProvider>
 `),
 	args: {
 		commands: { ...baseCommands, test },
@@ -125,9 +128,10 @@ import { Shell, baseCommands, test, flowerTheme, dictEn, dictFr } from "flower-s
 }
 
 /** written outside the package: the dictionary covers the base commands */
-export const German: StoryObj<typeof Shell> = {
+export const German: StoryObj<typeof ShellProvider> = {
+	render: inProvider,
 	parameters: source(`
-import { Shell, baseCommands, test, flowerTheme } from "flower-shell"
+import { Shell, ShellProvider, baseCommands, test, flowerTheme } from "flower-shell"
 import type { Dict } from "flower-shell"
 
 // the package does not know German: nothing lives underneath, so the
@@ -180,7 +184,7 @@ const dictDe: Dict = {
 }
 
 // help lang opens the shell on the list of what is mounted: de and en
-<Shell
+<ShellProvider
 	commands={{ ...baseCommands, test }}
 	themes={{ flower: flowerTheme }}
 	lang="de"
@@ -191,7 +195,9 @@ const dictDe: Dict = {
 		de: dictDe,
 	}}
 	initialCommands={["help lang"]}
-/>
+>
+	<Shell />
+</ShellProvider>
 `),
 	args: {
 		commands: { ...baseCommands, test },

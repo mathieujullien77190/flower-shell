@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { Shell } from "../Shell"
+import { ShellProvider } from "../state/context"
 import { baseCommands } from "../commands/base"
 import { test } from "../commands/test"
 import { themes } from "../theme"
-import { boxed } from "./decorators"
+import { boxed, inProvider } from "./decorators"
 import { prose } from "./i18n"
 import { source } from "./source"
 
@@ -15,9 +15,9 @@ import { source } from "./source"
 // As line comments, and not as a block: a block above the meta makes the CSF
 // plugin inject its own `parameters`, which cover ours — and the prose would
 // disappear along with them.
-const meta: Meta<typeof Shell> = {
+const meta: Meta<typeof ShellProvider> = {
 	title: "flower-shell",
-	component: Shell,
+	component: ShellProvider,
 	decorators: [boxed],
 	parameters: prose({
 		en: `
@@ -51,17 +51,20 @@ d'outils lit ces pages en français.
 
 export default meta
 
-export const FlowerShell: StoryObj<typeof Shell> = {
+export const FlowerShell: StoryObj<typeof ShellProvider> = {
 	name: "flower-shell",
+	render: inProvider,
 	parameters: source(`
-import { Shell, baseCommands, test, themes } from "flower-shell"
+import { Shell, ShellProvider, baseCommands, test, themes } from "flower-shell"
 
 // the whole catalogue to switch through, the opening played at startup
-<Shell
+<ShellProvider
 	commands={{ ...baseCommands, test }}
 	themes={themes}
 	initialCommands={["title", "welcome"]}
-/>
+>
+	<Shell />
+</ShellProvider>
 `),
 	args: {
 		commands: { ...baseCommands, test },
