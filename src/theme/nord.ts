@@ -12,4 +12,6 @@ export const nordTheme: ShellTheme = makeTheme({
 		infoColor: "#88C0D0",
 		appColor: "#B48EAD",
 	},
+	// squarer than the others: the cold end of the catalogue
+	container: { padding: "18px", border: "solid 2px #88C0D0", borderRadius: 4 },
 })

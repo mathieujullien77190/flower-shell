@@ -12,4 +12,7 @@ export const twilightTheme: ShellTheme = makeTheme({
 		infoColor: "#77CDF1",
 		appColor: "#90be20",
 	},
+	// neutral, so barely there: the text color at low opacity draws the
+	// edge without adding a color to the palette
+	container: { border: "solid 1px #CED4DF33", borderRadius: 6 },
 })

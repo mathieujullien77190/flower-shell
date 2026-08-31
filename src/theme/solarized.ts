@@ -12,4 +12,10 @@ export const solarizedTheme: ShellTheme = makeTheme({
 		infoColor: "#268BD2",
 		appColor: "#6C71C4",
 	},
+	// measured, like the palette: a hairline and room to breathe
+	container: {
+		padding: "24px",
+		border: "solid 1px #586E7533",
+		borderRadius: 6,
+	},
 })

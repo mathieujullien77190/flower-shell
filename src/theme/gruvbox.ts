@@ -12,4 +12,6 @@ export const gruvboxTheme: ShellTheme = makeTheme({
 		infoColor: "#83A598",
 		appColor: "#D3869B",
 	},
+	// blocky, barely rounded, to go with the earth
+	container: { padding: "18px", border: "solid 2px #FABD2F", borderRadius: 2 },
 })

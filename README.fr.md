@@ -328,6 +328,13 @@ besoin courant — elle vaut `16px` par défaut — mais un arrondi, une bordure
 une ombre se posent au même endroit. Ce qu'on y met recouvre le style de base
 du conteneur, propriété par propriété.
 
+Les huit thèmes du paquet stylent chacun le leur : une bordure prise dans les
+couleurs de la palette, un arrondi qui va avec, et la place que le thème
+demande — `monokai` a les coins carrés, `parchment` élargit ses marges. Comme
+un thème monté est posé sur `defaultTheme`, un thème à vous qui ne dit rien de
+`container` hérite de celui de `flower` ; donnez-lui son propre `container`
+pour dire autre chose.
+
 `fonts.shell` habille la sortie comme la saisie, et vaut `monospace` par
 défaut : un terminal veut du chasse fixe.
 

@@ -326,6 +326,13 @@ gives the same result whichever theme you are leaving.
 What you put there overrides the base style of the container, property by
 property.
 
+The eight shipped themes each style theirs: a border in the colors of the
+palette, a radius that goes with them, and the room the theme calls for —
+`monokai` squares its corners, `parchment` widens its margins. Since a
+mounted theme is laid on `defaultTheme`, a theme of yours that says nothing
+about `container` inherits the one of `flower`; give it a `container` of its
+own to say otherwise.
+
 `fonts.shell` dresses the output and the input alike, and is `monospace` by
 default: a terminal wants a fixed pitch.
 

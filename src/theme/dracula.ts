@@ -12,4 +12,5 @@ export const draculaTheme: ShellTheme = makeTheme({
 		infoColor: "#8BE9FD",
 		appColor: "#BD93F9",
 	},
+	container: { padding: "18px", border: "solid 2px #BD93F9", borderRadius: 8 },
 })

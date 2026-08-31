@@ -19,4 +19,8 @@ export const flowerTheme: ShellTheme = makeTheme({
 		infoColor: "#7FC6D9",
 		appColor: "#F2A0C4",
 	},
+	// the pollen of the prompt, run around the box: this is the theme
+	// that carries the name, and it is the only one to wear its accent
+	// full strength
+	container: { padding: "20px", border: "solid 2px #FFD25F", borderRadius: 10 },
 })

@@ -16,4 +16,11 @@ export const parchmentTheme: ShellTheme = makeTheme({
 		infoColor: "#1C7FB8",
 		appColor: "#5E8A12",
 	},
+	// a sheet: wide margins, and an edge that reads as a fold rather
+	// than a frame
+	container: {
+		padding: "24px",
+		border: "solid 1px #2A333A26",
+		borderRadius: 6,
+	},
 })

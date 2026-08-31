@@ -12,4 +12,6 @@ export const monokaiTheme: ShellTheme = makeTheme({
 		infoColor: "#66D9EF",
 		appColor: "#AE81FF",
 	},
+	// no rounding at all, and the magenta it is known for
+	container: { padding: "18px", border: "solid 2px #F92672", borderRadius: 0 },
 })

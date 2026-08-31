@@ -11,7 +11,8 @@ import { source } from "../source"
 
 /**
  * Written from scratch: only the colors and the prompt. What a theme does
- * not say keeps the value of `defaultTheme` — the font, here.
+ * not say keeps the value of `defaultTheme` — the font and the box it is
+ * served in, here.
  */
 const neon: ShellThemeInput = {
 	colors: {
@@ -64,7 +65,7 @@ import { Shell, baseCommands, test, flowerTheme, nordTheme, themes } from "flowe
 import type { ShellThemeInput } from "flower-shell"
 
 // written from scratch: what it does not say keeps the default —
-// the font, here
+// the font and the box it is served in, here
 const neon: ShellThemeInput = {
 	colors: {
 		background: "#0B0F1A",
