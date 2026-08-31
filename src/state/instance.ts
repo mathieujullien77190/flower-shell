@@ -1,6 +1,12 @@
 import { BaseCommands } from "@types"
 import type { CommandErrorListener, CommandListener } from "@engine/send"
-import { createShellStore, type ShellOptions, type ShellStore } from "./store"
+import {
+	createActions,
+	initialData,
+	type ShellActions,
+	type ShellData,
+	type ShellOptions,
+} from "./store"
 
 export type ShellListeners = {
 	start?: CommandListener
@@ -9,22 +15,32 @@ export type ShellListeners = {
 }
 
 /**
- * Everything one terminal owns: its state, the commands it knows, and the
- * listeners the consumer gave it. Two shells on the same page own two of
- * these and never meet.
+ * Everything one terminal owns: its values, its actions, the commands it
+ * knows and the listeners the consumer gave it. Two shells on the same page
+ * own two of these and never meet.
  *
- * The commands and the listeners are reached through functions rather than
- * fields: the component that renders the shell hands them down as props, and
- * a prop object is not something a render may write into.
+ * The values are held here rather than in the provider, because a command is
+ * not a component: an `effect` reaching `shellActions()` and `t()` reading
+ * the language both happen outside of any render, and a context alone cannot
+ * answer them. So the instance keeps them, hands the provider a copy to
+ * render, and the context only passes the instance around.
+ *
+ * Everything is read through functions rather than fields: the component
+ * that renders the shell takes the instance as a prop, and a prop object is
+ * not something a render may write into.
  *
  * The theme and the dictionaries stay in their modules, shared by every
  * shell: `highlight()` is a function and the styled-components read
- * `colors()` outside of any render, so a provider could not reach them. Two
- * terminals therefore wear the same theme, and switching it in one repaints
- * the other.
+ * `colors()` outside of any render, so a provider could not reach them
+ * either. Two terminals therefore wear the same theme, and switching it in
+ * one repaints the other.
  */
 export type ShellInstance = {
-	store: ShellStore
+	/** the values as they stand, read fresh */
+	data: () => ShellData
+	actions: ShellActions
+	/** what the provider hooks up so a change reaches the screen */
+	onChange: (watch: (data: ShellData) => void) => void
 	/** the commands this shell knows, its `commands` prop as it stands */
 	commands: () => BaseCommands
 	setCommands: (commands: BaseCommands) => void
@@ -33,11 +49,32 @@ export type ShellInstance = {
 }
 
 export const createInstance = (options?: ShellOptions): ShellInstance => {
+	const start = initialData(options)
+
+	let data = start
 	let commands: BaseCommands = {}
 	let listeners: ShellListeners = {}
+	let watch: (data: ShellData) => void = () => {}
+
+	/**
+	 * The new values are posted here first, then handed on to be rendered:
+	 * a command that plays two lines in a row reads the first back before
+	 * writing the second, and does not wait for a render to see it.
+	 */
+	const update = (change: (data: ShellData) => ShellData) => {
+		const next = change(data)
+		if (next === data) return
+
+		data = next
+		watch(next)
+	}
 
 	return {
-		store: createShellStore(options),
+		data: () => data,
+		actions: createActions(update, start),
+		onChange: next => {
+			watch = next
+		},
 		commands: () => commands,
 		setCommands: next => {
 			commands = next
@@ -54,12 +91,12 @@ export const createInstance = (options?: ShellOptions): ShellInstance => {
  *
  * A command's `action` and `effect` are plain functions, not components:
  * they cannot read a context, yet `t()` needs a language and an effect needs
- * a store. So the instance is posted here for the time `send` runs, and
+ * the actions. So the instance is posted here for the time `send` runs, and
  * taken back down after — a scope, not a singleton.
  *
  * It holds because everything between the two is synchronous: the action
  * returns its text, the effect plays, the line is added, and only then does
- * `send` return. An `effect` that awaits something and touches the store
+ * `send` return. An `effect` that awaits something and touches the state
  * afterwards is outside that window and must use the handle of its shell.
  */
 let playing: ShellInstance | null = null
@@ -89,5 +126,5 @@ export const shellActions = () => {
 		)
 	}
 
-	return playing.store.getState()
+	return { ...playing.data(), ...playing.actions }
 }

@@ -103,7 +103,7 @@ export const t = (
 	vars?: Record<string, string | number>,
 	force?: string
 ) => {
-	const current = force || playingInstance()?.store.getState().lang || BASE_LANG
+	const current = force || playingInstance()?.data().lang || BASE_LANG
 
 	const text =
 		read(dict[current] || {}, key) || read(dict[BASE_LANG] || {}, key) || key

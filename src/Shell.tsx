@@ -166,9 +166,9 @@ export const Shell = ({
 	onCommandError,
 }: ShellProps) => {
 	/**
-	 * This shell, and nothing of anyone else's: its store, its commands, its
+	 * This shell, and nothing of anyone else's: its values, its commands, its
 	 * listeners. Built before the first render, because the terminal reads
-	 * the registry as it renders.
+	 * them as it renders.
 	 */
 	const [instance] = useState(() => {
 		const created = createInstance({ lang, animation, keyboardOnFocus })
@@ -187,12 +187,15 @@ export const Shell = ({
 
 	useImperativeHandle(
 		ref,
-		() => ({ ...runners, actions: () => instance.store.getState() }),
+		() => ({
+			...runners,
+			actions: () => ({ ...instance.data(), ...instance.actions }),
+		}),
 		[instance, runners]
 	)
 
 	return (
-		<ShellProvider value={instance}>
+		<ShellProvider instance={instance}>
 			<Screen
 				commands={commands}
 				theme={theme}
@@ -220,7 +223,7 @@ type ScreenProps = Omit<ShellProps, "ref"> & {
 }
 
 /**
- * The terminal itself, inside the provider: the hooks below read the store
+ * The terminal itself, inside the provider: the hooks below read the values
  * of the instance above, which is why this is a component of its own.
  */
 const Screen = ({
@@ -277,27 +280,26 @@ const Screen = ({
 	// does not exist at prerender, and applying it earlier would make the HTML
 	// diverge
 	useEffect(() => {
-		if (lang) instance.store.getState().setLang(lang)
+		if (lang) instance.actions.setLang(lang)
 	}, [instance, lang])
 
 	useEffect(() => {
-		if (animation !== undefined)
-			instance.store.getState().setAnimation(animation)
+		if (animation !== undefined) instance.actions.setAnimation(animation)
 	}, [instance, animation])
 
 	useEffect(() => {
 		if (keyboardOnFocus !== undefined)
-			instance.store.getState().setKeyboardOnFocus(keyboardOnFocus)
+			instance.actions.setKeyboardOnFocus(keyboardOnFocus)
 	}, [instance, keyboardOnFocus])
 
 	/**
 	 * The opening plays on mount, but only if the screen is empty. The shell
 	 * can be unmounted then mounted again — a page one leaves and comes back
-	 * to — and a story or a route may hand it a store that has already
-	 * played: playing it again would show the title twice.
+	 * to — and it may come back to an instance that has already played:
+	 * playing the opening again would show the title twice.
 	 */
 	useEffect(() => {
-		const { commands: played, restrictedCommands } = instance.store.getState()
+		const { commands: played, restrictedCommands } = instance.data()
 		const onScreen = [...played, ...restrictedCommands].some(
 			command => command.visible
 		)
@@ -328,13 +330,13 @@ const Screen = ({
 	 */
 	const handleRendered = useCallback(
 		(id: string) => {
-			const actions = instance.store.getState()
-			const done = [...actions.commands, ...actions.restrictedCommands].find(
+			const { commands: played, restrictedCommands } = instance.data()
+			const done = [...played, ...restrictedCommands].find(
 				command => command.id === id
 			)
 			const first = !!done && !done.isRendered
 
-			actions.setIsRendered(id)
+			instance.actions.setIsRendered(id)
 			scrollDown()
 
 			if (first && done.canExecute) {
@@ -350,7 +352,7 @@ const Screen = ({
 
 	const moveCursor = useCallback(
 		(direction: number) => {
-			instance.store.getState().moveCursor(direction)
+			instance.actions.moveCursor(direction)
 		},
 		[instance]
 	)

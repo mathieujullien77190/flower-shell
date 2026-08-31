@@ -48,7 +48,6 @@ const send = (
 	withInstance(instance, () => {
 		const commands = instance.commands()
 		const listeners = instance.listeners()
-		const store = instance.store
 
 		/**
 		 * The start is reported before `createCommand`, which already plays the
@@ -87,7 +86,7 @@ const send = (
 			}
 		}
 
-		store.getState().addCommand(cmd)
+		instance.actions.addCommand(cmd)
 
 		if (cmd.canExecute) {
 			// the action returned its text and the effect played: the command is

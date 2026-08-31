@@ -27,7 +27,7 @@ export { dictFr } from "./i18n/fr"
 
 export { highlight } from "./render/Command/helpers"
 
-export type { ShellState } from "./state/store"
+export type { ShellActions, ShellData, ShellState } from "./state/store"
 
 export {
 	bareTheme,

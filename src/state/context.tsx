@@ -1,36 +1,57 @@
-import { createContext, useContext } from "react"
-import { useStore } from "zustand"
-import { useShallow } from "zustand/react/shallow"
+import { createContext, useContext, useMemo, useState } from "react"
 
 import { BaseCommands } from "@types"
 import type { ShellInstance } from "./instance"
-import type { ShellState } from "./store"
+import type { ShellData } from "./store"
+
+type Seen = { instance: ShellInstance; data: ShellData }
 
 /**
- * The shell a component belongs to. It carries the instance, not the state:
- * what changes lives in the store, and every hook below subscribes to the
- * slice it needs. A context holding the state itself would rerender the
- * whole terminal on each letter written.
+ * The shell a component belongs to, and its values as they were last
+ * rendered. The instance holds the truth — a command reads it outside of any
+ * render — and the context carries a copy so React knows when to paint.
  */
-const ShellContext = createContext<ShellInstance | null>(null)
+const ShellContext = createContext<Seen | null>(null)
 
-export const ShellProvider = ShellContext.Provider
+const useSeen = (): Seen => {
+	const seen = useContext(ShellContext)
 
-const useInstance = (): ShellInstance => {
-	const instance = useContext(ShellContext)
-
-	if (!instance) {
+	if (!seen) {
 		throw new Error("This hook only reads inside a <Shell>.")
 	}
 
-	return instance
+	return seen
 }
 
-const useShellState = <T,>(selector: (state: ShellState) => T): T =>
-	useStore(useInstance().store, selector)
+const useData = (): ShellData => useSeen().data
+
+/**
+ * Holds what the terminal renders. The instance writes first and calls back
+ * here, which is the only thing that turns a played command into a screen.
+ */
+export const ShellProvider = ({
+	instance,
+	children,
+}: {
+	instance: ShellInstance
+	children: React.ReactNode
+}) => {
+	const [data, setData] = useState(instance.data)
+
+	// hooked up before the first render: the opening plays on mount, and its
+	// lines would otherwise be written with nobody listening
+	useState(() => {
+		instance.onChange(setData)
+		return true
+	})
+
+	const seen = useMemo(() => ({ instance, data }), [instance, data])
+
+	return <ShellContext.Provider value={seen}>{children}</ShellContext.Provider>
+}
 
 /** the commands this shell knows, read at render */
-export const useCommands = (): BaseCommands => useInstance().commands()
+export const useCommands = (): BaseCommands => useSeen().instance.commands()
 
 /**
  * The two lists put back in the order they arrived in. The sort goes by
@@ -38,27 +59,27 @@ export const useCommands = (): BaseCommands => useInstance().commands()
  * same loop and land on the same millisecond, and the sort, being stable,
  * then returned the order of the two lists rather than the one of the
  * typing.
- *
- * The array is rebuilt on every call, hence useShallow: without it, the new
- * reference would trigger a render on every change of the store, even an
- * unrelated one.
  */
-export const useGetCommands = () =>
-	useShellState(
-		useShallow(state =>
+export const useGetCommands = () => {
+	const { commands, restrictedCommands } = useData()
+
+	return useMemo(
+		() =>
 			[
-				...state.commands.filter(command => command.visible),
-				...state.restrictedCommands.filter(command => command.visible),
-			].sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-		)
+				...commands.filter(command => command.visible),
+				...restrictedCommands.filter(command => command.visible),
+			].sort((a, b) => (a.order ?? 0) - (b.order ?? 0)),
+		[commands, restrictedCommands]
 	)
+}
 
-export const useGetCursor = () => useShellState(state => state.cursor)
+export const useGetCursor = () => useData().cursor
 
-export const useGetCurrentCommand = () =>
-	useShellState(state =>
-		state.cursor === null ? null : state.commands[state.cursor] || null
-	)
+export const useGetCurrentCommand = () => {
+	const { cursor, commands } = useData()
+
+	return cursor === null ? null : commands[cursor] || null
+}
 
 /**
  * The startup is over: not one restricted command left waiting to be
@@ -66,22 +87,26 @@ export const useGetCurrentCommand = () =>
  * `initialCommands` plays that fills the first condition, whatever its
  * length.
  */
-export const useGetStart = () =>
-	useShellState(
-		state =>
-			state.restrictedCommands.every(command => command.isRendered) &&
-			state.commands.length === 0
+export const useGetStart = () => {
+	const { commands, restrictedCommands } = useData()
+
+	return (
+		restrictedCommands.every(command => command.isRendered) &&
+		commands.length === 0
 	)
+}
 
 /** last command played by the visitor, the restricted ones left out */
-export const useGetLastCommand = () =>
-	useShellState(state => state.commands[state.commands.length - 1] || null)
+export const useGetLastCommand = () => {
+	const { commands } = useData()
 
-export const useLang = () => useShellState(state => state.lang)
+	return commands[commands.length - 1] || null
+}
 
-export const useAnimation = () => useShellState(state => state.animation)
+export const useLang = () => useData().lang
 
-export const useThemeName = () => useShellState(state => state.themeName)
+export const useAnimation = () => useData().animation
 
-export const useKeyboardOnFocus = () =>
-	useShellState(state => state.keyboardOnFocus)
+export const useThemeName = () => useData().themeName
+
+export const useKeyboardOnFocus = () => useData().keyboardOnFocus
