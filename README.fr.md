@@ -63,7 +63,8 @@ rien ne défile — c'est la page qui défile alors, si elle est assez longue.
 
 ## Les commandes de base
 
-`help`, `clear`, `hello`, `flowers`, `animation`, `lang` et `theme`.
+`help`, `clear`, `hello`, `flowers`, `animation`, `font`, `lang` et
+`theme`.
 
 `test` s'exporte tout seul, à côté de `baseCommands`, et se monte à la main :
 c'est un banc d'essai, pas quelque chose que vos visiteurs ont à trouver.
@@ -98,7 +99,7 @@ Plus les commandes restreintes — que le visiteur ne peut pas taper :
 
 [TAB] complète la ligne en cours de frappe : le nom de la commande d'abord,
 puis son premier argument une fois la commande nommée. `anim` donne
-`animation`, `theme sunf` donne `theme sunflower`, `lang f` donne `lang fr`.
+`animation`, `theme lav` donne `theme lavender`, `lang f` donne `lang fr`.
 
 Les valeurs viennent de `testArgs.authorize`, la liste même qui refuse un
 mauvais argument — donc une commande à vous se complète toute seule dès
@@ -242,6 +243,29 @@ Un antislash devant un marqueur l'affiche tel quel : `\+` donne `+`. Un
 antislash sans marqueur derrière reste tel quel, il n'y a donc pas besoin de
 l'échapper.
 
+## Accessibilité
+
+Le terminal s'utilise sans souris et sans l'écran.
+
+`font +` et `font -` agrandissent et réduisent le texte, deux pixels par pas,
+entre 10 et 40 ; `font reset` rend la taille au thème. Elle appartient au
+shell et non au thème : deux terminaux sur la même page zooment séparément, et
+un thème changé sous un shell zoomé garde la taille que le visiteur a mise.
+
+La sortie est une région de journal — `role="log"`, annoncée à mesure qu'elle
+se remplit — et une commande en cours d'écriture lettre par lettre est tenue
+`aria-busy` jusqu'au bout : un lecteur d'écran lit la réponse une fois,
+entière, et non lettre à lettre. La saisie porte son propre nom, l'invite est
+retirée de la lecture (une fleur annoncée avant chaque ligne est du bruit), et
+l'indication de complétion est rattachée au champ, donc lue après lui.
+
+Un marqueur cliquable — `#libellé ~ cmd#` — est un bouton : il prend sa place
+dans l'ordre de tabulation, [ENTER] et [ESPACE] le jouent. Il n'était
+atteignable qu'à la souris.
+
+Les deux textes viennent du dictionnaire comme le reste, sous `input.label` et
+`terminal.output`, et se recouvrent par `dict` comme n'importe quelle clé.
+
 ## Les langues
 
 Le paquet livre ses textes en deux dictionnaires — `dictEn` et `dictFr`, un
@@ -284,22 +308,30 @@ langue d'origine ; seules les suivantes changent.
 
 ## Le thème
 
-Le paquet en livre sept, tous pris à ce qui pousse, chacun portant son emoji
-pour invite — trois sombres, trois clairs, autour de celui qui lui donne son
-nom :
+Le paquet en livre huit, chacun portant son emoji pour invite. Sept sont pris
+à ce qui pousse — quatre sombres, trois clairs, autour de celui qui donne son
+nom au paquet. Le huitième n'est pas là pour être regardé :
 
-| nom         |                                                                 |
-| ----------- | --------------------------------------------------------------- |
-| `flower`    | 🌼 **le défaut** — feuillage sombre, une fleur pour invite      |
-| `hibiscus`  | 🌺 sombre — fond lie de vin, rose du pétale et jaune du pollen  |
-| `sunflower` | 🌻 sombre — fond terre, jaune du pétale et ciel d'été           |
-| `maple`     | 🍁 sombre — fond écorce, l'or et le rouge de la feuille         |
-| `lavender`  | 🪻 clair — lilas pâle, violet et vert gris des tiges            |
-| `rice`      | 🌾 clair — paille, or du grain et eau de la rizière             |
-| `nest`      | 🪺 clair — beige coquille, brun des brindilles et bleu des œufs |
+| nom        |                                                                          |
+| ---------- | ------------------------------------------------------------------------ |
+| `flower`   | 🌼 **le défaut** — feuillage sombre, une fleur pour invite               |
+| `hibiscus` | 🌺 sombre — fond lie de vin, rose du pétale et jaune du pollen           |
+| `kiwi`     | 🥝 sombre — fond peau, vert de la chair et anneau des graines            |
+| `contrast` | 🌻 sombre — **fait pour être lu** : blanc sur noir, lettres plus grandes |
+| `maple`    | 🍁 sombre — fond écorce, l'or et le rouge de la feuille                  |
+| `lavender` | 🪻 clair — lilas pâle, violet et vert gris des tiges                     |
+| `rice`     | 🌾 clair — paille, or du grain et eau de la rizière                      |
+| `nest`     | 🪺 clair — beige coquille, brun des brindilles et bleu des œufs          |
 
 Chacun s'exporte sous son nom — `flowerTheme`, `hibiscusTheme`,
-`lavenderTheme`… — et `themes` rassemble les sept sous les clés du tableau.
+`lavenderTheme`… — et `themes` rassemble les huit sous les clés du tableau.
+
+`contrast` est le thème d'accessibilité : blanc pur sur noir pur, chaque
+accent tenu au-dessus d'un rapport de contraste de 7:1 sur ce fond — ce que la
+WCAG demande à son niveau le plus haut — et `fonts.size` monté à 20. Son
+invite est le tournesol que porte qui vit avec quelque chose qui ne se voit
+pas. Montez-le avec les autres et `theme contrast` est à une ligne pour qui en
+a besoin.
 
 Deux props, et elles se lisent comme `dict` et `lang`. `themes` dit quels
 thèmes existent ; `theme` nomme celui du départ, une clé de `themes` :
@@ -307,7 +339,7 @@ thèmes existent ; `theme` nomme celui du départ, une clé de `themes` :
 ```tsx
 import { Shell, baseCommands, lavenderTheme, themes } from "flower-shell"
 
-// the whole catalogue: all seven, worn on the first of them
+// the whole catalogue: all eight, worn on the first of them
 <Shell commands={baseCommands} themes={themes} />
 
 // one of them, and nothing else to switch to
@@ -382,7 +414,7 @@ besoin courant — elle vaut `16px` par défaut — mais un arrondi, une bordure
 une ombre se posent au même endroit. Ce qu'on y met recouvre le style de base
 du conteneur, propriété par propriété.
 
-Les sept thèmes du paquet stylent chacun le leur : une bordure prise dans les
+Les huit thèmes du paquet stylent chacun le leur : une bordure prise dans les
 couleurs de la palette, un arrondi qui va avec, et la place que le thème
 demande — `maple` a les coins presque carrés, `rice` élargit ses marges. Comme
 un thème monté est posé sur `defaultTheme`, un thème à vous qui ne dit rien de
@@ -403,7 +435,10 @@ const mine = {
 ```
 
 `fonts.shell` habille la sortie comme la saisie, et vaut `monospace` par
-défaut : un terminal veut du chasse fixe.
+défaut : un terminal veut du chasse fixe. `fonts.size` est la taille du shell
+en pixels, 16 par défaut : la sortie, la saisie et l'ASCII art s'y mesurent
+tous, et un thème fait pour être lu de loin — ou lu mal — la monte, comme le
+fait `contrast`.
 
 ## Plusieurs terminaux, et comment en commander un
 

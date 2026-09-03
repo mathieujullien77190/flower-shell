@@ -39,12 +39,25 @@ export const dictFr: Dict = {
 		click: "cliquez pour jouer hello",
 	},
 	input: {
+		label: "Ligne de commande",
 		predict: "( {word} ? appuyez sur [{key}] )",
+	},
+	terminal: {
+		output: "Sortie du terminal",
+	},
+	font: {
+		up: "Agrandit le texte",
+		down: "Réduit le texte",
+		reset: "Revient à la taille du thème",
+		bigger: "plus grand",
+		smaller: "plus petit",
+		back: "retour à la taille du thème",
 	},
 	theme: {
 		flower: "Le thème du paquet : feuillage sombre, une fleur pour invite",
 		hibiscus: "Fond lie de vin, rose du pétale et jaune du pollen",
-		sunflower: "Fond terre sombre, jaune du pétale et ciel d'été",
+		kiwi: "Fond peau sombre, vert de la chair et anneau des graines",
+		contrast: "Fait pour être lu : blanc sur noir, lettres plus grandes",
 		maple: "Fond écorce sombre, l'or et le rouge de la feuille",
 		lavender: "Fond lilas pâle, violet et vert gris des tiges",
 		rice: "Fond paille, or du grain et eau de la rizière",

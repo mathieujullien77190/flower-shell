@@ -80,6 +80,7 @@ export type BaseCommands = {
 	hello?: BaseCommand
 	flowers?: BaseCommand
 	animation?: BaseCommand
+	font?: BaseCommand
 	theme?: BaseCommand
 	lang?: BaseCommand
 	/**

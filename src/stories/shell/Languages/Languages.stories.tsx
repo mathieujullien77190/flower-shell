@@ -57,7 +57,19 @@ const dictDe: Dict = {
 		click: "klicken, um hello zu spielen",
 	},
 	input: {
+		label: "Befehlszeile",
 		predict: "( {word}? drücke [{key}] )",
+	},
+	terminal: {
+		output: "Terminalausgabe",
+	},
+	font: {
+		up: "Vergrößert den Text",
+		down: "Verkleinert den Text",
+		reset: "Zurück zur Größe des Themas",
+		bigger: "größer",
+		smaller: "kleiner",
+		back: "zurück zur Größe des Themas",
 	},
 	theme: {
 		flower: "Das Thema des Pakets: dunkles Laub, eine Blume als Eingabe",

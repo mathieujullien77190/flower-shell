@@ -179,6 +179,61 @@ describe("the options", () => {
 	})
 })
 
+describe("the size of the text", () => {
+	it("opens on the size of the theme, and says so by naming none", () => {
+		expect(store().read().fontSize).toBeNull()
+	})
+
+	it("steps up from the size of the theme", () => {
+		const { actions, read } = store()
+
+		actions.zoomFont(1)
+
+		// the package theme is written on 16
+		expect(read().fontSize).toBe(18)
+	})
+
+	it("steps down, and goes on from where it is", () => {
+		const { actions, read } = store()
+
+		actions.zoomFont(-1)
+		actions.zoomFont(-1)
+
+		expect(read().fontSize).toBe(12)
+	})
+
+	it("stops at the top and at the bottom", () => {
+		const { actions, read } = store()
+
+		Array.from({ length: 20 }).forEach(() => actions.zoomFont(1))
+		expect(read().fontSize).toBe(40)
+
+		Array.from({ length: 40 }).forEach(() => actions.zoomFont(-1))
+		expect(read().fontSize).toBe(10)
+	})
+
+	it("wakes nobody once it cannot go further", () => {
+		const { actions, read } = store()
+
+		Array.from({ length: 20 }).forEach(() => actions.zoomFont(1))
+		const before = read()
+
+		actions.zoomFont(1)
+
+		// same object: an identical value must wake no render
+		expect(read()).toBe(before)
+	})
+
+	it("gives the size back to the theme", () => {
+		const { actions, read } = store()
+
+		actions.zoomFont(1)
+		actions.resetFont()
+
+		expect(read().fontSize).toBeNull()
+	})
+})
+
 describe("setThemeName", () => {
 	it("takes the name of a mounted theme", () => {
 		setThemes(themes)

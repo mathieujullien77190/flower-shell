@@ -220,7 +220,7 @@ const autocompleteArg = (
 /**
  * What the line would become on a [TAB]: the name of the command while the
  * first word is being typed, then its first argument. It comes back whole —
- * `theme sunf` gives `theme sunflower` — because that is what the input
+ * `theme lav` gives `theme lavender` — because that is what the input
  * puts in place of what was typed.
  *
  * Nothing to offer, and nothing comes back: an empty string. Same when the

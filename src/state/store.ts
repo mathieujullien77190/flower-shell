@@ -1,5 +1,5 @@
 import { Command } from "@types"
-import { DEFAULT_THEME_NAME, setTheme, themeByName } from "@theme"
+import { DEFAULT_THEME_NAME, fonts, setTheme, themeByName } from "@theme"
 
 /** the name of a theme of the catalogue: what the visitor types */
 type ThemeName = string
@@ -14,6 +14,12 @@ export type ShellData = {
 	keyboardOnFocus: boolean
 	/** the current theme, by its name in the catalogue */
 	themeName: ThemeName
+	/**
+	 * The size of the text, in pixels, when the visitor has set one. `null`
+	 * on the size the theme carries — which is the point: a shell that has
+	 * not been zoomed follows its theme, including when the theme changes.
+	 */
+	fontSize: number | null
 
 	commands: Command[]
 	restrictedCommands: Command[]
@@ -29,6 +35,10 @@ export type ShellActions = {
 	setAnimation: (animation: boolean) => void
 	setKeyboardOnFocus: (keyboardOnFocus: boolean) => void
 	setThemeName: (name: ThemeName) => void
+	/** grows the text one step, or shrinks it: `1` and `-1` */
+	zoomFont: (direction: number) => void
+	/** back to the size of the theme */
+	resetFont: () => void
 
 	addCommand: (command: Command) => void
 	setIsRendered: (id: string) => void
@@ -51,6 +61,7 @@ const DEFAULTS: ShellData = {
 	animation: true,
 	keyboardOnFocus: true,
 	themeName: DEFAULT_THEME_NAME,
+	fontSize: null,
 
 	commands: [],
 	restrictedCommands: [],
@@ -64,6 +75,15 @@ export const initialData = (options: ShellOptions = {}): ShellData => ({
 		Object.entries(options).filter(([, value]) => value !== undefined)
 	),
 })
+
+/**
+ * What a step of zoom is worth, and how far it goes. The bounds are read
+ * ones: under 10 pixels a terminal is a texture, over 40 a line of ASCII art
+ * no longer fits the screen it was drawn for.
+ */
+const FONT_STEP = 2
+const FONT_MIN = 10
+const FONT_MAX = 40
 
 const rendered = (list: Command[], id: string) =>
 	list.map(command =>
@@ -100,6 +120,27 @@ export const createActions = (
 		setTheme(next)
 		update(data => ({ ...data, themeName: name }))
 	},
+
+	/**
+	 * The step starts from what is on screen: the size of the theme as long
+	 * as nobody has zoomed, the size the visitor set afterwards. Asking for
+	 * more at the top changes nothing, and so wakes nothing.
+	 */
+	zoomFont: direction =>
+		update(data => {
+			const current = data.fontSize ?? fonts().size
+			const next = Math.min(
+				FONT_MAX,
+				Math.max(FONT_MIN, current + direction * FONT_STEP)
+			)
+
+			return next === data.fontSize ? data : { ...data, fontSize: next }
+		}),
+
+	resetFont: () =>
+		update(data =>
+			data.fontSize === null ? data : { ...data, fontSize: null }
+		),
 
 	addCommand: command =>
 		update(data =>

@@ -55,11 +55,19 @@ const Command = ({
 			{canRendered && (
 				<S.CmdContainer
 					data-tutorial={`cmd-${command.name}`}
+					/*
+					 * Being written: a live region holds what is busy, and reads
+					 * it once it is done. Without this the answer would be
+					 * announced letter by letter, which is what the animation
+					 * does to the screen.
+					 */
+					aria-busy={!displayResult.finish}
 					style={baseCommand?.display?.style || {}}
 				>
 					{!baseCommand?.display?.hideCmd && (
 						<S.CmdLine $restricted={command.restricted}>
-							<strong>{theme().prompt}</strong>{" "}
+							{/* a drawing, not a word: it names nothing out loud */}
+							<strong aria-hidden="true">{theme().prompt}</strong>{" "}
 							<span>
 								{name} {args}
 							</span>

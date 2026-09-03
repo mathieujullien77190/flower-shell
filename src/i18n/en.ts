@@ -38,6 +38,8 @@ export const dictEn: Dict = {
 		click: "click to run hello",
 	},
 	input: {
+		/** the field itself, named for whoever cannot see the prompt */
+		label: "Command line",
 		/**
 		 * The hint under the line being typed: {word} is what [TAB] would put
 		 * there, {key} the key that takes it — [ENTER] on a phone, which has
@@ -45,10 +47,27 @@ export const dictEn: Dict = {
 		 */
 		predict: "( {word}? press [{key}] )",
 	},
+	terminal: {
+		/**
+		 * What a screen reader announces the terminal as. The output is a
+		 * log: it reads the answers as they land, and says what it is when
+		 * one steps into it.
+		 */
+		output: "Terminal output",
+	},
+	font: {
+		up: "Makes the text bigger",
+		down: "Makes the text smaller",
+		reset: "Back to the size of the theme",
+		bigger: "bigger",
+		smaller: "smaller",
+		back: "back to the size of the theme",
+	},
 	theme: {
 		flower: "The package theme: leaf-dark, with a flower for a prompt",
 		hibiscus: "Wine dark ground, petal pink and pollen yellow",
-		sunflower: "Loam dark ground, petal yellow and summer sky",
+		kiwi: "Husk dark ground, flesh green and the ring of the seeds",
+		contrast: "Made to be read: white on black, bigger letters",
 		maple: "Bark dark ground, the gold and the red of the leaf",
 		lavender: "Pale lilac ground, violet and the grey green of the stems",
 		rice: "Straw ground, grain gold and the water of the paddy",

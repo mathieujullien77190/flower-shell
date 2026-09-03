@@ -62,7 +62,8 @@ and nothing scrolls — the page then scrolls instead, if it is long enough.
 
 ## The base commands
 
-`help`, `clear`, `hello`, `flowers`, `animation`, `lang` and `theme`.
+`help`, `clear`, `hello`, `flowers`, `animation`, `font`, `lang` and
+`theme`.
 
 `test` is exported on its own, beside `baseCommands`, and mounted by hand: it
 is a workbench, not something a visitor of yours needs to find.
@@ -97,7 +98,7 @@ Plus the restricted commands — ones the visitor cannot type:
 
 [TAB] completes the line being typed: the name of the command first, then its
 first argument once the command is named. `anim` gives `animation`,
-`theme sunf` gives `theme sunflower`, `lang f` gives `lang fr`.
+`theme lav` gives `theme lavender`, `lang f` gives `lang fr`.
 
 The values come from `testArgs.authorize`, the very list that turns a wrong
 argument down — so a command of yours completes on its own as soon as it
@@ -239,6 +240,28 @@ background is.
 A backslash before a marker prints it as-is: `\+` gives `+`. A backslash with
 no marker behind it stays as-is, so there is no need to escape it.
 
+## Accessibility
+
+The terminal is usable without a mouse and without the screen.
+
+`font +` and `font -` grow and shrink the text, two pixels a step, between 10
+and 40; `font reset` gives the size back to the theme. It belongs to the
+shell and not to the theme: two terminals on the same page zoom apart, and a
+theme changed under a zoomed shell keeps the size the visitor set.
+
+The output is a log region — `role="log"`, announced as it fills — and a
+command being written letter by letter is held `aria-busy` until it is done:
+a screen reader reads the answer once, whole, and not one letter at a time.
+The input carries its own name, the prompt is hidden from the reading (a
+flower announced before every line is noise), and the hint of the completion
+is tied to the field, so it is read after it.
+
+A clickable marker — `#label ~ cmd#` — is a button: it takes the tab order,
+[ENTER] and [SPACE] play it. It could only be reached with a mouse before.
+
+The two texts come from the dictionary like the rest, under `input.label` and
+`terminal.output`, and are overridden through `dict` like any other key.
+
 ## Languages
 
 The package ships its texts in two dictionaries — `dictEn` and `dictFr`, one
@@ -282,22 +305,29 @@ language; only the following ones change.
 
 ## The theme
 
-The package ships seven, each one a thing that grows, each one wearing its
-emoji for a prompt — three dark, three light, around the one it is named
-after:
+The package ships eight, each one wearing its emoji for a prompt. Seven are
+named after a thing that grows — four dark, three light, around the one the
+package is named after. The eighth is not there to be looked at:
 
-| name        |                                                               |
-| ----------- | ------------------------------------------------------------- |
-| `flower`    | 🌼 **the default** — dark foliage, a flower for a prompt      |
-| `hibiscus`  | 🌺 dark — wine background, petal pink and pollen yellow       |
-| `sunflower` | 🌻 dark — loam background, petal yellow and summer sky        |
-| `maple`     | 🍁 dark — bark background, the gold and red of the leaf       |
-| `lavender`  | 🪻 light — pale lilac, violet and the grey green of the stems |
-| `rice`      | 🌾 light — straw, grain gold and the water of the paddy       |
-| `nest`      | 🪺 light — shell beige, twig brown and egg blue               |
+| name       |                                                               |
+| ---------- | ------------------------------------------------------------- |
+| `flower`   | 🌼 **the default** — dark foliage, a flower for a prompt      |
+| `hibiscus` | 🌺 dark — wine background, petal pink and pollen yellow       |
+| `kiwi`     | 🥝 dark — husk background, flesh green and seed ring          |
+| `contrast` | 🌻 dark — **made to be read**: white on black, bigger letters |
+| `maple`    | 🍁 dark — bark background, the gold and red of the leaf       |
+| `lavender` | 🪻 light — pale lilac, violet and the grey green of the stems |
+| `rice`     | 🌾 light — straw, grain gold and the water of the paddy       |
+| `nest`     | 🪺 light — shell beige, twig brown and egg blue               |
 
 Each is exported under its own name — `flowerTheme`, `hibiscusTheme`,
-`lavenderTheme`… — and `themes` gathers all seven under the keys of the table.
+`lavenderTheme`… — and `themes` gathers all eight under the keys of the table.
+
+`contrast` is the accessibility theme: pure white on pure black, every accent
+kept above a contrast ratio of 7:1 on that ground — what WCAG asks at its
+highest level — and `fonts.size` raised to 20. Its prompt is the sunflower
+worn by whoever carries something that does not show. Mount it beside the
+others and `theme contrast` is one line away for whoever needs it.
 
 Two props, and they read like `dict` and `lang`. `themes` says which themes
 exist; `theme` names the one it starts on, a key of `themes`:
@@ -305,7 +335,7 @@ exist; `theme` names the one it starts on, a key of `themes`:
 ```tsx
 import { Shell, baseCommands, lavenderTheme, themes } from "flower-shell"
 
-// the whole catalogue: all seven, worn on the first of them
+// the whole catalogue: all eight, worn on the first of them
 <Shell commands={baseCommands} themes={themes} />
 
 // one of them, and nothing else to switch to
@@ -379,7 +409,7 @@ gives the same result whichever theme you are leaving.
 What you put there overrides the base style of the container, property by
 property.
 
-The seven shipped themes each style theirs: a border in the colors of the
+The eight shipped themes each style theirs: a border in the colors of the
 palette, a radius that goes with them, and the room the theme calls for —
 `maple` barely rounds its corners, `rice` widens its margins. Since a
 mounted theme is laid on `defaultTheme`, a theme of yours that says nothing
@@ -400,7 +430,10 @@ const mine = {
 ```
 
 `fonts.shell` dresses the output and the input alike, and is `monospace` by
-default: a terminal wants a fixed pitch.
+default: a terminal wants a fixed pitch. `fonts.size` is the size of the
+shell in pixels, 16 by default: the output, the input and the ASCII art are
+all measured on it, and a theme meant to be read from far — or read badly —
+raises it, the way `contrast` does.
 
 ## Several terminals, and how to command one
 

@@ -90,12 +90,31 @@ export const highlight = (
 		// a clickable marker announces itself as a link
 		if (item.command) style.textDecoration = "underline"
 
+		const play = () => {
+			if (item.command) onClick(item.command, args)
+		}
+
 		return (
 			<span
 				key={uniqid()}
 				style={{ ...style, cursor: item.command ? "pointer" : undefined }}
-				onClick={() => {
-					if (item.command) onClick(item.command, args)
+				/*
+				 * A clickable marker is a button, and says so: without a role
+				 * and a place in the tab order it could only be reached with a
+				 * mouse — invisible to the keyboard, and unnamed to a screen
+				 * reader. [ENTER] and [SPACE] play it, the way a button does.
+				 */
+				role={item.command ? "button" : undefined}
+				tabIndex={item.command ? 0 : undefined}
+				onClick={play}
+				onKeyDown={event => {
+					if (!item.command) return
+					if (event.key !== "Enter" && event.key !== " ") return
+
+					// [SPACE] scrolls the page otherwise, and the terminal is a
+					// scroll box of its own
+					event.preventDefault()
+					play()
 				}}
 			>
 				{label}

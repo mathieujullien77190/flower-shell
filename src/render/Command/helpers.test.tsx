@@ -99,6 +99,31 @@ describe("highlight", () => {
 		expect(onClick).toHaveBeenCalledWith("actionmap", ["theme", "lavender"])
 	})
 
+	it("puts a clickable marker in the tab order, as a button", () => {
+		show("#go to help ~ help#")
+
+		const marker = screen.getByRole("button", { name: "go to help" })
+		expect(marker).toHaveAttribute("tabindex", "0")
+	})
+
+	it("plays a clickable marker on [ENTER] and on [SPACE]", async () => {
+		const onClick = jest.fn()
+		show("#the lavender theme ~ theme lavender#", onClick)
+
+		screen.getByRole("button").focus()
+		await userEvent.keyboard("{Enter}")
+		await userEvent.keyboard(" ")
+
+		expect(onClick).toHaveBeenCalledTimes(2)
+		expect(onClick).toHaveBeenCalledWith("actionmap", ["theme", "lavender"])
+	})
+
+	it("leaves a marker that plays nothing out of the tab order", () => {
+		show("+info+")
+
+		expect(screen.queryByRole("button")).not.toBeInTheDocument()
+	})
+
 	it("trims the label of what surrounds the tilde", () => {
 		show("#label ~ help#")
 

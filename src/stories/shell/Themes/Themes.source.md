@@ -18,7 +18,7 @@ const neon: ShellThemeInput = {
 	prompt: "λ",
 }
 
-// the catalogue the visitor can reach, and nothing else: the five other
+// the catalogue the visitor can reach, and nothing else: the six other
 // themes of the package are not mounted, so `theme maple` is refused.
 // each name describes itself through the `theme.<name>` key.
 <Shell
@@ -29,6 +29,6 @@ const neon: ShellThemeInput = {
 	dict={{ en: { theme: { neon: "Written from scratch, in the story file" } } }}
 />
 
-// or hand over the whole catalogue, and let the visitor have all seven
+// or hand over the whole catalogue, and let the visitor have all eight
 <Shell commands={baseCommands} themes={themes} />
 ```

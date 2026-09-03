@@ -1,5 +1,6 @@
 import React, {
 	useCallback,
+	useId,
 	useState,
 	KeyboardEvent,
 	useRef,
@@ -169,13 +170,23 @@ export const Input = ({
 		options.lang
 	)
 
+	// an id of its own, and not a constant: two terminals on the same page
+	// would otherwise describe their field with the hint of the other
+	const hintId = useId()
+
 	return (
 		<S.Container data-tutorial="input">
-			<S.Lambda>{theme().prompt}</S.Lambda>
+			{/* the prompt is a drawing: read out, the flower of the theme
+			    becomes "cherry blossom" before every line */}
+			<S.Lambda aria-hidden="true">{theme().prompt}</S.Lambda>
 			<S.CustomInput
 				$nbsLetters={nbsLetters}
 				ref={ref}
 				value={inputValue}
+				// the prompt names nothing for whoever does not see it
+				aria-label={t("input.label", undefined, options.lang)}
+				// the hint of the completion, read after the field
+				aria-describedby={predict !== "" ? hintId : undefined}
 				spellCheck="false"
 				// `off`, and not `false`: an unknown value falls back on `on`,
 				// and the browser was suggesting what had been typed elsewhere
@@ -194,7 +205,7 @@ export const Input = ({
 					setInputValue(e.currentTarget.value)
 				}}
 			/>
-			{predict !== "" && <S.Predict>{predictDisplay}</S.Predict>}
+			{predict !== "" && <S.Predict id={hintId}>{predictDisplay}</S.Predict>}
 		</S.Container>
 	)
 }

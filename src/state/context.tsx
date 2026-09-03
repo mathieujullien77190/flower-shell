@@ -114,5 +114,8 @@ export const useThemeName = () => useData().themeName
 
 export const useKeyboardOnFocus = () => useData().keyboardOnFocus
 
+/** the size the visitor set, or null on the one of the theme */
+export const useFontSize = () => useData().fontSize
+
 /** the instance itself, for what has to write into it */
 export const useInstance = (): ShellInstance => useSeen().instance
