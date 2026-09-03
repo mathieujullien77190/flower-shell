@@ -8,7 +8,14 @@ import { alias } from "./alias.ts"
 // runtime deps stay external: it is the consumer who installs them.
 export default defineConfig({
 	resolve: { alias },
-	plugins: [dts({ include: ["src"], exclude: ["src/stories/**"] })],
+	// the stories and the tests are not part of what is published: without
+	// this the tests each shipped an empty `.d.ts` beside the real ones
+	plugins: [
+		dts({
+			include: ["src"],
+			exclude: ["src/stories/**", "src/**/*.test.ts", "src/**/*.test.tsx"],
+		}),
+	],
 	build: {
 		lib: {
 			entry: path.resolve(process.cwd(), "src/index.ts"),
