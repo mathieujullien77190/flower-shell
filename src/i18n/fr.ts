@@ -4,6 +4,8 @@ export const dictFr: Dict = {
 	common: {
 		restricted:
 			"Ceci est une commande à accès restreint, vous ne pouvez pas l'utiliser",
+		light: "clair",
+		dark: "sombre",
 	},
 	help: {
 		desc: "Fournit des informations d’aide sur les commandes",
@@ -38,13 +40,12 @@ export const dictFr: Dict = {
 	},
 	theme: {
 		flower: "Le thème du paquet : feuillage sombre, une fleur pour invite",
-		twilight: "Un terminal sombre et neutre",
-		parchment: "Un terminal clair et neutre",
-		dracula: "Fond ardoise violette, accents saturés",
-		nord: "Fond bleu nuit, accents froids et bas en saturation",
-		gruvbox: "Fond terreux, accents chauds",
-		monokai: "Fond olive sombre, accents francs",
-		solarized: "Fond ivoire, accents mesurés",
+		hibiscus: "Fond lie de vin, rose du pétale et jaune du pollen",
+		sunflower: "Fond terre sombre, jaune du pétale et ciel d'été",
+		maple: "Fond écorce sombre, l'or et le rouge de la feuille",
+		lavender: "Fond lilas pâle, violet et vert gris des tiges",
+		rice: "Fond paille, or du grain et eau de la rizière",
+		nest: "Fond beige coquille, brun des brindilles et bleu des œufs",
 		set: "thème : {mode}",
 	},
 	lang: {

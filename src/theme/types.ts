@@ -13,6 +13,10 @@ export type ShellColors = {
 	appColor: string
 	/** the color of the background: a text laid on it stays invisible */
 	invisible: string
+	/** the thumb of the scrollbar, the part one drags */
+	scrollbarThumb: string
+	/** the groove the thumb slides in */
+	scrollbarTrack: string
 }
 
 /** the font of the shell: it dresses the output and the input alike */

@@ -18,7 +18,7 @@ export const baseFonts: ShellFonts = {
 /**
  * A theme comes down to its palette, its prompt and the box it is served in.
  * The font does not vary — a terminal wants a monospace — so writing the
- * eight themes in full would have copied that line over.
+ * seven themes in full would have copied that line over.
  *
  * `container` is laid on `baseContainer`: a theme that only wants a border
  * says so and keeps the padding.
@@ -28,15 +28,26 @@ export const makeTheme = ({
 	prompt = ">",
 	container,
 }: {
-	/** `invisible` left out: it always equals the background */
-	colors: Omit<ShellColors, "invisible">
+	/**
+	 * `invisible` left out: it always equals the background. The two
+	 * scrollbar colors are optional — the text and the background make a
+	 * scrollbar that goes with the palette, and a theme says otherwise only
+	 * if it wants to.
+	 */
+	colors: Omit<ShellColors, "invisible" | "scrollbarThumb" | "scrollbarTrack"> &
+		Partial<Pick<ShellColors, "scrollbarThumb" | "scrollbarTrack">>
 	prompt?: string
 	/** the box the terminal is served in: padding, border, radius */
 	container?: CSSProperties
 }): ShellTheme => ({
 	// a text laid on `invisible` blends into the background, revealed by
 	// selecting it
-	colors: { ...colors, invisible: colors.background },
+	colors: {
+		...colors,
+		invisible: colors.background,
+		scrollbarThumb: colors.scrollbarThumb ?? colors.textColor,
+		scrollbarTrack: colors.scrollbarTrack ?? colors.background,
+	},
 	prompt,
 	fonts: baseFonts,
 	container: { ...baseContainer, ...container },

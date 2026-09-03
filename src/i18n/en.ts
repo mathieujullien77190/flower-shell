@@ -3,6 +3,9 @@ import { Dict } from "@types"
 export const dictEn: Dict = {
 	common: {
 		restricted: "This is a restricted command, you cannot use it",
+		/** the tone of a theme, put before its description in the help */
+		light: "light",
+		dark: "dark",
 	},
 	help: {
 		desc: "Provides help about the commands",
@@ -36,13 +39,12 @@ export const dictEn: Dict = {
 	},
 	theme: {
 		flower: "The package theme: leaf-dark, with a flower for a prompt",
-		twilight: "A neutral dark terminal",
-		parchment: "A neutral light terminal",
-		dracula: "Slate purple ground, saturated accents",
-		nord: "Night blue ground, cool low-saturation accents",
-		gruvbox: "Earthy ground, warm accents",
-		monokai: "Dark olive ground, blunt accents",
-		solarized: "Ivory ground, measured accents",
+		hibiscus: "Wine dark ground, petal pink and pollen yellow",
+		sunflower: "Loam dark ground, petal yellow and summer sky",
+		maple: "Bark dark ground, the gold and the red of the leaf",
+		lavender: "Pale lilac ground, violet and the grey green of the stems",
+		rice: "Straw ground, grain gold and the water of the paddy",
+		nest: "Shell beige ground, twig brown and egg blue",
 		set: "theme: {mode}",
 	},
 	lang: {

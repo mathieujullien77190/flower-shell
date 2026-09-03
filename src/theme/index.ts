@@ -1,13 +1,12 @@
 import { CSSProperties } from "react"
 
-import { twilightTheme } from "./twilight"
-import { draculaTheme } from "./dracula"
 import { flowerTheme } from "./flower"
-import { gruvboxTheme } from "./gruvbox"
-import { parchmentTheme } from "./parchment"
-import { monokaiTheme } from "./monokai"
-import { nordTheme } from "./nord"
-import { solarizedTheme } from "./solarized"
+import { hibiscusTheme } from "./hibiscus"
+import { sunflowerTheme } from "./sunflower"
+import { mapleTheme } from "./maple"
+import { lavenderTheme } from "./lavender"
+import { riceTheme } from "./rice"
+import { nestTheme } from "./nest"
 import type {
 	ShellColors,
 	ShellFonts,
@@ -22,14 +21,16 @@ export type {
 	ShellThemeInput,
 } from "./types"
 
-export { twilightTheme } from "./twilight"
-export { draculaTheme } from "./dracula"
+export { themeTone } from "./tone"
+export type { ShellTone } from "./tone"
+
 export { flowerTheme } from "./flower"
-export { gruvboxTheme } from "./gruvbox"
-export { parchmentTheme } from "./parchment"
-export { monokaiTheme } from "./monokai"
-export { nordTheme } from "./nord"
-export { solarizedTheme } from "./solarized"
+export { hibiscusTheme } from "./hibiscus"
+export { sunflowerTheme } from "./sunflower"
+export { mapleTheme } from "./maple"
+export { lavenderTheme } from "./lavender"
+export { riceTheme } from "./rice"
+export { nestTheme } from "./nest"
 
 /**
  * The catalogue of the package, the way a publisher would have one. It is
@@ -38,13 +39,12 @@ export { solarizedTheme } from "./solarized"
  */
 export const themes: Record<string, ShellTheme> = {
 	flower: flowerTheme,
-	twilight: twilightTheme,
-	parchment: parchmentTheme,
-	dracula: draculaTheme,
-	nord: nordTheme,
-	gruvbox: gruvboxTheme,
-	monokai: monokaiTheme,
-	solarized: solarizedTheme,
+	hibiscus: hibiscusTheme,
+	sunflower: sunflowerTheme,
+	maple: mapleTheme,
+	lavender: lavenderTheme,
+	rice: riceTheme,
+	nest: nestTheme,
 }
 
 /** the name of the starting theme, the one `reset` finds back */
@@ -68,6 +68,10 @@ export const bareTheme: ShellTheme = {
 		infoColor: "inherit",
 		appColor: "inherit",
 		invisible: "transparent",
+		// `auto` and not a color: the scrollbar of the browser, untouched,
+		// the way the rest of the bare theme paints nothing
+		scrollbarThumb: "auto",
+		scrollbarTrack: "auto",
 	},
 	prompt: ">",
 	fonts: { shell: "inherit" },
@@ -75,8 +79,9 @@ export const bareTheme: ShellTheme = {
 }
 
 /**
- * The default theme of the package. `twilightTheme` and `parchmentTheme`
- * stay there for whoever wants a neutral terminal, `>` prompt included.
+ * The default theme of the package: the flower it is named after. The
+ * catalogue turns around it — three dark themes, three light ones, each one
+ * a thing that grows and each one wearing its emoji for a prompt.
  */
 export const defaultTheme: ShellTheme = flowerTheme
 
@@ -167,5 +172,23 @@ export const fonts = (): ShellFonts => current.fonts
 
 /** the style laid on the general container of the terminal */
 export const container = (): CSSProperties => current.container
+
+/**
+ * The scrollbar of the terminal, ready for CSS: the pair `scrollbar-color`
+ * takes, and the width that goes with it.
+ *
+ * A theme that leaves its scrollbar colors on `auto` — `bareTheme` is the
+ * one — gets the scrollbar of the browser, whole: `scrollbar-color` refuses
+ * a pair with `auto` in it, and a themed width on a browser scrollbar would
+ * be the one thing painted on a shell that paints nothing.
+ */
+export const scrollbar = (): { color: string; width: string } => {
+	const { scrollbarThumb, scrollbarTrack } = current.colors
+	const bare = scrollbarThumb === "auto" || scrollbarTrack === "auto"
+
+	return bare
+		? { color: "auto", width: "auto" }
+		: { color: `${scrollbarThumb} ${scrollbarTrack}`, width: "thin" }
+}
 
 export type { CSSProperties }

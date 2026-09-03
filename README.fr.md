@@ -25,7 +25,6 @@ const App = () => <Shell commands={baseCommands} themes={themes} />
 | `lang`              | langue de départ, parmi celles de `dict` (`en` par défaut)                                                                       |
 | `animation`         | écriture lettre par lettre des réponses (`true` par défaut)                                                                      |
 | `keyboardOnFocus`   | la saisie reprend le focus dès qu'elle le perd (`true` par défaut)                                                               |
-| `scrollRef`         | élément à faire défiler quand la sortie s'allonge : la boîte qui tient le shell                                                  |
 | `id`                | le nom sous lequel un `<ShellProvider>` le trouve, pour que `useShell()` le commande                                             |
 | `onCommandStart`    | avant que la commande ne joue ; part aussi pour une commande inconnue                                                            |
 | `onCommandDone`     | l'action a rendu son texte et l'effet a joué ; rien n'est encore à l'écran                                                       |
@@ -38,6 +37,29 @@ tapée passe à la suivante sans message d'erreur, et aucun thème, donc rien
 n'est peint — le shell prend les couleurs et la police de la page qui le
 tient, l'invite retombe sur `>`, et le balisage cesse de colorer. Dès qu'une
 commande existe, une commande inconnue redevient une erreur.
+
+Un clic sur le terminal donne toujours le clavier à sa saisie.
+`keyboardOnFocus` couvre le reste de la page : activée, ce qui est le défaut,
+la saisie reprend le focus où que le clic soit tombé, et l'on tape sans viser ;
+désactivée, le shell attend qu'on le clique — ce que veut une page qui a ses
+propres champs à remplir.
+
+## Hauteur et défilement
+
+Le shell prend la place qu'on lui donne : donnez une hauteur à la boîte qui le
+tient, et il défile dedans — une longue sortie reste dans le terminal, sur une
+barre de défilement du thème, et le shell suit sa dernière ligne à mesure
+qu'elle s'écrit.
+
+```tsx
+<div style={{ height: "100vh" }}>
+	<Shell commands={baseCommands} themes={themes} />
+</div>
+```
+
+Rien à transmettre : le défilement appartient au shell. Une boîte sans hauteur
+laisse le terminal grandir avec sa sortie, aussi haut que ce qu'il contient, et
+rien ne défile — c'est la page qui défile alors, si elle est assez longue.
 
 ## Les commandes de base
 
@@ -71,6 +93,20 @@ Plus les commandes restreintes — que le visiteur ne peut pas taper :
 - `actionmap` est l'aiguillage des marqueurs cliquables : un clic sur
   `#libellé ~ cmd args#` lui envoie `cmd args`, et son effet joue cette ligne.
   Elle n'affiche rien d'elle-même — retirez-la et le clic ne fait plus rien
+
+## La complétion
+
+[TAB] complète la ligne en cours de frappe : le nom de la commande d'abord,
+puis son premier argument une fois la commande nommée. `anim` donne
+`animation`, `theme sunf` donne `theme sunflower`, `lang f` donne `lang fr`.
+
+Les valeurs viennent de `testArgs.authorize`, la liste même qui refuse un
+mauvais argument — donc une commande à vous se complète toute seule dès
+qu'elle en déclare une, et une commande à texte libre, comme `hello`, n'a
+rien à deviner. Seul le premier argument est complété.
+
+Sur un téléphone il n'y a pas de [TAB] : [ENTER] prend la suggestion au lieu
+d'envoyer la ligne, et le suivant l'envoie.
 
 ## L'ouverture
 
@@ -244,36 +280,37 @@ langue d'origine ; seules les suivantes changent.
 
 ## Le thème
 
-Le paquet en livre huit, à la manière d'un éditeur :
+Le paquet en livre sept, tous pris à ce qui pousse, chacun portant son emoji
+pour invite — trois sombres, trois clairs, autour de celui qui lui donne son
+nom :
 
-| nom         |                                                         |
-| ----------- | ------------------------------------------------------- |
-| `flower`    | **le défaut** — feuillage sombre, une fleur pour invite |
-| `twilight`  | un terminal sombre et neutre, invite `>`                |
-| `parchment` | un terminal clair et neutre                             |
-| `dracula`   | fond ardoise violette, accents saturés                  |
-| `nord`      | fond bleu nuit, accents froids                          |
-| `gruvbox`   | fond terreux, accents chauds                            |
-| `monokai`   | fond olive sombre, accents francs                       |
-| `solarized` | fond ivoire, accents mesurés                            |
+| nom         |                                                                 |
+| ----------- | --------------------------------------------------------------- |
+| `flower`    | 🌼 **le défaut** — feuillage sombre, une fleur pour invite      |
+| `hibiscus`  | 🌺 sombre — fond lie de vin, rose du pétale et jaune du pollen  |
+| `sunflower` | 🌻 sombre — fond terre, jaune du pétale et ciel d'été           |
+| `maple`     | 🍁 sombre — fond écorce, l'or et le rouge de la feuille         |
+| `lavender`  | 🪻 clair — lilas pâle, violet et vert gris des tiges            |
+| `rice`      | 🌾 clair — paille, or du grain et eau de la rizière             |
+| `nest`      | 🪺 clair — beige coquille, brun des brindilles et bleu des œufs |
 
-Chacun s'exporte sous son nom — `flowerTheme`, `twilightTheme`, `nordTheme`… —
-et `themes` rassemble les huit sous les clés du tableau.
+Chacun s'exporte sous son nom — `flowerTheme`, `hibiscusTheme`,
+`lavenderTheme`… — et `themes` rassemble les sept sous les clés du tableau.
 
 Deux props, et elles se lisent comme `dict` et `lang`. `themes` dit quels
 thèmes existent ; `theme` nomme celui du départ, une clé de `themes` :
 
 ```tsx
-import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
+import { Shell, baseCommands, lavenderTheme, themes } from "flower-shell"
 
-// the whole catalogue: all eight, worn on the first of them
+// the whole catalogue: all seven, worn on the first of them
 <Shell commands={baseCommands} themes={themes} />
 
 // one of them, and nothing else to switch to
-<Shell commands={baseCommands} themes={{ nord: nordTheme }} />
+<Shell commands={baseCommands} themes={{ lavender: lavenderTheme }} />
 
 // the catalogue to reach, and the name it starts on
-<Shell commands={baseCommands} themes={themes} theme="nord" />
+<Shell commands={baseCommands} themes={themes} theme="lavender" />
 
 // neither: nothing to switch to, and nothing painted
 <Shell commands={baseCommands} />
@@ -281,7 +318,17 @@ import { Shell, baseCommands, nordTheme, themes } from "flower-shell"
 
 **Les thèmes du shell sont exactement les clés de `themes`** — rien de plus.
 `theme <nom>` n'accepte que ceux-là, et `help theme` les liste, chacun décrit
-par la clé de dictionnaire `theme.<nom>`.
+par la clé de dictionnaire `theme.<nom>`, sa tonalité d'abord :
+
+```
+theme rice      : clair : Fond paille, or du grain et eau de la rizière
+theme maple     : sombre : Fond écorce sombre, l'or et le rouge de la feuille
+```
+
+`clair` ou `sombre` se lit sur `colors.background`, et non sur un mot de la
+description — un thème à vous s'annonce donc comme les autres, sans rien
+écrire nulle part. Un fond dont elle ne se lit pas — une couleur nommée,
+`transparent` — laisse la ligne telle quelle.
 
 Aucune des deux n'est obligatoire, et aucune ne retombe sur un défaut qui
 habillerait le shell dans votre dos. `theme` nomme ce qu'il porte ; sans elle,
@@ -299,7 +346,7 @@ hors des deux :
 ```tsx
 <Shell
 	commands={baseCommands}
-	themes={{ nord: nordTheme, mine }}
+	themes={{ lavender: lavenderTheme, mine }}
 	theme="mine"
 	dict={{ en: { theme: { mine: "The house theme" } } }}
 />
@@ -331,12 +378,25 @@ besoin courant — elle vaut `16px` par défaut — mais un arrondi, une bordure
 une ombre se posent au même endroit. Ce qu'on y met recouvre le style de base
 du conteneur, propriété par propriété.
 
-Les huit thèmes du paquet stylent chacun le leur : une bordure prise dans les
+Les sept thèmes du paquet stylent chacun le leur : une bordure prise dans les
 couleurs de la palette, un arrondi qui va avec, et la place que le thème
-demande — `monokai` a les coins carrés, `parchment` élargit ses marges. Comme
+demande — `maple` a les coins presque carrés, `rice` élargit ses marges. Comme
 un thème monté est posé sur `defaultTheme`, un thème à vous qui ne dit rien de
 `container` hérite de celui de `flower` ; donnez-lui son propre `container`
 pour dire autre chose.
+
+`colors.scrollbarThumb` et `colors.scrollbarTrack` habillent la barre de
+défilement du terminal : le curseur qu'on attrape, et la glissière où il
+coulisse. Les deux sont facultatives — un thème qui n'en dit rien prend sa
+propre couleur de texte sur son propre fond, ce qui va avec n'importe quelle
+palette — et la barre est tracée fine. Seul `bareTheme` laisse la barre du
+navigateur intacte, comme il ne peint rien d'autre.
+
+```tsx
+const mine = {
+	colors: { background: "#212E35", scrollbarThumb: "#FFCC6A" },
+}
+```
 
 `fonts.shell` habille la sortie comme la saisie, et vaut `monospace` par
 défaut : un terminal veut du chasse fixe.
@@ -396,7 +456,7 @@ composant à vous et rangez les méthodes où il vous les faut.
 **Ce qui reste partagé, et pourquoi.** Le thème et les dictionnaires restent
 dans des modules, communs à tous les terminaux de la page : le balisage est
 coloré par `highlight`, une fonction et non un composant, qu'un contexte
-n'atteindrait pas. Donc `theme nord` tapé dans un shell repeint les autres,
+n'atteindrait pas. Donc `theme lavender` tapé dans un shell repeint les autres,
 tandis que la langue, l'historique et les options appartiennent à chacun.
 
 Une commande atteint son propre shell sans avoir à le demander : dans une

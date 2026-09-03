@@ -31,7 +31,7 @@ const Toolbar = () => {
 }
 
 const Box = ({ children }: { children: React.ReactNode }) => (
-	<div style={{ overflowY: "auto", minHeight: 0 }}>{children}</div>
+	<div style={{ minHeight: 0 }}>{children}</div>
 )
 
 const meta: Meta<typeof Shell> = {
@@ -53,7 +53,7 @@ and does not need to be.
 
 **The theme is the exception.** It lives in a module, because the markup is
 coloured by a function and not by a component, so a context could not reach
-it: \`theme nord\` typed in one terminal repaints both. The language, the
+it: \`theme lavender\` typed in one terminal repaints both. The language, the
 history and the options are per shell; the palette is not.
 `,
 		fr: `
@@ -71,7 +71,7 @@ provider au-dessus, ne peut pas être atteint — et n'a pas à l'être.
 
 **Le thème est l'exception.** Il vit dans un module, parce que le balisage est
 coloré par une fonction et non par un composant, et qu'un contexte ne
-l'atteindrait pas : \`theme nord\` tapé dans un terminal repeint les deux. La
+l'atteindrait pas : \`theme lavender\` tapé dans un terminal repeint les deux. La
 langue, l'historique et les options sont par shell ; la palette non.
 `,
 	}),

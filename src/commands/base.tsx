@@ -2,7 +2,7 @@ import { BaseCommands, Help } from "@types"
 import { langs, t } from "@i18n/lang"
 import { readHelp } from "@engine/terminalEngine"
 import { runHere } from "@engine/send"
-import { colors, themeNames } from "@theme"
+import { colors, themeByName, themeNames, themeTone } from "@theme"
 import { shellActions } from "@state/instance"
 import { highlightFlower, plantFlowers } from "./flowers"
 import { title } from "./title"
@@ -138,12 +138,26 @@ export const baseCommands: BaseCommands = {
 		 * A function, as for `lang`: the help lists the catalogue as it is at
 		 * the moment it is shown. Each theme describes itself through the key
 		 * `theme.<name>`.
+		 *
+		 * Its tone comes first — `light : …`, `dark : …` — read off its
+		 * background and not off a word in the description: it is what one
+		 * looks for in that list, and a theme of the consumer's answers for
+		 * it like the others. Translated here, because the description is
+		 * handed over already written; a background the tone cannot be read
+		 * from leaves the line as it was.
 		 */
 		help: () => ({
-			patterns: themeNames().map(name => ({
-				pattern: `theme ${name}`,
-				description: `theme.${name}`,
-			})),
+			patterns: themeNames().map(name => {
+				const tone = themeTone(themeByName(name))
+				const description = t(`theme.${name}`)
+
+				return {
+					pattern: `theme ${name}`,
+					description: tone
+						? `${t(`common.${tone}`)} : ${description}`
+						: description,
+				}
+			}),
 		}),
 	},
 	lang: {

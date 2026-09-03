@@ -25,7 +25,7 @@ A retro terminal in React: a command engine, history, autocompletion and
 animated ASCII rendering. No layout imposed.
 
 **The terminal below is the real one.** Type \`help\` to see what it answers,
-\`theme nord\` to dress it differently, \`test\` to print every color of the
+\`theme lavender\` to dress it differently, \`test\` to print every color of the
 theme it wears, \`flowers\` for no reason at all.
 
 Everything else in the sidebar is one case at a time, and each shows the code
@@ -38,7 +38,7 @@ Un terminal rétro en React : moteur de commandes, historique, autocomplétion
 et rendu ASCII animé. Aucune mise en page imposée.
 
 **Le terminal ci-dessous est le vrai.** Tapez \`help\` pour voir ce qu'il
-répond, \`theme nord\` pour l'habiller autrement, \`test\` pour afficher toutes
+répond, \`theme lavender\` pour l'habiller autrement, \`test\` pour afficher toutes
 les couleurs du thème qu'il porte, \`flowers\` pour rien.
 
 Le reste de la barre latérale prend un cas à la fois, et chacun montre le code

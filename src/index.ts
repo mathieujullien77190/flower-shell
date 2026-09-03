@@ -34,27 +34,28 @@ export type { ShellActions, ShellData, ShellState } from "./state/store"
 export {
 	bareTheme,
 	defaultTheme,
-	draculaTheme,
 	flowerTheme,
-	gruvboxTheme,
-	monokaiTheme,
-	nordTheme,
-	parchmentTheme,
+	hibiscusTheme,
+	lavenderTheme,
+	mapleTheme,
+	nestTheme,
+	riceTheme,
 	setTheme,
 	setThemes,
+	sunflowerTheme,
 	wearTheme,
-	solarizedTheme,
 	theme,
 	themeByName,
 	themeNames,
+	themeTone,
 	themes,
-	twilightTheme,
 } from "./theme"
 export type {
 	ShellColors,
 	ShellFonts,
 	ShellTheme,
 	ShellThemeInput,
+	ShellTone,
 } from "./theme"
 
 export type {
