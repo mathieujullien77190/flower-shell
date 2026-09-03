@@ -1,0 +1,38 @@
+# Les verifications du paquet, a chaque poussee sur main et sur chaque
+# pull request. Le Storybook a son propre workflow : celui-ci ne publie
+# rien, il dit seulement si ce qui arrive tient debout.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+# une passe a la fois par branche : une poussee qui en suit une autre
+# annule la precedente, c'est la derniere qui compte
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # `ci` et non `install` : on veut exactement le package-lock du depot
+      - run: npm ci
+
+      # du plus rapide au plus lent, pour que ce qui casse casse tot
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run typecheck:test
+      - run: npm test
+      - run: npm run build
