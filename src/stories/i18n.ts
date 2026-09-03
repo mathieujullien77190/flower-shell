@@ -86,6 +86,11 @@ export const useLocale = (): Locale => {
 /**
  * The prose of a docs page, set on the `meta`.
  *
+ * The two texts come from the two markdowns beside the story —
+ * `Default.en.md`, `Default.fr.md`, imported with Vite's `?raw` — and not
+ * from a template literal in the file: prose is written in markdown, and a
+ * `.md` is what an editor, a spellchecker and a diff all read as such.
+ *
  * It cannot stay in a comment above the meta: Storybook extracts those at
  * build time, and a choice made in the toolbar would change nothing there.
  * As a parameter, the docs page reads it at render time and follows the
