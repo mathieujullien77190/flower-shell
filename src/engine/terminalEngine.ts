@@ -1,11 +1,18 @@
 import { BaseCommand, BaseCommands, Command, Args, Help } from "@types"
 import { t } from "@i18n/lang"
 
+/**
+ * The values a command accepts. `authorize` can be a function — `theme` and
+ * `lang` read a catalogue the consumer mounts long after the command was
+ * written — so it is called here, at the moment it is needed.
+ */
+const authorizeList = (testArgs: Args): string[] =>
+	typeof testArgs.authorize === "function"
+		? testArgs.authorize()
+		: testArgs.authorize
+
 const isAuthorizeArgs = (args: string[], testArgs: Args) => {
-	const authorize =
-		typeof testArgs.authorize === "function"
-			? testArgs.authorize()
-			: testArgs.authorize
+	const authorize = authorizeList(testArgs)
 
 	const test1 =
 		args.filter(item => authorize.includes(item)).length === args.length
@@ -175,15 +182,70 @@ type AutocompleteCommandProps = {
 	startCommand: string
 }
 
+/**
+ * The first word being typed, completed on the names of the registry. A
+ * restricted command is not offered: the visitor cannot type it.
+ */
+const autocompleteName = (
+	commands: BaseCommands,
+	start: string
+): string | null => {
+	const find = Object.keys(commands).filter(
+		name => !commands[name]?.restricted && name.indexOf(start) === 0
+	)
+
+	return find[0] || null
+}
+
+/**
+ * The first argument, completed on what the command accepts: `testArgs`
+ * already lists them, since it is what turns a wrong argument down. A
+ * command that takes free text — `hello` — has no list, and there is
+ * nothing to guess.
+ */
+const autocompleteArg = (
+	commands: BaseCommands,
+	name: string,
+	start: string
+): string | null => {
+	const command = findCommand({ commands, name, restricted: false })
+	if (!command?.testArgs) return null
+
+	return (
+		authorizeList(command.testArgs).find(arg => arg.indexOf(start) === 0) ||
+		null
+	)
+}
+
+/**
+ * What the line would become on a [TAB]: the name of the command while the
+ * first word is being typed, then its first argument. It comes back whole —
+ * `theme sunf` gives `theme sunflower` — because that is what the input
+ * puts in place of what was typed.
+ *
+ * Nothing to offer, and nothing comes back: an empty string. Same when the
+ * word is already complete, so that the hint stops showing what is
+ * already there, and past the first argument, which no command of the
+ * package lists.
+ */
 export const autocompleteCommand = ({
 	commands,
 	startCommand,
 }: AutocompleteCommandProps): string => {
 	if (startCommand === "") return ""
 
-	const find = Object.keys(commands).filter(
-		name => !commands[name]?.restricted && name.indexOf(startCommand) === 0
-	)
-	if ((find[0] || "").length === startCommand.length) return ""
-	return find[0] || ""
+	const [name, ...args] = startCommand.split(" ")
+
+	if (args.length === 0) {
+		const found = autocompleteName(commands, name)
+
+		return !found || found.length === name.length ? "" : found
+	}
+
+	// one argument, and one only: the second is nobody's to guess
+	if (args.length > 1 || args[0] === "") return ""
+
+	const found = autocompleteArg(commands, name, args[0])
+
+	return !found || found.length === args[0].length ? "" : `${name} ${found}`
 }
