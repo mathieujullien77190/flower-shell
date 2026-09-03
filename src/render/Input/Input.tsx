@@ -18,7 +18,9 @@ import { cleanCommand, hasSelection } from "./helpers"
 
 export const Input = ({
 	value = "",
-	forceFocus,
+	// a click count, so the zero of a shell nobody has clicked yet is a
+	// number and not an absence
+	forceFocus = 0,
 	options,
 	onValidate = () => {},
 	onCallPrevious = () => {},
@@ -102,8 +104,15 @@ export const Input = ({
 		[onCallPrevious, onCallNext]
 	)
 
+	/**
+	 * The focus at mount, and only for a shell that takes it back anyway: a
+	 * terminal that has given it up must not steal it from the page around
+	 * it. It is mounted again more often than it looks — a preview keyed on
+	 * what is being edited remounts at every keystroke — and each time it
+	 * would empty the field being filled.
+	 */
 	useEffect(() => {
-		ref?.current?.focus()
+		if (options.keyboardOnFocus) ref?.current?.focus()
 	}, [options.keyboardOnFocus])
 
 	/**
@@ -135,8 +144,17 @@ export const Input = ({
 		}
 	}, [])
 
+	/**
+	 * A click on the terminal hands the keyboard over, whatever
+	 * `keyboardOnFocus` says: the option guards the focus taken back from
+	 * the rest of the page, and a click aimed at the shell is asking for it
+	 * plainly. Turning it off is for a page that is not the shell — a form
+	 * around it — and even there, clicking the terminal means typing in it.
+	 */
 	useEffect(() => {
-		if (keyboardOnFocus.current) ref?.current?.focus()
+		// the counter starts at zero and moves on a click alone: at mount
+		// there has been none, and the focus is not this effect's to take
+		if (forceFocus > 0) ref?.current?.focus()
 	}, [forceFocus])
 
 	const predictDisplay = `( ${predict}? appuyez sur [${

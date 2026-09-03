@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useState } from "react"
 import type { Decorator } from "@storybook/react-vite"
 
 import { setThemes, wearTheme } from "../theme"
@@ -23,38 +23,23 @@ export const Fresh = ({ children }: { children: React.ReactNode }) => {
 }
 
 /**
- * The box that holds the shell: smaller than the page, bordered, and above
- * all scrollable. Its ref goes to scrollRef, which lets the shell scroll it
- * down as the output grows — without it, anything overflowing would stay out
- * of reach.
+ * The box that holds the shell: smaller than the page, and of a set height.
+ * That height is all the shell needs — it scrolls itself inside whatever it
+ * is given, and a box of no height would leave it growing with its output.
  */
-export const Boxed = ({
-	children,
-}: {
-	children: (box: React.RefObject<HTMLDivElement | null>) => React.ReactNode
-}) => {
-	const box = useRef<HTMLDivElement>(null)
+export const Boxed = ({ children }: { children: React.ReactNode }) => (
+	<Fresh>
+		<div style={{ height: "100vh", boxSizing: "border-box", padding: 32 }}>
+			{children}
+		</div>
+	</Fresh>
+)
 
-	return (
-		<Fresh>
-			<div style={{ height: "100vh", boxSizing: "border-box", padding: 32 }}>
-				<div
-					ref={box}
-					style={{
-						height: "100%",
-						overflowY: "auto",
-					}}
-				>
-					{children(box)}
-				</div>
-			</div>
-		</Fresh>
-	)
-}
-
-/** the shell in its box, reset before each story, scrolled by its container */
-export const boxed: Decorator = (Story, context) => (
-	<Boxed>{box => <Story args={{ ...context.args, scrollRef: box }} />}</Boxed>
+/** the shell in its box, reset before each story */
+export const boxed: Decorator = Story => (
+	<Boxed>
+		<Story />
+	</Boxed>
 )
 
 /** the reset alone, for a story that lays out its own frame */

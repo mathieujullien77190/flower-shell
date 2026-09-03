@@ -1,6 +1,10 @@
+import { RefObject } from "react"
+
 import { Command } from "@types"
 
 export type TerminalProps = {
+	/** the box that scrolls: the shell scrolls it down as the output grows */
+	boxRef: RefObject<HTMLDivElement | null>
 	commands: Command[]
 	currentCommand: Command | null
 	options: { lang: string; animation: boolean; keyboardOnFocus: boolean }

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../Shell"
@@ -8,7 +8,7 @@ import { themes } from "../../theme"
 import type { BaseCommand } from "../../types"
 import type { CommandErrorEvent, CommandEvent } from "../../engine/send"
 import { fresh } from "../decorators"
-import { prose } from "../i18n"
+import { prose, useLocale, type Labels } from "../i18n"
 import { source } from "../source"
 
 type Watched = {
@@ -43,8 +43,42 @@ const mark = (
 	return list.map((row, i) => (i === index ? { ...row, [key]: true } : row))
 }
 
+/**
+ * What the panel says, in the language of the page. The four moments keep
+ * the name of their prop in a tooltip: the column is read, the callback is
+ * called, and only one of the two translates.
+ */
+const LABELS: Labels<{
+	console: string
+	command: string
+	start: string
+	done: string
+	shown: string
+	nothing: string
+}> = {
+	en: {
+		console:
+			"Every event is logged in full to the browser console — open it to read the arguments and the whole line.",
+		command: "command",
+		start: "start",
+		done: "done",
+		shown: "shown",
+		nothing: "nothing yet",
+	},
+	fr: {
+		console:
+			"Chaque événement est journalisé en entier dans la console du navigateur — ouvrez-la pour lire les arguments et la ligne complète.",
+		command: "commande",
+		start: "départ",
+		done: "jouée",
+		shown: "affichée",
+		nothing: "rien encore",
+	},
+}
+
 const Watcher = () => {
-	const box = useRef<HTMLDivElement>(null)
+	const label = LABELS[useLocale()]
+
 	const [seen, setSeen] = useState<Watched[]>([])
 
 	// useCallback, or the listeners would be reset on every render
@@ -94,12 +128,11 @@ const Watcher = () => {
 				padding: 32,
 			}}
 		>
-			<div ref={box} style={{ flex: 1, overflowY: "auto" }}>
+			<div style={{ flex: 1 }}>
 				<Shell
 					commands={{ ...baseCommands, test, boom }}
 					themes={themes}
 					initialCommands={["title", "welcome"]}
-					scrollRef={box}
 					onCommandStart={start}
 					onCommandDone={done}
 					onCommandRendered={rendered}
@@ -119,10 +152,7 @@ const Watcher = () => {
 					background: "#f7f7f5",
 				}}
 			>
-				<p style={{ margin: "0 0 12px", opacity: 0.75 }}>
-					Every event is logged in full to the browser console — open it to read
-					the arguments and the whole line.
-				</p>
+				<p style={{ margin: "0 0 12px", opacity: 0.75 }}>{label.console}</p>
 
 				<div
 					style={{
@@ -132,17 +162,17 @@ const Watcher = () => {
 						alignItems: "center",
 					}}
 				>
-					<strong>command</strong>
-					<strong title="onCommandStart">start</strong>
-					<strong title="onCommandDone">done</strong>
-					<strong title="onCommandRendered">shown</strong>
+					<strong>{label.command}</strong>
+					<strong title="onCommandStart">{label.start}</strong>
+					<strong title="onCommandDone">{label.done}</strong>
+					<strong title="onCommandRendered">{label.shown}</strong>
 
 					{seen.map((row, index) => (
 						<Row key={`${index}-${row.name}`} row={row} />
 					))}
 				</div>
 
-				{seen.length === 0 && <p style={{ opacity: 0.55 }}>nothing yet</p>}
+				{seen.length === 0 && <p style={{ opacity: 0.55 }}>{label.nothing}</p>}
 			</div>
 		</div>
 	)
@@ -245,7 +275,7 @@ export default meta
 
 export const Events: StoryObj<typeof Shell> = {
 	parameters: source(`
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useState } from "react"
 import { Shell, baseCommands, test, themes } from "flower-shell"
 
 // a command that fails on purpose, to reach the third reason
@@ -258,7 +288,6 @@ const boom = {
 }
 
 const Watcher = () => {
-	const box = useRef(null)
 	const [seen, setSeen] = useState([])
 
 	// every event carries { name, args, pattern }: the whole line as sent
@@ -284,12 +313,11 @@ const Watcher = () => {
 
 	return (
 		<div style={{ display: "flex", gap: 16, height: "100vh" }}>
-			<div ref={box} style={{ flex: 1, overflowY: "auto" }}>
+			<div style={{ flex: 1 }}>
 				<Shell
 					commands={{ ...baseCommands, test, boom }}
 					themes={themes}
 					initialCommands={["title", "welcome"]}
-					scrollRef={box}
 					onCommandStart={start}
 					onCommandDone={useCallback(mark("done"), [])}
 					onCommandRendered={useCallback(mark("rendered"), [])}

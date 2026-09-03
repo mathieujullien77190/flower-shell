@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { colors, fonts } from "@theme"
+import { colors, fonts, scrollbar } from "@theme"
 
 export const TerminalContainer = styled.div`
 	background: ${() => colors().background};
@@ -11,10 +11,19 @@ export const TerminalContainer = styled.div`
 	   and height, or the container overflows whatever holds it */
 	box-sizing: border-box;
 
-	/* min-height and not height: the background has to go down with the
-	   output. At a fixed height, anything past the parent is drawn outside
-	   the background, on the white of the page. */
-	min-height: 100%;
+	/* The terminal scrolls itself: it takes the height it is given and keeps
+	   the overflow inside, scrollbar included. Its own height, and not that
+	   of the output: a scroll box has to be shorter than what it holds.
+
+	   A parent of no set height leaves this height at auto — the shell then
+	   grows with the output and nothing scrolls. */
+	height: 100%;
+	overflow-y: auto;
+
+	/* the scrollbar wears the theme: the thumb and its groove, and a thin
+	   bar — a terminal is read, not dragged around */
+	scrollbar-color: ${() => scrollbar().color};
+	scrollbar-width: ${() => scrollbar().width};
 
 	/* size of the shell, inherited by the commands and the input */
 	font-size: 16px;

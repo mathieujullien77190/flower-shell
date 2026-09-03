@@ -12,6 +12,7 @@ import { findCommand } from "@engine/terminalEngine"
 import * as S from "./UI"
 
 export const Terminal = ({
+	boxRef,
 	commands,
 	currentCommand,
 	options,
@@ -30,6 +31,7 @@ export const Terminal = ({
 
 	return (
 		<S.TerminalContainer
+			ref={boxRef}
 			data-theme={themeName}
 			// the style of the container comes from the theme: set inline, it
 			// covers the base style without the consumer having to fight

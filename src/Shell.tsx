@@ -1,4 +1,4 @@
-import { RefObject, useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import Terminal from "./render/Terminal"
 
@@ -75,7 +75,14 @@ export type ShellProps = {
 	lang?: string
 	/** letter by letter writing of the answers; true by default */
 	animation?: boolean
-	/** the input takes the focus back as soon as it loses it; true by default */
+	/**
+	 * The input takes the focus back as soon as it loses it, wherever on the
+	 * page the click landed; true by default.
+	 *
+	 * A click on the terminal itself hands it the keyboard in any case: that
+	 * one is not guarded, and turning this off leaves the shell to a page
+	 * that has its own fields to fill.
+	 */
 	keyboardOnFocus?: boolean
 	/**
 	 * Commands played at startup, in the order of the array. Each one goes as
@@ -89,12 +96,6 @@ export type ShellProps = {
 	 * played into from `useShell()`.
 	 */
 	initialCommands?: string[]
-	/**
-	 * Element to scroll as the output grows: the box holding the shell, when
-	 * it has a scroll of its own. Without it, nothing scrolls on its own and
-	 * a long output goes past whatever holds the shell.
-	 */
-	scrollRef?: RefObject<HTMLElement | null>
 	/**
 	 * Before the command plays. The name and the arguments are read off the
 	 * line that was sent: at that point the shell does not yet know whether
@@ -129,7 +130,9 @@ export type ShellProps = {
  * The terminal: the list of the commands played and the input line.
  *
  * It takes the room it is given and nothing more — the height, the frame and
- * the place on the page belong to whoever displays it.
+ * the place on the page belong to whoever displays it. Inside that room it
+ * scrolls itself: the output stays in the box, on a scrollbar wearing the
+ * theme, and the shell follows it down as it is written.
  *
  * Each one owns its history, its cursor and its options, so several can live
  * on the same page. The theme and the dictionaries stay shared: the markup is
@@ -149,7 +152,6 @@ export const Shell = ({
 	animation,
 	keyboardOnFocus,
 	initialCommands = [],
-	scrollRef,
 	onCommandStart,
 	onCommandDone,
 	onCommandRendered,
@@ -200,7 +202,6 @@ export const Shell = ({
 				animation={animation}
 				keyboardOnFocus={keyboardOnFocus}
 				initialCommands={initialCommands}
-				scrollRef={scrollRef}
 				onCommandStart={onCommandStart}
 				onCommandDone={onCommandDone}
 				onCommandRendered={onCommandRendered}
@@ -230,7 +231,6 @@ const Screen = ({
 	animation,
 	keyboardOnFocus,
 	initialCommands = [],
-	scrollRef,
 	onCommandStart,
 	onCommandDone,
 	onCommandRendered,
@@ -319,9 +319,16 @@ const Screen = ({
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [instance])
 
+	/**
+	 * The terminal is its own scroll box: it keeps the output inside itself
+	 * and follows it down. Nothing to hand over — the height of the box is
+	 * the one it is given, and the scroll belongs to the shell.
+	 */
+	const box = useRef<HTMLDivElement>(null)
+
 	const scrollDown = useCallback(() => {
-		scrollRef?.current?.scrollTo(0, 1000000)
-	}, [scrollRef])
+		box.current?.scrollTo(0, box.current.scrollHeight)
+	}, [])
 
 	/**
 	 * The end of the writing is reported on every render for as long as the
@@ -361,6 +368,7 @@ const Screen = ({
 
 	return (
 		<Terminal
+			boxRef={box}
 			options={options}
 			commands={history}
 			currentCommand={currentCommand}
