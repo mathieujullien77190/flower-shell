@@ -28,5 +28,15 @@ export default tseslint.config(
 			],
 		},
 	},
+	{
+		// the config of Jest is read by Node, in CommonJS
+		files: ["jest.config.cjs"],
+		languageOptions: { globals: globals.node, sourceType: "commonjs" },
+	},
+	{
+		// the tests: `describe`, `it` and `jest` are given by the runner
+		files: ["**/*.test.{ts,tsx}", "jest.setup.ts"],
+		languageOptions: { globals: globals.jest },
+	},
 	prettier
 )
