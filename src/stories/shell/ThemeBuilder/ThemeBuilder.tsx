@@ -1,11 +1,11 @@
 import { useState } from "react"
 
-import { Shell } from "../../Shell"
-import { baseCommands } from "../../commands/base"
-import { test } from "../../commands/test"
-import { themes } from "../../theme"
-import { useLocale, type Labels } from "../i18n"
-import type { ShellColors, ShellTheme } from "../../theme"
+import { Shell } from "../../../Shell"
+import { baseCommands } from "../../../commands/base"
+import { test } from "../../../commands/test"
+import { themes } from "../../../theme"
+import { useLocale, type Labels } from "../../i18n"
+import type { ShellColors, ShellTheme } from "../../../theme"
 
 /**
  * The preview: a real shell, wearing the draft. It opens on `test`, which

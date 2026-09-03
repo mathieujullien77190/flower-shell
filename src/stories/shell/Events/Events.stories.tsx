@@ -1,15 +1,18 @@
 import { useCallback, useState } from "react"
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { Shell } from "../../Shell"
-import { baseCommands } from "../../commands/base"
-import { test } from "../../commands/test"
-import { themes } from "../../theme"
-import type { BaseCommand } from "../../types"
-import type { CommandErrorEvent, CommandEvent } from "../../engine/send"
-import { fresh } from "../decorators"
-import { prose, useLocale, type Labels } from "../i18n"
-import { source } from "../source"
+import { Shell } from "../../../Shell"
+import { baseCommands } from "../../../commands/base"
+import { test } from "../../../commands/test"
+import { themes } from "../../../theme"
+import type { BaseCommand } from "../../../types"
+import type { CommandErrorEvent, CommandEvent } from "../../../engine/send"
+import { fresh } from "../../decorators"
+import { prose, useLocale, type Labels } from "../../i18n"
+import { source } from "../../source"
+import en from "./Events.en.md?raw"
+import fr from "./Events.fr.md?raw"
+import eventsCode from "./Events.source.md?raw"
 
 type Watched = {
 	name: string
@@ -222,114 +225,12 @@ const meta: Meta<typeof Shell> = {
 	title: "Shell/Events",
 	component: Shell,
 	decorators: [fresh],
-	parameters: prose({
-		en: `
-Everything the shell hands back, and nothing else: the panel on the right is
-written from the four event props alone, one row per command with a tick under
-each moment it has reached.
-
-**Open the browser console.** Every event is logged there in full, which is
-where you see what the panel cannot show: each one carries the name, the
-arguments, and \`pattern\` — the whole line as it was sent.
-
-\`onCommandStart\` fires before anything runs, off that line — so it fires for
-a command that does not exist too, which the others never do.
-\`onCommandDone\` fires once the action has returned its text and the effect
-has played: the command is over, but nothing is on screen yet.
-\`onCommandRendered\` fires when the text has finished being written, which on
-a long output is a good while later.
-
-\`onCommandError\` fires instead of \`onCommandDone\` when the command did not
-play, and says why through \`reason\`. Three lines to try, one for each: \`nope\`
-is \`unknown\`, \`theme nope\` is \`args\` — the command exists, the argument does
-not — and \`boom\` throws on purpose, which is \`thrown\` and carries the error
-itself.
-`,
-		fr: `
-Tout ce que le shell rend, et rien d'autre : le panneau de droite est écrit
-avec les seules quatre props d'évènement, une ligne par commande, une coche
-sous chaque moment qu'elle a atteint.
-
-**Ouvrez la console du navigateur.** Chaque évènement y part en entier, et
-c'est là qu'on voit ce que le panneau ne peut pas montrer : chacun porte le
-nom, les arguments, et \`pattern\` — la ligne entière telle qu'elle a été
-envoyée.
-
-\`onCommandStart\` part avant que quoi que ce soit ne joue, lu sur cette ligne
-— il part donc aussi pour une commande qui n'existe pas, ce que les autres ne
-font jamais. \`onCommandDone\` part une fois que l'action a rendu son texte et
-que l'effet a joué : la commande est faite, mais rien n'est encore à l'écran.
-\`onCommandRendered\` part quand le texte a fini de s'écrire, ce qui sur une
-sortie longue arrive bien plus tard.
-
-\`onCommandError\` part à la place de \`onCommandDone\` quand la commande n'a pas
-joué, et dit pourquoi par \`reason\`. Trois lignes à essayer, une par raison :
-\`nope\` donne \`unknown\`, \`theme nope\` donne \`args\` — la commande existe,
-l'argument non — et \`boom\` lève exprès, ce qui donne \`thrown\` et porte
-l'erreur elle-même.
-`,
-	}),
+	parameters: prose({ en, fr }),
 }
 
 export default meta
 
 export const Events: StoryObj<typeof Shell> = {
-	parameters: source(`
-import { useCallback, useState } from "react"
-import { Shell, baseCommands, test, themes } from "flower-shell"
-
-// a command that fails on purpose, to reach the third reason
-const boom = {
-	restricted: false,
-	action: () => {
-		throw new Error("boom, as advertised")
-	},
-	help: { patterns: [{ pattern: "boom", description: "throws on purpose" }] },
-}
-
-const Watcher = () => {
-	const [seen, setSeen] = useState([])
-
-	// every event carries { name, args, pattern }: the whole line as sent
-	const start = useCallback(event => {
-		console.log("[onCommandStart]", event)
-		setSeen(list => [...list, { ...event, done: false, rendered: false, error: null }])
-	}, [])
-
-	// the mark lands on the last row still waiting for it: a name can be
-	// played twice, and the rows are in the order the commands started
-	const mark = key => event =>
-		setSeen(list => {
-			const index = list.findLastIndex(row => row.name === event.name && !row[key])
-			if (index === -1) return list
-
-			return list.map((row, i) => (i === index ? { ...row, [key]: true } : row))
-		})
-
-	// reason is "unknown", "args" or "thrown" — the last one carries error
-	const failed = useCallback(event => {
-		console.error("[onCommandError]", event)
-	}, [])
-
-	return (
-		<div style={{ display: "flex", gap: 16, height: "100vh" }}>
-			<div style={{ flex: 1 }}>
-				<Shell
-					commands={{ ...baseCommands, test, boom }}
-					themes={themes}
-					initialCommands={["title", "welcome"]}
-					onCommandStart={start}
-					onCommandDone={useCallback(mark("done"), [])}
-					onCommandRendered={useCallback(mark("rendered"), [])}
-					onCommandError={failed}
-				/>
-			</div>
-
-			{/* one row per command, a tick under each moment it reached */}
-			<div style={{ width: 340, overflowY: "auto" }}>{/* … */}</div>
-		</div>
-	)
-}
-`),
+	parameters: source(eventsCode),
 	render: () => <Watcher />,
 }

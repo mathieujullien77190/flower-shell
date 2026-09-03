@@ -1,12 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react-vite"
 
-import { Shell } from "../Shell"
-import { baseCommands } from "../commands/base"
-import { test } from "../commands/test"
-import { themes } from "../theme"
-import { boxed } from "./decorators"
-import { prose } from "./i18n"
-import { source } from "./source"
+import { Shell } from "../../Shell"
+import { baseCommands } from "../../commands/base"
+import { test } from "../../commands/test"
+import { themes } from "../../theme"
+import { boxed } from "../decorators"
+import { prose } from "../i18n"
+import { source } from "../source"
+import en from "./Welcome.en.md?raw"
+import fr from "./Welcome.fr.md?raw"
+import flowerShellCode from "./FlowerShell.source.md?raw"
 
 // The page one lands on: the package running, not its list of props. It is
 // first in the sort of `preview.tsx`, and so it is the one the published
@@ -19,50 +22,14 @@ const meta: Meta<typeof Shell> = {
 	title: "flower-shell",
 	component: Shell,
 	decorators: [boxed],
-	parameters: prose({
-		en: `
-A retro terminal in React: a command engine, history, autocompletion and
-animated ASCII rendering. No layout imposed.
-
-**The terminal below is the real one.** Type \`help\` to see what it answers,
-\`theme lavender\` to dress it differently, \`test\` to print every color of the
-theme it wears, \`flowers\` for no reason at all.
-
-Everything else in the sidebar is one case at a time, and each shows the code
-that produces it: **Shell** from the bare component to the events it hands
-back, **Markup** for the markers that color the output. The globe in the
-toolbar reads these pages in French.
-`,
-		fr: `
-Un terminal rétro en React : moteur de commandes, historique, autocomplétion
-et rendu ASCII animé. Aucune mise en page imposée.
-
-**Le terminal ci-dessous est le vrai.** Tapez \`help\` pour voir ce qu'il
-répond, \`theme lavender\` pour l'habiller autrement, \`test\` pour afficher toutes
-les couleurs du thème qu'il porte, \`flowers\` pour rien.
-
-Le reste de la barre latérale prend un cas à la fois, et chacun montre le code
-qui le produit : **Shell** du composant nu jusqu'aux évènements qu'il rend,
-**Markup** pour les marqueurs qui colorent la sortie. Le globe de la barre
-d'outils lit ces pages en français.
-`,
-	}),
+	parameters: prose({ en, fr }),
 }
 
 export default meta
 
 export const FlowerShell: StoryObj<typeof Shell> = {
 	name: "flower-shell",
-	parameters: source(`
-import { Shell, baseCommands, test, themes } from "flower-shell"
-
-// the whole catalogue to switch through, the opening played at startup
-<Shell
-	commands={{ ...baseCommands, test }}
-	themes={themes}
-	initialCommands={["title", "welcome"]}
-/>
-`),
+	parameters: source(flowerShellCode),
 	args: {
 		commands: { ...baseCommands, test },
 		themes,
