@@ -13,6 +13,7 @@ export const baseContainer: CSSProperties = {
 /** same font for every theme: a terminal wants a monospace */
 export const baseFonts: ShellFonts = {
 	shell: "monospace",
+	size: 16,
 }
 
 /**
@@ -26,6 +27,7 @@ export const baseFonts: ShellFonts = {
 export const makeTheme = ({
 	colors,
 	prompt = ">",
+	fonts,
 	container,
 }: {
 	/**
@@ -37,6 +39,11 @@ export const makeTheme = ({
 	colors: Omit<ShellColors, "invisible" | "scrollbarThumb" | "scrollbarTrack"> &
 		Partial<Pick<ShellColors, "scrollbarThumb" | "scrollbarTrack">>
 	prompt?: string
+	/**
+	 * The font, if the theme wants another one: what it leaves out keeps the
+	 * monospace and the 16 pixels every theme is written on.
+	 */
+	fonts?: Partial<ShellFonts>
 	/** the box the terminal is served in: padding, border, radius */
 	container?: CSSProperties
 }): ShellTheme => ({
@@ -49,6 +56,6 @@ export const makeTheme = ({
 		scrollbarTrack: colors.scrollbarTrack ?? colors.background,
 	},
 	prompt,
-	fonts: baseFonts,
+	fonts: { ...baseFonts, ...fonts },
 	container: { ...baseContainer, ...container },
 })

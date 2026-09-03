@@ -2,7 +2,8 @@ import { CSSProperties } from "react"
 
 import { flowerTheme } from "./flower"
 import { hibiscusTheme } from "./hibiscus"
-import { sunflowerTheme } from "./sunflower"
+import { kiwiTheme } from "./kiwi"
+import { contrastTheme } from "./contrast"
 import { mapleTheme } from "./maple"
 import { lavenderTheme } from "./lavender"
 import { riceTheme } from "./rice"
@@ -26,7 +27,8 @@ export type { ShellTone } from "./tone"
 
 export { flowerTheme } from "./flower"
 export { hibiscusTheme } from "./hibiscus"
-export { sunflowerTheme } from "./sunflower"
+export { kiwiTheme } from "./kiwi"
+export { contrastTheme } from "./contrast"
 export { mapleTheme } from "./maple"
 export { lavenderTheme } from "./lavender"
 export { riceTheme } from "./rice"
@@ -40,7 +42,8 @@ export { nestTheme } from "./nest"
 export const themes: Record<string, ShellTheme> = {
 	flower: flowerTheme,
 	hibiscus: hibiscusTheme,
-	sunflower: sunflowerTheme,
+	kiwi: kiwiTheme,
+	contrast: contrastTheme,
 	maple: mapleTheme,
 	lavender: lavenderTheme,
 	rice: riceTheme,
@@ -74,14 +77,15 @@ export const bareTheme: ShellTheme = {
 		scrollbarTrack: "auto",
 	},
 	prompt: ">",
-	fonts: { shell: "inherit" },
+	fonts: { shell: "inherit", size: 16 },
 	container: {},
 }
 
 /**
  * The default theme of the package: the flower it is named after. The
- * catalogue turns around it — three dark themes, three light ones, each one
- * a thing that grows and each one wearing its emoji for a prompt.
+ * catalogue turns around it — four dark themes, three light ones, each one
+ * named after a thing that grows and wearing its emoji for a prompt, plus
+ * `contrast`, which is there to be read and not to be looked at.
  */
 export const defaultTheme: ShellTheme = flowerTheme
 

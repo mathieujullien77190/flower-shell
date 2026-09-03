@@ -22,6 +22,12 @@ export type ShellColors = {
 /** the font of the shell: it dresses the output and the input alike */
 export type ShellFonts = {
 	shell: string
+	/**
+	 * The size of the terminal, in pixels: the output and the input take it,
+	 * and the ASCII art is measured on it. 16 unless the theme says
+	 * otherwise — a theme meant to be read from far, or badly, raises it.
+	 */
+	size: number
 }
 
 export type ShellTheme = {

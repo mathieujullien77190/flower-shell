@@ -33,16 +33,17 @@ export type { ShellActions, ShellData, ShellState } from "./state/store"
 
 export {
 	bareTheme,
+	contrastTheme,
 	defaultTheme,
 	flowerTheme,
 	hibiscusTheme,
+	kiwiTheme,
 	lavenderTheme,
 	mapleTheme,
 	nestTheme,
 	riceTheme,
 	setTheme,
 	setThemes,
-	sunflowerTheme,
 	wearTheme,
 	theme,
 	themeByName,
