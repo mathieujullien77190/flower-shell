@@ -1,8 +1,28 @@
 {
 	"name": "flower-shell",
 	"version": "0.1.0",
-	"description": "Terminal retro en React : moteur de commandes, historique, rendu ASCII",
+	"description": "A retro terminal in React: a command engine, history, autocompletion and animated ASCII rendering",
+	"keywords": [
+		"react",
+		"terminal",
+		"console",
+		"shell",
+		"command-line",
+		"retro",
+		"ascii",
+		"typescript",
+		"styled-components"
+	],
 	"license": "MIT",
+	"author": "mathieu <mathieu.jullien77190@gmail.com>",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/mathieujullien77190/flower-shell.git"
+	},
+	"homepage": "https://mathieujullien77190.github.io/flower-shell/",
+	"bugs": {
+		"url": "https://github.com/mathieujullien77190/flower-shell/issues"
+	},
 	"type": "module",
 	"main": "./dist/index.cjs",
 	"module": "./dist/index.mjs",
@@ -15,8 +35,10 @@
 		}
 	},
 	"files": [
-		"dist"
+		"dist",
+		"README.fr.md"
 	],
+	"sideEffects": false,
 	"peerDependencies": {
 		"react": ">=19",
 		"react-dom": ">=19",
