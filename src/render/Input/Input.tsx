@@ -177,7 +177,9 @@ export const Input = ({
 				ref={ref}
 				value={inputValue}
 				spellCheck="false"
-				autoComplete="false"
+				// `off`, and not `false`: an unknown value falls back on `on`,
+				// and the browser was suggesting what had been typed elsewhere
+				autoComplete="off"
 				autoCapitalize="off"
 				autoCorrect="off"
 				onBlur={() => {
