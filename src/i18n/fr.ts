@@ -38,6 +38,9 @@ export const dictFr: Dict = {
 		clicked: "cliquable",
 		click: "cliquez pour jouer hello",
 	},
+	input: {
+		predict: "( {word} ? appuyez sur [{key}] )",
+	},
 	theme: {
 		flower: "Le thème du paquet : feuillage sombre, une fleur pour invite",
 		hibiscus: "Fond lie de vin, rose du pétale et jaune du pollen",

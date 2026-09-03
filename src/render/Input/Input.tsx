@@ -9,6 +9,7 @@ import { InputProps } from "./types"
 import { isMobile } from "react-device-detect"
 
 import { theme } from "@theme"
+import { t } from "@i18n/lang"
 
 import { useCommands } from "@state/context"
 import { autocompleteCommand } from "@engine/terminalEngine"
@@ -157,9 +158,16 @@ export const Input = ({
 		if (forceFocus > 0) ref?.current?.focus()
 	}, [forceFocus])
 
-	const predictDisplay = `( ${predict}? appuyez sur [${
-		isMobile ? "ENTER" : "TAB"
-	}] )`
+	/**
+	 * The language is forced, and not read off the shell in play: `t()`
+	 * finds one while a command runs, and this is a render. The input holds
+	 * its options, the language among them, so it says which one it speaks.
+	 */
+	const predictDisplay = t(
+		"input.predict",
+		{ word: predict, key: isMobile ? "ENTER" : "TAB" },
+		options.lang
+	)
 
 	return (
 		<S.Container data-tutorial="input">

@@ -107,6 +107,10 @@ guess. Only the first argument is completed.
 On a phone there is no [TAB]: [ENTER] takes the suggestion instead of sending
 the line, and the next one sends it.
 
+The hint shown under the line comes from the dictionary like the rest, under
+`input.predict` — `{word}` is what would be taken, `{key}` the key that takes
+it. Override that key through `dict` to word it your way.
+
 ## The opening
 
 The shell starts bare. The logo and the welcome message are two commands,

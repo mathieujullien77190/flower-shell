@@ -37,6 +37,14 @@ export const dictEn: Dict = {
 		clicked: "clickable",
 		click: "click to run hello",
 	},
+	input: {
+		/**
+		 * The hint under the line being typed: {word} is what [TAB] would put
+		 * there, {key} the key that takes it — [ENTER] on a phone, which has
+		 * no [TAB].
+		 */
+		predict: "( {word}? press [{key}] )",
+	},
 	theme: {
 		flower: "The package theme: leaf-dark, with a flower for a prompt",
 		hibiscus: "Wine dark ground, petal pink and pollen yellow",

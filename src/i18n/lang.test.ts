@@ -1,10 +1,36 @@
+import type { Dict } from "@types"
 import { createInstance, withInstance } from "@state/instance"
+import { dictEn } from "./en"
 import { dictFr } from "./fr"
 import { BASE_LANG, browserLang, langs, setDict, t } from "./lang"
 
 // the dictionaries live at module level, shared by every shell: each test
 // puts them back where it found them
 afterEach(() => setDict())
+
+/** every dotted path of a dictionary, leaves only */
+const paths = (dict: Dict, prefix = ""): string[] =>
+	Object.entries(dict).flatMap(([key, value]) =>
+		typeof value === "string"
+			? `${prefix}${key}`
+			: paths(value, `${prefix}${key}.`)
+	)
+
+describe("the dictionaries of the package", () => {
+	it("says the same things in French as in English", () => {
+		// a key added to one and forgotten in the other comes out in English
+		// on a French shell, and nothing else would say so
+		expect(paths(dictEn).filter(key => !paths(dictFr).includes(key))).toEqual(
+			[]
+		)
+	})
+
+	it("says nothing in French the English does not carry", () => {
+		expect(paths(dictFr).filter(key => !paths(dictEn).includes(key))).toEqual(
+			[]
+		)
+	})
+})
 
 describe("setDict", () => {
 	it("speaks English alone until it is given more", () => {

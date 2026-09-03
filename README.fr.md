@@ -108,6 +108,10 @@ rien à deviner. Seul le premier argument est complété.
 Sur un téléphone il n'y a pas de [TAB] : [ENTER] prend la suggestion au lieu
 d'envoyer la ligne, et le suivant l'envoie.
 
+L'indication affichée sous la ligne vient du dictionnaire comme le reste, sous
+`input.predict` — `{word}` est ce qui serait pris, `{key}` la touche qui le
+prend. Recouvrez cette clé par `dict` pour la formuler autrement.
+
 ## L'ouverture
 
 Le shell démarre nu. Le logo et le mot d'accueil sont deux commandes, jouées

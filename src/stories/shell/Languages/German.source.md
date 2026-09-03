@@ -39,6 +39,9 @@ const dictDe: Dict = {
 		clicked: "klickbar",
 		click: "klicken, um hello zu spielen",
 	},
+	input: {
+		predict: "( {word}? drücke [{key}] )",
+	},
 	theme: {
 		flower: "Das Thema des Pakets: dunkles Laub, eine Blume als Eingabe",
 		set: "Thema: {mode}",
