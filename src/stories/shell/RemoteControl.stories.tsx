@@ -9,7 +9,7 @@ import { themes } from "../../theme"
 import { dictEn } from "../../i18n/en"
 import { dictFr } from "../../i18n/fr"
 import { fresh } from "../decorators"
-import { prose } from "../i18n"
+import { prose, useLocale, type Labels } from "../i18n"
 import { source } from "../source"
 
 const TERMINAL = "terminal"
@@ -17,7 +17,40 @@ const TERMINAL = "terminal"
 /** what a read of `actions(id)` gives back, frozen at the moment it was asked */
 type Snapshot = { lang: string; animation: boolean; played: number }
 
+/**
+ * What the panel says, in the language of the page. The buttons are not in
+ * there: `run`, `clear`, `lang fr`, `title` name the API and the commands,
+ * and they are typed the same in either language.
+ */
+const LABELS: Labels<{
+	play: string
+	restricted: string
+	state: string
+	read: string
+	nothing: string
+	played: string
+}> = {
+	en: {
+		play: "play a line",
+		restricted: "restricted",
+		state: "its state",
+		read: "read it back",
+		nothing: "nothing read yet",
+		played: "played",
+	},
+	fr: {
+		play: "jouer une ligne",
+		restricted: "restreintes",
+		state: "son état",
+		read: "le relire",
+		nothing: "rien de lu pour l'instant",
+		played: "jouées",
+	},
+}
+
 const Remote = () => {
+	const label = LABELS[useLocale()]
+
 	const shell = useShell()
 	const [line, setLine] = useState("help")
 	const [seen, setSeen] = useState<Snapshot | null>(null)
@@ -34,7 +67,7 @@ const Remote = () => {
 
 	return (
 		<div style={{ display: "grid", gap: 20, alignContent: "start" }}>
-			<Group title="play a line">
+			<Group title={label.play}>
 				<form
 					style={{ display: "flex", gap: 8 }}
 					onSubmit={event => {
@@ -65,7 +98,7 @@ const Remote = () => {
 				</div>
 			</Group>
 
-			<Group title="restricted">
+			<Group title={label.restricted}>
 				{/* the visitor cannot type these: they only come from here */}
 				<div style={{ display: "flex", gap: 8 }}>
 					<button onClick={() => shell.runRestricted(TERMINAL, "title")}>
@@ -77,7 +110,7 @@ const Remote = () => {
 				</div>
 			</Group>
 
-			<Group title="its state">
+			<Group title={label.state}>
 				<div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
 					<button onClick={() => shell.actions(TERMINAL).clear()}>clear</button>
 					<button onClick={() => shell.actions(TERMINAL).reset()}>reset</button>
@@ -93,13 +126,13 @@ const Remote = () => {
 				</div>
 			</Group>
 
-			<Group title="read it back">
+			<Group title={label.read}>
 				<div style={{ display: "flex", gap: 8, alignItems: "center" }}>
 					<button onClick={read}>read</button>
 					<code style={{ opacity: 0.7, font: "12px ui-monospace, monospace" }}>
 						{seen
-							? `lang ${seen.lang} · animation ${seen.animation ? "on" : "off"} · ${seen.played} played`
-							: "nothing read yet"}
+							? `lang ${seen.lang} · animation ${seen.animation ? "on" : "off"} · ${seen.played} ${label.played}`
+							: label.nothing}
 					</code>
 				</div>
 			</Group>
@@ -234,7 +267,7 @@ const Remote = () => {
 			>
 				<Remote />
 
-				<div style={{ overflowY: "auto", minHeight: 0 }}>
+				<div style={{ minHeight: 0 }}>
 					<Shell
 						id={TERMINAL}
 						commands={{ ...baseCommands, test }}

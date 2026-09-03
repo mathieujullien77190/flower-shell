@@ -4,6 +4,7 @@ import { Shell } from "../../Shell"
 import { baseCommands } from "../../commands/base"
 import { test } from "../../commands/test"
 import { themes } from "../../theme"
+import { useLocale, type Labels } from "../i18n"
 import type { ShellColors, ShellTheme } from "../../theme"
 
 /**
@@ -23,7 +24,8 @@ import type { ShellColors, ShellTheme } from "../../theme"
  * shell takes it back on every mouse release anywhere on the page, so that
  * a visitor can type without aiming. Here the page is not the shell — it is
  * a form around it, and a picker or a select would be closed the instant it
- * was opened.
+ * was opened. A click on the preview still hands it the keyboard: that one
+ * is asked for, and it is how one types in it.
  */
 const Preview = ({ draft }: { draft: ShellTheme }) => (
 	<Shell
@@ -47,6 +49,8 @@ const SHELL_FIELDS: { key: keyof ShellColors; label: string }[] = [
 	{ key: "restrictedColor", label: "restricted" },
 	{ key: "infoColor", label: "info" },
 	{ key: "appColor", label: "brand" },
+	{ key: "scrollbarThumb", label: "scrollbar thumb" },
+	{ key: "scrollbarTrack", label: "scrollbar track" },
 ]
 
 /**
@@ -164,7 +168,37 @@ const asCode = (draft: ShellTheme) =>
  */
 const CUSTOM = "custom"
 
+/**
+ * The titles of the panel, in the language of the page. The pickers keep
+ * the names of the colors they edit — they are the keys of the theme, read
+ * again in the code block below.
+ */
+const LABELS: Labels<{
+	base: string
+	prompt: string
+	shell: string
+	preview: string
+	code: string
+}> = {
+	en: {
+		base: "start from",
+		prompt: "prompt",
+		shell: "shell",
+		preview: "preview",
+		code: "your theme",
+	},
+	fr: {
+		base: "partir de",
+		prompt: "invite",
+		shell: "shell",
+		preview: "aperçu",
+		code: "votre thème",
+	},
+}
+
 export const ThemeBuilder = () => {
+	const label = LABELS[useLocale()]
+
 	const [base, setBase] = useState("flower")
 	const [draft, setDraft] = useState<ShellTheme>(themes.flower)
 
@@ -212,7 +246,7 @@ export const ThemeBuilder = () => {
 			}}
 		>
 			<div style={{ display: "grid", gap: 20 }}>
-				<Group title="start from">
+				<Group title={label.base}>
 					<select
 						value={base}
 						onChange={event => pickBase(event.target.value)}
@@ -233,7 +267,7 @@ export const ThemeBuilder = () => {
 					</select>
 				</Group>
 
-				<Group title="prompt">
+				<Group title={label.prompt}>
 					<input
 						value={draft.prompt}
 						onChange={event =>
@@ -249,7 +283,7 @@ export const ThemeBuilder = () => {
 					/>
 				</Group>
 
-				<Group title="shell">
+				<Group title={label.shell}>
 					{SHELL_FIELDS.map(({ key, label }) => (
 						<Picker
 							key={key}
@@ -262,19 +296,17 @@ export const ThemeBuilder = () => {
 			</div>
 
 			<div style={{ display: "grid", gap: 20 }}>
-				<Group title="preview">
+				<Group title={label.preview}>
 					{/* The shell takes this whole box: it needs a height, and the
-					    package imposes none. Tall enough for `test` to hold in one
-					    block — the shell scrolls down to its last line, and it is the
-					    list of the colors that would go past the top. */}
-					<div
-						style={{ height: 700, boxSizing: "border-box", overflowY: "auto" }}
-					>
+					    package imposes none. It scrolls inside it on its own — the
+					    scrollbar being edited two pickers above is the one showing
+					    here, as soon as `test` runs past 700px. */}
+					<div style={{ height: 700, boxSizing: "border-box" }}>
 						<Preview key={signature} draft={draft} />
 					</div>
 				</Group>
 
-				<Group title="your theme">
+				<Group title={label.code}>
 					<pre
 						style={{
 							margin: 0,

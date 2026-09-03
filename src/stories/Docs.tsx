@@ -1,9 +1,7 @@
-import { useContext, useEffect, useState } from "react"
 import {
 	Controls,
 	Description,
 	DocsContainer,
-	DocsContext,
 	Markdown,
 	Primary,
 	Stories,
@@ -13,63 +11,18 @@ import {
 } from "@storybook/addon-docs/blocks"
 import { themes } from "storybook/theming"
 
-import { LOCALES, type Locale, type Prose } from "./i18n"
+import {
+	useGlobalsFromDocs,
+	useLocale,
+	type DocsInternals,
+	type Prose,
+} from "./i18n"
 
 type MetaWithProse = {
 	preparedMeta?: {
 		parameters?: { docs?: { prose?: Prose; controls?: boolean } }
 	}
 	csfFile?: { stories?: Record<string, unknown> }
-}
-
-/** what the page needs, and what the public type of the context omits */
-type DocsInternals = {
-	channel?: {
-		on: (event: string, listener: () => void) => void
-		off: (event: string, listener: () => void) => void
-	}
-	primaryStory?: unknown
-	getStoryContext?: (story: unknown) => { globals?: Record<string, unknown> }
-}
-
-const isLocale = (value: unknown): value is Locale =>
-	LOCALES.includes(value as Locale)
-
-/**
- * The language of the documentation, taken from the globals.
- *
- * `useGlobals` is of no use here: Storybook turns it down outside of a
- * decorator or a story, and a docs page is neither. The URL of the page does
- * not carry them either — the rendering frame does not see it. What is left
- * are the globals of the story context, read on every render.
- *
- * The channel only serves to trigger that render: the value always comes
- * from the reading below, which saves having to guess the shape of what the
- * event carries.
- */
-const useGlobalsFromDocs = (
-	context: DocsInternals
-): Record<string, unknown> => {
-	const [, redraw] = useState(0)
-
-	useEffect(() => {
-		const channel = context?.channel
-		if (!channel) return
-
-		const refresh = () => redraw(count => count + 1)
-
-		channel.on("globalsUpdated", refresh)
-		return () => channel.off("globalsUpdated", refresh)
-	}, [context])
-
-	return context?.getStoryContext?.(context.primaryStory)?.globals || {}
-}
-
-const useLocale = (): Locale => {
-	const context = useContext(DocsContext) as unknown as DocsInternals
-	const globals = useGlobalsFromDocs(context)
-
-	return isLocale(globals.locale) ? globals.locale : "en"
 }
 
 /**
