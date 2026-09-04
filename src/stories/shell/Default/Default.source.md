@@ -1,5 +1,5 @@
 ```tsx
 import { Shell } from "flower-shell"
 
-<Shell />
+const App = () => <Shell />
 ```

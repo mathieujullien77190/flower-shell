@@ -14,9 +14,11 @@ const ping: BaseCommand = {
 
 // the command is added to the object, the rest stays put.
 // help ping opens the shell on what the help block above produces.
-<Shell
-	commands={{ ...baseCommands, test, ping }}
-	themes={themes}
-	initialCommands={["help ping"]}
-/>
+const App = () => (
+	<Shell
+		commands={{ ...baseCommands, test, ping }}
+		themes={themes}
+		initialCommands={["help ping"]}
+	/>
+)
 ```

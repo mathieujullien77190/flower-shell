@@ -29,26 +29,28 @@ const Toolbar = () => {
 	)
 }
 
-<ShellProvider>
-	<Toolbar />
+const App = () => (
+	<ShellProvider>
+		<Toolbar />
 
-	<Shell
-		id="left"
-		commands={baseCommands}
-		themes={{ flower: flowerTheme }}
-		dict={{ en: dictEn, fr: dictFr }}
-		lang="en"
-		initialCommands={["welcome"]}
-	/>
+		<Shell
+			id="left"
+			commands={baseCommands}
+			themes={{ flower: flowerTheme }}
+			dict={{ en: dictEn, fr: dictFr }}
+			lang="en"
+			initialCommands={["welcome"]}
+		/>
 
-	{/* same commands, same dictionaries, its own history and its own language */}
-	<Shell
-		id="right"
-		commands={baseCommands}
-		themes={{ flower: flowerTheme }}
-		dict={{ en: dictEn, fr: dictFr }}
-		lang="fr"
-		initialCommands={["welcome"]}
-	/>
-</ShellProvider>
+		{/* same commands, same dictionaries, its own history and its own language */}
+		<Shell
+			id="right"
+			commands={baseCommands}
+			themes={{ flower: flowerTheme }}
+			dict={{ en: dictEn, fr: dictFr }}
+			lang="fr"
+			initialCommands={["welcome"]}
+		/>
+	</ShellProvider>
+)
 ```

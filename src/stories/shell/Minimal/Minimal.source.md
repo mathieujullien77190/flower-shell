@@ -5,9 +5,11 @@ import { Shell, baseCommands, test, themes } from "flower-shell"
 // welcome prints `welcome.text`, which the package already carries —
 // override that key through `dict` to put your own words there.
 // test rides along: it ships beside baseCommands, not inside it.
-<Shell
-	commands={{ ...baseCommands, test }}
-	themes={themes}
-	initialCommands={["title", "welcome"]}
-/>
+const App = () => (
+	<Shell
+		commands={{ ...baseCommands, test }}
+		themes={themes}
+		initialCommands={["title", "welcome"]}
+	/>
+)
 ```

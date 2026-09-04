@@ -51,9 +51,11 @@ it scrolls inside it — a long output stays in the terminal, on a scrollbar of
 the theme, and the shell follows its last line as it is written.
 
 ```tsx
-<div style={{ height: "100vh" }}>
-	<Shell commands={baseCommands} themes={themes} />
-</div>
+const App = () => (
+	<div style={{ height: "100vh" }}>
+		<Shell commands={baseCommands} themes={themes} />
+	</div>
+)
 ```
 
 There is nothing to hand over: the scroll belongs to the shell. A box of no
@@ -71,7 +73,7 @@ is a workbench, not something a visitor of yours needs to find.
 ```tsx
 import { Shell, baseCommands, test } from "flower-shell"
 
-;<Shell commands={{ ...baseCommands, test }} />
+const App = () => <Shell commands={{ ...baseCommands, test }} />
 ```
 
 It prints every color of the theme, the source on the left and its render on
@@ -118,20 +120,26 @@ The shell starts bare. The logo and the welcome message are two commands,
 played like any other:
 
 ```tsx
-<Shell commands={baseCommands} initialCommands={["title", "welcome"]} />
+const App = () => (
+	<Shell commands={baseCommands} initialCommands={["title", "welcome"]} />
+)
 ```
 
 `welcome` prints the `welcome.text` key, which the package already carries. To
 put your own words there, override that key like any other:
 
 ```tsx
-<Shell
-	commands={baseCommands}
-	initialCommands={["title", "welcome"]}
-	dict={{
-		en: { welcome: { text: "Welcome to $acme$ — type `help` to look around" } },
-	}}
-/>
+const App = () => (
+	<Shell
+		commands={baseCommands}
+		initialCommands={["title", "welcome"]}
+		dict={{
+			en: {
+				welcome: { text: "Welcome to $acme$ — type `help` to look around" },
+			},
+		}}
+	/>
+)
 ```
 
 `initialCommands` only plays once, on a blank screen: a `clear` does not
@@ -145,13 +153,15 @@ Four props, four moments. Each is handed one object, the same shape
 throughout:
 
 ```tsx
-<Shell
-	commands={baseCommands}
-	onCommandStart={event => console.log("about to run", event.pattern)}
-	onCommandDone={event => console.log("ran", event.name, event.args)}
-	onCommandRendered={event => console.log("written out", event.name)}
-	onCommandError={event => console.error(event.reason, event.pattern)}
-/>
+const App = () => (
+	<Shell
+		commands={baseCommands}
+		onCommandStart={event => console.log("about to run", event.pattern)}
+		onCommandDone={event => console.log("ran", event.name, event.args)}
+		onCommandRendered={event => console.log("written out", event.name)}
+		onCommandError={event => console.error(event.reason, event.pattern)}
+	/>
+)
 ```
 
 | field     |                                |
@@ -271,8 +281,13 @@ shell are exactly the keys of the `dict` prop:
 ```tsx
 import { Shell, baseCommands, dictEn, dictFr } from "flower-shell"
 
-<Shell commands={baseCommands} />                                            // en
-<Shell commands={baseCommands} lang="fr" dict={{ en: dictEn, fr: dictFr }} />
+// English alone: the shell speaks one language until it is given more
+const App = () => <Shell commands={baseCommands} />
+
+// English and French, opening in French
+const Bilingual = () => (
+	<Shell commands={baseCommands} lang="fr" dict={{ en: dictEn, fr: dictFr }} />
+)
 ```
 
 `lang` picks the starting one; the `lang` command only accepts those that are
@@ -285,14 +300,16 @@ dictionary does not cover comes out in English rather than as a bare key, and
 you can add a single text without losing the others.
 
 ```tsx
-<Shell
-	commands={commands}
-	lang="de"
-	dict={{
-		en: { welcome: { text: "Type `help`" } }, // the package English, one key overridden
-		de: dictDe, // yours, written at home
-	}}
-/>
+const App = () => (
+	<Shell
+		commands={commands}
+		lang="de"
+		dict={{
+			en: { welcome: { text: "Type `help`" } }, // the package English, one key overridden
+			de: dictDe, // yours, written at home
+		}}
+	/>
+)
 ```
 
 `t("hello.world")` reads the current language, falls back to English, then to
@@ -336,16 +353,20 @@ exist; `theme` names the one it starts on, a key of `themes`:
 import { Shell, baseCommands, lavenderTheme, themes } from "flower-shell"
 
 // the whole catalogue: all eight, worn on the first of them
-<Shell commands={baseCommands} themes={themes} />
+const All = () => <Shell commands={baseCommands} themes={themes} />
 
 // one of them, and nothing else to switch to
-<Shell commands={baseCommands} themes={{ lavender: lavenderTheme }} />
+const One = () => (
+	<Shell commands={baseCommands} themes={{ lavender: lavenderTheme }} />
+)
 
 // the catalogue to reach, and the name it starts on
-<Shell commands={baseCommands} themes={themes} theme="lavender" />
+const Chosen = () => (
+	<Shell commands={baseCommands} themes={themes} theme="lavender" />
+)
 
 // neither: nothing to switch to, and nothing painted
-<Shell commands={baseCommands} />
+const Bare = () => <Shell commands={baseCommands} />
 ```
 
 **The themes of the shell are exactly the keys of `themes`** — nothing more.
@@ -376,12 +397,14 @@ So a shell of your own, with one theme of the package, one of yours, and no
 way out of the two:
 
 ```tsx
-<Shell
-	commands={baseCommands}
-	themes={{ lavender: lavenderTheme, mine }}
-	theme="mine"
-	dict={{ en: { theme: { mine: "The house theme" } } }}
-/>
+const App = () => (
+	<Shell
+		commands={baseCommands}
+		themes={{ lavender: lavenderTheme, mine }}
+		theme="mine"
+		dict={{ en: { theme: { mine: "The house theme" } } }}
+	/>
+)
 ```
 
 A theme is written piece by piece, and mounted under the name the visitor will
@@ -395,7 +418,7 @@ const mine = {
 	container: { padding: "16px" },
 }
 
-<Shell commands={commands} themes={{ mine }} theme="mine" />
+const App = () => <Shell commands={commands} themes={{ mine }} theme="mine" />
 ```
 
 Absent values keep those of `defaultTheme`, inside a group included: giving
@@ -474,11 +497,13 @@ const Toolbar = () => {
 	)
 }
 
-;<ShellProvider>
-	<Toolbar />
-	<Shell id="left" commands={baseCommands} lang="en" />
-	<Shell id="right" commands={baseCommands} lang="fr" />
-</ShellProvider>
+const App = () => (
+	<ShellProvider>
+		<Toolbar />
+		<Shell id="left" commands={baseCommands} lang="en" />
+		<Shell id="right" commands={baseCommands} lang="fr" />
+	</ShellProvider>
+)
 ```
 
 | `useShell()`                 | role                                              |

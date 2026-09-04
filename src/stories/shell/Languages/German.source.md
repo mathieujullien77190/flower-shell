@@ -74,16 +74,18 @@ const dictDe: Dict = {
 }
 
 // help lang opens the shell on the list of what is mounted: de and en
-<Shell
-	commands={{ ...baseCommands, test }}
-	themes={{ flower: flowerTheme }}
-	lang="de"
-	dict={{
-		// the package English does not know German: lang.de is added here,
-		// otherwise the lang help shows the bare key once switched to English
-		en: { lang: { de: "Shows every text in German" } },
-		de: dictDe,
-	}}
-	initialCommands={["help lang"]}
-/>
+const App = () => (
+	<Shell
+		commands={{ ...baseCommands, test }}
+		themes={{ flower: flowerTheme }}
+		lang="de"
+		dict={{
+			// the package English does not know German: lang.de is added here,
+			// otherwise the lang help shows the bare key once switched to English
+			en: { lang: { de: "Shows every text in German" } },
+			de: dictDe,
+		}}
+		initialCommands={["help lang"]}
+	/>
+)
 ```

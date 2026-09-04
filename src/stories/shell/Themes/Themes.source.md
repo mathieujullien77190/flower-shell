@@ -21,14 +21,16 @@ const neon: ShellThemeInput = {
 // the catalogue the visitor can reach, and nothing else: the six other
 // themes of the package are not mounted, so `theme maple` is refused.
 // each name describes itself through the `theme.<name>` key.
-<Shell
-	commands={{ ...baseCommands, test }}
-	themes={{ flower: flowerTheme, lavender: lavenderTheme, neon }}
-	theme="lavender"
-	initialCommands={["title", "help theme"]}
-	dict={{ en: { theme: { neon: "Written from scratch, in the story file" } } }}
-/>
+const App = () => (
+	<Shell
+		commands={{ ...baseCommands, test }}
+		themes={{ flower: flowerTheme, lavender: lavenderTheme, neon }}
+		theme="lavender"
+		initialCommands={["title", "help theme"]}
+		dict={{ en: { theme: { neon: "Written from scratch, in the story file" } } }}
+	/>
+)
 
 // or hand over the whole catalogue, and let the visitor have all eight
-<Shell commands={baseCommands} themes={themes} />
+const AllThemes = () => <Shell commands={baseCommands} themes={themes} />
 ```

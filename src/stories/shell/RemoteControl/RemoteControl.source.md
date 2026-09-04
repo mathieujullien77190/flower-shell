@@ -76,15 +76,17 @@ const Remote = () => {
 	)
 }
 
-<ShellProvider>
-	<Remote />
+const App = () => (
+	<ShellProvider>
+		<Remote />
 
-	<Shell
-		id={TERMINAL}
-		commands={{ ...baseCommands, test }}
-		themes={themes}
-		dict={{ en: dictEn, fr: dictFr }}
-		initialCommands={["title", "welcome"]}
-	/>
-</ShellProvider>
+		<Shell
+			id={TERMINAL}
+			commands={{ ...baseCommands, test }}
+			themes={themes}
+			dict={{ en: dictEn, fr: dictFr }}
+			initialCommands={["title", "welcome"]}
+		/>
+	</ShellProvider>
+)
 ```
