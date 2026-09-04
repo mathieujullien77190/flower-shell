@@ -5,6 +5,7 @@ import { baseCommands } from "../../../commands/base"
 import { testCommand as test } from "../../../commands/common/test"
 import { themes } from "../../../theme"
 import type { ShellColors, ShellTheme } from "../../../theme"
+import { ink, toolbarTone } from "../../tone"
 
 /**
  * The preview: a real shell, wearing the draft. It opens on `title`, the
@@ -186,6 +187,10 @@ const LABEL = {
 }
 
 export const ThemeBuilder = () => {
+	// the panel is not a terminal: it follows the documentation around it,
+	// and black on a page read in the dark is what one cannot read
+	const paint = ink(toolbarTone())
+
 	const [base, setBase] = useState("flower")
 	const [draft, setDraft] = useState<ShellTheme>(themes.flower)
 
@@ -230,6 +235,7 @@ export const ThemeBuilder = () => {
 				gap: 24,
 				alignItems: "start",
 				font: "14px/1.6 system-ui, sans-serif",
+				color: paint.text,
 			}}
 		>
 			<div style={{ display: "grid", gap: 20 }}>
@@ -240,7 +246,10 @@ export const ThemeBuilder = () => {
 						style={{
 							font: "13px/1.5 ui-monospace, monospace",
 							padding: "6px 8px",
+							border: `1px solid ${paint.border}`,
 							borderRadius: 4,
+							background: paint.field,
+							color: paint.text,
 						}}
 					>
 						{Object.keys(themes).map(name => (
@@ -263,8 +272,10 @@ export const ThemeBuilder = () => {
 						style={{
 							font: "14px/1.5 ui-monospace, monospace",
 							padding: "6px 8px",
-							border: "1px solid #000000",
+							border: `1px solid ${paint.border}`,
 							borderRadius: 4,
+							background: paint.field,
+							color: paint.text,
 							width: 80,
 						}}
 					/>
@@ -295,8 +306,10 @@ export const ThemeBuilder = () => {
 						style={{
 							font: "13px/1.5 ui-monospace, monospace",
 							padding: "6px 8px",
-							border: "1px solid #000000",
+							border: `1px solid ${paint.border}`,
 							borderRadius: 4,
+							background: paint.field,
+							color: paint.text,
 						}}
 					/>
 				</Group>
