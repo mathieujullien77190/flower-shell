@@ -32,22 +32,20 @@ module.exports = {
 	],
 	/**
 	 * The floor the coverage may not go under, measured on the same `src`
-	 * minus the stories. It is a ratchet and not a target: it sits just under
-	 * what the suite covers today, so a change that tests less than it
-	 * removes fails instead of passing quietly. Raise it when the suite
-	 * earns it.
+	 * minus the stories. It is at a hundred on the four counts: every line,
+	 * every branch and every function of what is published is played by a
+	 * test, and code that nothing reaches is code to delete rather than to
+	 * excuse.
 	 *
-	 * It stays this low because the tests are on the logic and not on the
-	 * rendering: the engine, the store, the instance, i18n, the theme and the
-	 * commands are near 100, the React components of `render` and `Shell`
-	 * are not covered at all, and they weigh half of `src`.
+	 * So a line added without a test fails the run. That is the point, and
+	 * the answer is a test — never a lower number here.
 	 */
 	coverageThreshold: {
 		global: {
-			statements: 60,
-			branches: 55,
-			functions: 57,
-			lines: 59,
+			statements: 100,
+			branches: 100,
+			functions: 100,
+			lines: 100,
 		},
 	},
 }
