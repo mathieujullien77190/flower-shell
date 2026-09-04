@@ -28,6 +28,14 @@ export type ShellFonts = {
 	 * otherwise — a theme meant to be read from far, or badly, raises it.
 	 */
 	size: number
+	/**
+	 * The size of the logo, the ASCII art the `title` command draws. A CSS
+	 * length and not a number of pixels: it is written on the width of the
+	 * container — `calc(100cqw / 90)` by default — so the logo keeps its
+	 * shape whatever the terminal is served in. A theme wanting it bigger
+	 * divides by less.
+	 */
+	logo: string
 }
 
 export type ShellTheme = {

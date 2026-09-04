@@ -77,7 +77,7 @@ export const bareTheme: ShellTheme = {
 		scrollbarTrack: "auto",
 	},
 	prompt: ">",
-	fonts: { shell: "inherit", size: 16 },
+	fonts: { shell: "inherit", size: 16, logo: "calc(100cqw / 90)" },
 	container: {},
 }
 

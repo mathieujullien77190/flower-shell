@@ -14,6 +14,7 @@ export const baseContainer: CSSProperties = {
 export const baseFonts: ShellFonts = {
 	shell: "monospace",
 	size: 16,
+	logo: "calc(100cqw / 90)",
 }
 
 /**
@@ -41,7 +42,7 @@ export const makeTheme = ({
 	prompt?: string
 	/**
 	 * The font, if the theme wants another one: what it leaves out keeps the
-	 * monospace and the 16 pixels every theme is written on.
+	 * monospace, the 16 pixels and the logo size every theme is written on.
 	 */
 	fonts?: Partial<ShellFonts>
 	/** the box the terminal is served in: padding, border, radius */

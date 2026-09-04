@@ -435,6 +435,18 @@ shell in pixels, 16 by default: the output, the input and the ASCII art are
 all measured on it, and a theme meant to be read from far — or read badly —
 raises it, the way `contrast` does.
 
+`fonts.logo` is the size of the logo, the ASCII art the `title` command
+draws. A CSS length and not a number of pixels — `calc(100cqw / 90)` by
+default — because it is written on the width of the container: the logo then
+keeps its shape whatever the terminal is served in. A theme wanting it bigger
+divides by less.
+
+```tsx
+const mine = {
+	fonts: { size: 20, logo: "calc(100cqw / 70)" },
+}
+```
+
 ## Several terminals, and how to command one
 
 Each shell owns its history, its cursor and its options, so several can live

@@ -440,6 +440,18 @@ en pixels, 16 par défaut : la sortie, la saisie et l'ASCII art s'y mesurent
 tous, et un thème fait pour être lu de loin — ou lu mal — la monte, comme le
 fait `contrast`.
 
+`fonts.logo` est la taille du logo, l'ASCII art que dessine la commande
+`title`. Une longueur CSS et non un nombre de pixels — `calc(100cqw / 90)`
+par défaut — parce qu'elle s'écrit sur la largeur du conteneur : le logo
+garde alors sa forme quel que soit ce dans quoi le terminal est servi. Un
+thème qui le veut plus gros divise par moins.
+
+```tsx
+const mine = {
+	fonts: { size: 20, logo: "calc(100cqw / 70)" },
+}
+```
+
 ## Plusieurs terminaux, et comment en commander un
 
 Chaque shell porte son historique, son curseur et ses options : plusieurs
