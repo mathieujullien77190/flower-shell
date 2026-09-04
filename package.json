@@ -58,6 +58,7 @@
 		"test:detail": "jest --verbose --reporters=default",
 		"test:watch": "jest --watch",
 		"test:coverage": "jest --coverage",
+		"test:coverage:check": "jest --coverage --coverageReporters=text-summary",
 		"lint": "eslint .",
 		"lint:fix": "eslint . --fix",
 		"format": "prettier --write .",

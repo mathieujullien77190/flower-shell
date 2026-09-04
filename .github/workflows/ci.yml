@@ -34,5 +34,7 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run typecheck:test
-      - run: npm test
+      # la couverture joue les memes tests et refuse en plus de descendre
+      # sous le plancher de jest.config.cjs : une seule passe pour les deux
+      - run: npm run test:coverage:check
       - run: npm run build

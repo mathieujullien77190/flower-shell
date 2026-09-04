@@ -30,4 +30,24 @@ module.exports = {
 		"!src/stories/**",
 		"!src/**/*.stories.tsx",
 	],
+	/**
+	 * The floor the coverage may not go under, measured on the same `src`
+	 * minus the stories. It is a ratchet and not a target: it sits just under
+	 * what the suite covers today, so a change that tests less than it
+	 * removes fails instead of passing quietly. Raise it when the suite
+	 * earns it.
+	 *
+	 * It stays this low because the tests are on the logic and not on the
+	 * rendering: the engine, the store, the instance, i18n, the theme and the
+	 * commands are near 100, the React components of `render` and `Shell`
+	 * are not covered at all, and they weigh half of `src`.
+	 */
+	coverageThreshold: {
+		global: {
+			statements: 55,
+			branches: 52,
+			functions: 50,
+			lines: 55,
+		},
+	},
 }
