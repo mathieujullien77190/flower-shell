@@ -29,7 +29,14 @@ export const Fresh = ({ children }: { children: React.ReactNode }) => {
  */
 export const Boxed = ({ children }: { children: React.ReactNode }) => (
 	<Fresh>
-		<div style={{ height: "100vh", boxSizing: "border-box", padding: 32 }}>
+		<div
+			style={{
+				height: "100vh",
+				boxSizing: "border-box",
+				padding: 32,
+				backgroundColor: "#f8f8f8",
+			}}
+		>
 			{children}
 		</div>
 	</Fresh>
