@@ -31,6 +31,19 @@ describe("actionmap", () => {
 		expect(actionmapCommand.display!.hideCmd).toBe(true)
 	})
 
+	it("falls back on an empty line when it is handed no arguments", () => {
+		const instance = createInstance({ animation: false })
+		instance.setCommands({ hello, actionmap: actionmapCommand })
+
+		// `args` left out entirely: a marker pointing at nothing sends
+		// nothing, and the shell answers it the way it answers any unknown line
+		withInstance(instance, () =>
+			actionmapCommand.effect!({} as { args: string[] })
+		)
+
+		expect(instance.store.getState().commands[0].pattern).toBe("")
+	})
+
 	it("plays the line the marker points at, arguments included", () => {
 		const played = click(["hello", "you"])
 

@@ -28,6 +28,15 @@ describe("theme", () => {
 		expect(instance.store.getState().themeName).toBe("kiwi")
 	})
 
+	it("leaves the line as it is when the tone cannot be read", () => {
+		// a background no tone can be read off: the description stands alone
+		setThemes({ ghost: { colors: { background: "transparent" } } })
+
+		expect(readHelp(themeCommand)!.patterns).toEqual([
+			{ pattern: "theme ghost", description: "theme.ghost" },
+		])
+	})
+
 	it("lists the catalogue as it stands, each theme behind its tone", () => {
 		setThemes({ kiwi: themes.kiwi })
 

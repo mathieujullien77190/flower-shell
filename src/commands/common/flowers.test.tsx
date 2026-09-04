@@ -1,3 +1,6 @@
+import type { ReactNode } from "react"
+import { render } from "@testing-library/react"
+
 import { flowersCommand, plantFlowers } from "./flowers"
 
 describe("plantFlowers", () => {
@@ -24,6 +27,16 @@ describe("the flowers command", () => {
 		expect(flowersCommand.restricted).toBe(false)
 	})
 
+	it("plants a field when it is played", () => {
+		const played = flowersCommand.action({
+			name: "flowers",
+			args: [],
+			commands: {},
+		})
+
+		expect(played.split("\n")).toHaveLength(9)
+	})
+
 	it("writes it backwards, letter by letter: it grows from the ground", () => {
 		expect(flowersCommand.display).toMatchObject({
 			reverse: true,
@@ -34,5 +47,11 @@ describe("the flowers command", () => {
 
 	it("measures the drawing on the width of the container", () => {
 		expect(flowersCommand.display!.stylePre!.fontSize).toBe("calc(100cqw/60)")
+	})
+
+	it("colors the field on its markers, at the size it drew it", () => {
+		const painted = flowersCommand.display!.highlight!("R@@@@R") as ReactNode[]
+
+		expect(render(<div>{painted}</div>).container.textContent).toBe("@@@@")
 	})
 })

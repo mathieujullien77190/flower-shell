@@ -96,6 +96,21 @@ describe("the history", () => {
 		).toEqual(["a", "b"])
 	})
 
+	it("keeps the order of arrival when the commands carry none", () => {
+		const { instance, actions } = shell()
+
+		act(() => {
+			actions().addCommand(line({ id: "a" }))
+			actions().addCommand(line({ id: "b" }))
+		})
+
+		expect(
+			renderHook(() => useGetCommands(instance)).result.current.map(
+				command => command.id
+			)
+		).toEqual(["a", "b"])
+	})
+
 	it("leaves out what is not visible", () => {
 		const { instance, actions } = shell()
 

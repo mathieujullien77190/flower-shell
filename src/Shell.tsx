@@ -210,7 +210,15 @@ export const Shell = ({
 	)
 }
 
-type ScreenProps = Omit<ShellProps, "id"> & {
+/**
+ * What the shell above hands down. `commands` and `initialCommands` are
+ * required here where they are optional on the shell: they were defaulted
+ * once already, and defaulting them a second time would only hide it the day
+ * they stopped being.
+ */
+type ScreenProps = Omit<ShellProps, "id" | "commands" | "initialCommands"> & {
+	commands: BaseCommands
+	initialCommands: string[]
 	instance: ReturnType<typeof createInstance>
 	runners: ReturnType<typeof createRunners>
 }
@@ -222,14 +230,14 @@ type ScreenProps = Omit<ShellProps, "id"> & {
  * language.
  */
 const Screen = ({
-	commands = {},
+	commands,
 	theme,
 	themes,
 	dict,
 	lang,
 	animation,
 	keyboardOnFocus,
-	initialCommands = [],
+	initialCommands,
 	onCommandStart,
 	onCommandDone,
 	onCommandRendered,

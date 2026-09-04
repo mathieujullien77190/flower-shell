@@ -25,6 +25,30 @@ const store = (start: ShellData = initialData()) => {
 	return { actions, read: () => data }
 }
 
+describe("resetFont", () => {
+	it("wakes nobody when the size is already the theme's", () => {
+		const { actions, read } = store()
+		const before = read()
+
+		actions.resetFont()
+
+		expect(read()).toBe(before)
+	})
+})
+
+describe("moveCursor", () => {
+	it("stays where it is when it is asked for no direction", () => {
+		const { actions, read } = store()
+		actions.addCommand(command())
+		actions.moveCursor(-1)
+
+		const before = read()
+		actions.moveCursor(0)
+
+		expect(read()).toBe(before)
+	})
+})
+
 describe("initialData", () => {
 	it("answers the defaults of the package", () => {
 		expect(initialData()).toMatchObject({

@@ -40,6 +40,17 @@ describe("createInstance", () => {
 		expect(watch).not.toHaveBeenCalled()
 	})
 
+	it("wakes nobody when an action answers the values it was given", () => {
+		const instance = createInstance()
+		const watch = jest.fn()
+
+		instance.store.subscribe(watch)
+		// the size is already the theme's: there is nothing to put back
+		instance.store.getState().resetFont()
+
+		expect(watch).not.toHaveBeenCalled()
+	})
+
 	it("holds its commands and its listeners", () => {
 		const instance = createInstance()
 		const commands = { hello: { restricted: false, action: () => "hi" } }

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react"
+import { fireEvent, render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { flowerTheme, setTheme } from "@theme"
@@ -49,6 +49,17 @@ describe("highlight", () => {
 		expect(span.style.fontWeight).toBe("bold")
 		// the brackets are the mark of the tag: they do not show
 		expect(line()).toHaveTextContent("tag here")
+	})
+
+	it("reads a colour through the low end of the luminance curve", () => {
+		// under 0.03928 a channel is read flat, not raised to a power: an
+		// almost black tag goes through that branch and reads white
+		setTheme({ colors: { infoColor: "#050505" } })
+		show("[+info+]")
+
+		expect(line().querySelector("span")!.style.color).toBe("rgb(255, 255, 255)")
+
+		setTheme(flowerTheme)
 	})
 
 	it("reads white or black on the background of a tag", () => {
@@ -116,6 +127,28 @@ describe("highlight", () => {
 
 		expect(onClick).toHaveBeenCalledTimes(2)
 		expect(onClick).toHaveBeenCalledWith("actionmap", ["theme", "lavender"])
+	})
+
+	it("plays nothing on a key that is neither [ENTER] nor [SPACE]", async () => {
+		const onClick = jest.fn()
+		show("#run ~ hello#", onClick)
+
+		// the focus, not a click: a click would play it, which is the other test
+		screen.getByRole("button").focus()
+		await userEvent.keyboard("{Escape}")
+
+		expect(onClick).not.toHaveBeenCalled()
+	})
+
+	it("leaves the keyboard alone on a marker that plays nothing", () => {
+		const onClick = jest.fn()
+		show("+info+", onClick)
+
+		// fired by hand: the span is out of the tab order, so nothing could
+		// focus it to type on it
+		fireEvent.keyDown(line().querySelector("span")!, { key: "Enter" })
+
+		expect(onClick).not.toHaveBeenCalled()
 	})
 
 	it("leaves a marker that plays nothing out of the tab order", () => {

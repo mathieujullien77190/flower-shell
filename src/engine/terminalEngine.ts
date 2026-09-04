@@ -26,7 +26,8 @@ const isAuthorizeArgs = (args: string[], testArgs: Args) => {
 type CreateCommandProps = {
 	commands: BaseCommands
 	commandPattern: string
-	restricted: boolean
+	/** a line of the visitor unless it is said otherwise */
+	restricted?: boolean
 }
 
 /**
@@ -161,7 +162,8 @@ export const readHelp = (command: BaseCommand): Help | undefined =>
 type FindCommandProps = {
 	commands: BaseCommands
 	name: string
-	restricted: boolean
+	/** a command of the visitor unless it is said otherwise */
+	restricted?: boolean
 }
 
 export const findCommand = ({

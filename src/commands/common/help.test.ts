@@ -44,6 +44,14 @@ describe("help with no argument", () => {
 	it("leaves out a command that carries no help", () => {
 		expect(ask([], mounted)).not.toContain("+silent+")
 	})
+
+	it("names a command whose help carries no patterns all the same", () => {
+		// `patterns` is required by the type, and a consumer writing plain
+		// JavaScript can still leave it out
+		const bare = cmd({ help: {} as BaseCommand["help"] })
+
+		expect(ask([], { ...mounted, bare })).toContain("+bare+")
+	})
 })
 
 describe("help about one command", () => {

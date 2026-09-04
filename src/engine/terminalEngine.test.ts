@@ -56,6 +56,15 @@ describe("findCommand", () => {
 			findCommand({ commands, name: "nope", restricted: false })
 		).toBeNull()
 	})
+
+	it("looks for a command of the visitor unless told otherwise", () => {
+		expect(
+			findCommand({ commands, name: "hello", restricted: undefined })
+		).toBe(commands.hello)
+		expect(
+			findCommand({ commands, name: "welcome", restricted: undefined })
+		).toBeNull()
+	})
 })
 
 describe("executeCommand", () => {
@@ -110,6 +119,18 @@ describe("createCommand", () => {
 		expect(command.result).toBe("hello you two")
 		expect(command.canExecute).toBe(true)
 		expect(command.isRendered).toBe(false)
+	})
+
+	it("reads a line as the visitor's unless told otherwise", () => {
+		const command = createCommand({
+			commands,
+			commandPattern: "welcome",
+			restricted: undefined,
+		})
+
+		// restricted, and not asked for as one: there is nothing to play
+		expect(command.canExecute).toBe(false)
+		expect(command.restricted).toBe(false)
 	})
 
 	it("orders two commands played in the same millisecond", () => {

@@ -1,3 +1,6 @@
+import type { ReactNode } from "react"
+import { render } from "@testing-library/react"
+
 import { title, titleCommand } from "./title"
 import { fonts } from "@theme"
 
@@ -21,6 +24,12 @@ describe("the title command", () => {
 
 	it("measures it on the logo size of the theme", () => {
 		expect(titleCommand.display!.stylePre!.fontSize).toBe(fonts().logo)
+	})
+
+	it("colors the logo on the markers written into it", () => {
+		const painted = titleCommand.display!.highlight!("IlitI") as ReactNode[]
+
+		expect(render(<div>{painted}</div>).container.textContent).toBe("lit")
 	})
 
 	it("hides the line that played it", () => {

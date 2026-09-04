@@ -43,6 +43,23 @@ describe("setDict", () => {
 		expect(langs()).toEqual(["en", "fr"])
 	})
 
+	it("mounts a language given nothing of its own", () => {
+		// the key is there, its dictionary is not: English answers for it
+		setDict({ en: dictEn, de: undefined as unknown as Dict })
+
+		expect(langs()).toEqual(["en", "de"])
+
+		const instance = createInstance({ lang: "de" })
+		withInstance(instance, () => expect(t("hello.world")).toBe("Hello world"))
+	})
+
+	it("answers the key itself once every dictionary is emptied", () => {
+		setDict({})
+
+		expect(langs()).toEqual([])
+		expect(t("hello.world")).toBe("hello.world")
+	})
+
 	it("lays each language on the English of the package", () => {
 		setDict({ de: { error: { args: "falsches Argument" } } })
 
@@ -131,5 +148,42 @@ describe("browserLang", () => {
 		languages(["de-DE"])
 
 		expect(browserLang()).toBe(BASE_LANG)
+	})
+
+	it("reads the single language of a browser that lists none", () => {
+		setDict({ en: {}, fr: dictFr })
+		languages(undefined)
+		const single = jest
+			.spyOn(navigator, "language", "get")
+			.mockReturnValue("fr-FR")
+
+		expect(browserLang()).toBe("fr")
+
+		single.mockRestore()
+	})
+
+	it("answers the fallback language on a browser that names none", () => {
+		setDict({ en: {}, fr: dictFr })
+		languages(undefined)
+		const none = jest.spyOn(navigator, "language", "get").mockReturnValue("")
+
+		expect(browserLang()).toBe(BASE_LANG)
+
+		none.mockRestore()
+	})
+
+	it("answers the fallback language where there is no navigator at all", () => {
+		// what a prerender is: the module is read on a server, and the
+		// starting language cannot be the visitor's
+		const real = global.navigator
+		// @ts-expect-error — deleting it is the whole point
+		delete global.navigator
+
+		expect(browserLang()).toBe(BASE_LANG)
+
+		Object.defineProperty(global, "navigator", {
+			value: real,
+			configurable: true,
+		})
 	})
 })
