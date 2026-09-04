@@ -1,3 +1,7 @@
+import { BaseCommand } from "@types"
+import { fonts } from "@theme"
+import { highlightFlower } from "../highlight"
+
 /**
  * The logo of the shell, in ascii. The lone letters (R, I, B, G…) are color
  * markers read by highlightFlower, not text.
@@ -13,3 +17,15 @@ R(_ o._)R__|I(  .  .-'I : B(  '\\_/ \\B   ;|  |/    \\|  |'  \\   .---.|  |\\ \\
 |   |       |        \\'. B\\_/\`\`"B.'  |    /  \\    |  \\       / |  |  \\    /          \\       / J(_{;}_)J|   |   \\       /   |        \\|        \\ 
 '---'       \`--------\`  '-----'    \`---'    \`---\`   \`'-..-'  ''-'   \`'-'            \`-...-'  'J(_,_)J '---'    \`'-..-'    \`--------\`\`--------\` 
 `
+
+export const titleCommand: BaseCommand = {
+	restricted: true,
+	action: () => title,
+	help: { description: "common.restricted", patterns: [] },
+	display: {
+		hideCmd: true,
+		style: { alignItems: "center" },
+		stylePre: { fontSize: fonts().logo },
+		highlight: text => highlightFlower(text, { fontSize: fonts().logo }),
+	},
+}

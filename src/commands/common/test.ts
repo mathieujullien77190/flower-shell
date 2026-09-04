@@ -56,7 +56,7 @@ const clickLine = () => {
 	return `  ${column(source, rendered.length)}${rendered}`
 }
 
-export const test: BaseCommand = {
+export const testCommand: BaseCommand = {
 	restricted: false,
 	action: () =>
 		[

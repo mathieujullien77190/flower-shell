@@ -4,9 +4,10 @@ export { ShellProvider, useShell } from "./state/registry"
 export type { ShellControls } from "./state/registry"
 
 export { baseCommands } from "./commands/base"
-export { highlightFlower, plantFlowers } from "./commands/flowers"
-export { test } from "./commands/test"
-export { title } from "./commands/title"
+export { highlightFlower } from "./commands/highlight"
+export { plantFlowers } from "./commands/common/flowers"
+export { testCommand as test } from "./commands/common/test"
+export { title } from "./commands/restricted/title"
 
 export type {
 	CommandErrorEvent,

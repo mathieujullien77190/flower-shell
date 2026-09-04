@@ -2,7 +2,7 @@ import { useState } from "react"
 
 import { Shell } from "../../../Shell"
 import { baseCommands } from "../../../commands/base"
-import { test } from "../../../commands/test"
+import { testCommand as test } from "../../../commands/common/test"
 import { themes } from "../../../theme"
 import { useLocale, type Labels } from "../../i18n"
 import type { ShellColors, ShellTheme } from "../../../theme"

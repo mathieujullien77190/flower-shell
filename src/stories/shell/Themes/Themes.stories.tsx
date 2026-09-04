@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite"
 
 import { Shell } from "../../../Shell"
 import { baseCommands } from "../../../commands/base"
-import { test } from "../../../commands/test"
+import { testCommand as test } from "../../../commands/common/test"
 import { flowerTheme, lavenderTheme } from "../../../theme"
 import type { ShellThemeInput } from "../../../theme"
 import { boxed } from "../../decorators"

@@ -1,43 +1,9 @@
-import { CSSProperties, ReactNode } from "react"
-import reactStringReplace from "react-string-replace"
-import uniqid from "uniqid"
-
+import { BaseCommand } from "@types"
 import { colors } from "@theme"
+import { highlightFlower } from "../highlight"
 
-export const highlightFlower = (text: string, baseStyles: CSSProperties) => {
-	let result: string | ReactNode[] = text
-
-	const list = [
-		{ reg: /R(.*)R/g, styles: { color: colors().restrictedColor } },
-		{ reg: /S(.*)S/g, styles: { color: colors().restrictedColor } },
-		{ reg: /I(.*)I/g, styles: { color: colors().importantColor } },
-		{ reg: /B(.*)B/g, styles: { color: colors().infoColor } },
-		{ reg: /G(.*)G/g, styles: { color: colors().appColor } },
-		{ reg: /T(.*)T/g, styles: { color: colors().restrictedColor } },
-		{ reg: /J(.*)J/g, styles: { color: colors().importantColor } },
-		{ reg: /H(.*)H/g, styles: { color: colors().appColor } },
-		{ reg: /K(.*)K/g, styles: { color: colors().restrictedColor } },
-		{ reg: /X(.*)X/g, styles: { color: colors().restrictedColor } },
-		{ reg: /D(.*)D/g, styles: { color: colors().appColor } },
-		{ reg: /Z(.*)Z/g, styles: { color: colors().infoColor } },
-	]
-
-	list.forEach(item => {
-		result = reactStringReplace(result, item.reg, match => (
-			<span
-				key={uniqid()}
-				style={{
-					...item.styles,
-					...baseStyles,
-				}}
-			>
-				{match}
-			</span>
-		))
-	})
-
-	return result
-}
+/** the size of the ASCII flowers: written on the width of the container */
+const FLOWER_FONT_SIZE = "calc(100cqw/60)"
 
 const rand = (min: number, max: number): number =>
 	Math.floor(Math.random() * (max - min + 1) + min)
@@ -121,4 +87,24 @@ export const plantFlowers = () => {
 		.join("\n")
 
 	return compileFlowers
+}
+
+export const flowersCommand: BaseCommand = {
+	restricted: false,
+	action: () => plantFlowers(),
+	display: {
+		stylePre: {
+			fontSize: FLOWER_FONT_SIZE,
+			color: colors().appColor,
+			transform: "scaleX(-1)",
+			textAlign: "right",
+		},
+		highlight: text => highlightFlower(text, { fontSize: FLOWER_FONT_SIZE }),
+		reverse: true,
+		stepTime: 1,
+		stepSize: 1,
+	},
+	help: {
+		patterns: [{ pattern: "flowers", description: "flowers.usage" }],
+	},
 }
