@@ -1,7 +1,7 @@
 import React, { useEffect } from "react"
+import { useTheme } from "styled-components"
 import { CommandProps } from "./types"
-
-import { theme } from "@theme"
+import type { Styled } from "@types"
 
 import * as S from "./UI"
 import { highlight } from "./helpers"
@@ -16,6 +16,12 @@ const Command = ({
 	onAnimate = () => {},
 	onClickCommand = () => {},
 }: CommandProps) => {
+	// the theme of this terminal, off the provider its terminal put up
+	const worn = useTheme()
+
+	/** a style of the command, read now: a function of the theme is called */
+	const dressed = (style?: Styled) =>
+		typeof style === "function" ? style(worn) : style || {}
 	// the text is frozen: `t()` translated when the command executed
 	const name = command.name
 	const args = command.args.map(arg => `${arg}`).join(" ")
@@ -62,12 +68,12 @@ const Command = ({
 					 * does to the screen.
 					 */
 					aria-busy={!displayResult.finish}
-					style={baseCommand?.display?.style || {}}
+					style={dressed(baseCommand?.display?.style)}
 				>
 					{!baseCommand?.display?.hideCmd && (
 						<S.CmdLine $restricted={command.restricted}>
 							{/* a drawing, not a word: it names nothing out loud */}
-							<strong aria-hidden="true">{theme().prompt}</strong>{" "}
+							<strong aria-hidden="true">{worn.prompt}</strong>{" "}
 							<span>
 								{name} {args}
 							</span>
@@ -75,12 +81,16 @@ const Command = ({
 					)}
 
 					{displayResult.txt !== "" && (
-						<S.CmdResult style={baseCommand?.display?.stylePre || {}}>
+						<S.CmdResult style={dressed(baseCommand?.display?.stylePre)}>
 							{baseCommand?.display?.highlight
-								? baseCommand?.display?.highlight(displayResult.txt)
-								: highlight(displayResult.txt, (name, args) => {
-										onClickCommand(name, args)
-									})}
+								? baseCommand?.display?.highlight(displayResult.txt, worn)
+								: highlight(
+										displayResult.txt,
+										(name, args) => {
+											onClickCommand(name, args)
+										},
+										worn.colors
+									)}
 						</S.CmdResult>
 					)}
 

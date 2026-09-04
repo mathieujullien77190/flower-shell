@@ -1,11 +1,17 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { ThemeProvider } from "styled-components"
 
 import type { BaseCommand, Command as Line } from "@types"
-import { flowerTheme, setTheme } from "@theme"
+import { flowerTheme } from "@theme"
 import Command from "./index"
 
-beforeAll(() => setTheme(flowerTheme))
+/**
+ * A command paints with the theme of its terminal, read off the provider
+ * that terminal puts up: on its own it needs one too.
+ */
+const dressed = (ui: React.ReactNode) =>
+	render(<ThemeProvider theme={flowerTheme}>{ui}</ThemeProvider>)
 
 const line = (over: Partial<Line> = {}): Line => ({
 	pattern: "hello you",
@@ -28,7 +34,7 @@ const show = (
 	over: Partial<React.ComponentProps<typeof Command>> = {},
 	baseCommand: BaseCommand | null = null
 ) =>
-	render(
+	dressed(
 		<Command
 			command={line()}
 			baseCommand={baseCommand}
@@ -170,7 +176,7 @@ describe("what it reports", () => {
 	})
 
 	it("clicks a marker with nobody listening", async () => {
-		render(
+		dressed(
 			<Command
 				command={line({ result: "#run ~ hello#" })}
 				baseCommand={null}
@@ -186,7 +192,7 @@ describe("what it reports", () => {
 
 	it("reports nothing to nobody: the callbacks are all optional", () => {
 		expect(() =>
-			render(
+			dressed(
 				<Command
 					command={line()}
 					baseCommand={null}

@@ -1,9 +1,10 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { ThemeProvider } from "styled-components"
 
 import { baseCommands } from "@commands/base"
 import { createInstance } from "@state/instance"
-import { flowerTheme, setTheme } from "@theme"
+import { flowerTheme } from "@theme"
 import Input from "./index"
 
 /**
@@ -13,14 +14,19 @@ import Input from "./index"
  */
 jest.mock("react-device-detect", () => ({ isMobile: true }))
 
-beforeAll(() => setTheme(flowerTheme))
+/**
+ * The input paints with the theme of its terminal, read off the provider
+ * that terminal puts up: on its own it needs one too.
+ */
+const dressed = (ui: React.ReactNode) =>
+	render(<ThemeProvider theme={flowerTheme}>{ui}</ThemeProvider>)
 
 const options = { lang: "en", animation: false, keyboardOnFocus: true }
 
 const instance = createInstance()
 
 const show = (onValidate = () => {}) =>
-	render(
+	dressed(
 		<Input
 			instance={instance}
 			known={baseCommands}

@@ -1,5 +1,4 @@
 import { BaseCommand } from "@types"
-import { colors } from "@theme"
 import { highlightFlower } from "../highlight"
 
 /** the size of the ASCII flowers: written on the width of the container */
@@ -93,13 +92,14 @@ export const flowersCommand: BaseCommand = {
 	restricted: false,
 	action: () => plantFlowers(),
 	display: {
-		stylePre: {
+		stylePre: theme => ({
 			fontSize: FLOWER_FONT_SIZE,
-			color: colors().appColor,
+			color: theme.colors.appColor,
 			transform: "scaleX(-1)",
 			textAlign: "right",
-		},
-		highlight: text => highlightFlower(text, { fontSize: FLOWER_FONT_SIZE }),
+		}),
+		highlight: (text, theme) =>
+			highlightFlower(text, { fontSize: FLOWER_FONT_SIZE }, theme.colors),
 		reverse: true,
 		stepTime: 1,
 		stepSize: 1,

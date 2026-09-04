@@ -9,7 +9,7 @@ import React, {
 import { InputProps } from "./types"
 import { isMobile } from "react-device-detect"
 
-import { theme } from "@theme"
+import { useTheme } from "styled-components"
 import { t } from "@i18n/lang"
 import { withInstance } from "@state/instance"
 
@@ -35,6 +35,9 @@ export const Input = ({
 	const [nbsLetters, setNbsLetters] = useState<number>(0)
 	const [prevValue, setPrevValue] = useState<string>(value)
 	const ref = useRef<HTMLInputElement>(null)
+
+	// the theme of this terminal, off the provider its terminal put up
+	const worn = useTheme()
 
 	// a mouse button held down may well be a selection under way
 	const pressed = useRef<boolean>(false)
@@ -179,7 +182,7 @@ export const Input = ({
 		<S.Container data-tutorial="input">
 			{/* the prompt is a drawing: read out, the flower of the theme
 			    becomes "cherry blossom" before every line */}
-			<S.Lambda aria-hidden="true">{theme().prompt}</S.Lambda>
+			<S.Lambda aria-hidden="true">{worn.prompt}</S.Lambda>
 			<S.CustomInput
 				$nbsLetters={nbsLetters}
 				ref={ref}

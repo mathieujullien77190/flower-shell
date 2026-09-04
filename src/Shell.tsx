@@ -13,7 +13,7 @@ import {
 	useLang,
 } from "./state/hooks"
 import { useRegistry } from "./state/registry"
-import { setThemes, ShellThemeInput, wearTheme } from "./theme"
+import { ShellThemeInput } from "./theme"
 import { BaseCommands, Dictionaries } from "./types"
 
 /** a catalogue of themes, indexed by the name the visitor types */
@@ -168,8 +168,8 @@ export const Shell = ({
 		created.setCommands(commands)
 		// the catalogue before the starting theme: `help theme` and `theme
 		// <name>` read the first, and the second need not be part of it
-		setThemes(themes)
-		wearTheme(theme)
+		created.setThemes(themes)
+		created.wearTheme(theme)
 		return created
 	})
 
@@ -264,9 +264,9 @@ const Screen = ({
 	}, [instance, commands])
 
 	useEffect(() => {
-		setThemes(themes)
-		wearTheme(theme)
-	}, [themes, theme])
+		instance.setThemes(themes)
+		instance.wearTheme(theme)
+	}, [instance, themes, theme])
 
 	// the listeners belong to this shell: two terminals warn two consumers
 	useEffect(() => {

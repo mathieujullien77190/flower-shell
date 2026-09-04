@@ -1,5 +1,4 @@
 import styled from "styled-components"
-import { colors } from "@theme"
 
 export const CmdContainer = styled.div`
 	display: flex;
@@ -10,8 +9,8 @@ export const CmdLine = styled.div<{ $restricted: boolean }>`
 	font-weight: bold;
 
 	span {
-		color: ${({ $restricted }) =>
-			$restricted ? colors().restrictedColor : colors().cmdColor};
+		color: ${({ $restricted, theme }) =>
+			$restricted ? theme.colors.restrictedColor : theme.colors.cmdColor};
 	}
 `
 

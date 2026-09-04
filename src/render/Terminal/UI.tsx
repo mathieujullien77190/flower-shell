@@ -1,10 +1,10 @@
 import styled from "styled-components"
-import { colors, fonts, scrollbar } from "@theme"
+import { scrollbar } from "@theme"
 
 export const TerminalContainer = styled.div<{ $size: number }>`
-	background: ${() => colors().background};
-	color: ${() => colors().textColor};
-	font-family: ${() => fonts().shell};
+	background: ${({ theme }) => theme.colors.background};
+	color: ${({ theme }) => theme.colors.textColor};
+	font-family: ${({ theme }) => theme.fonts.shell};
 	width: 100%;
 
 	/* the theme sets an inner padding: it is taken out of the 100% of width
@@ -22,8 +22,8 @@ export const TerminalContainer = styled.div<{ $size: number }>`
 
 	/* the scrollbar wears the theme: the thumb and its groove, and a thin
 	   bar — a terminal is read, not dragged around */
-	scrollbar-color: ${() => scrollbar().color};
-	scrollbar-width: ${() => scrollbar().width};
+	scrollbar-color: ${({ theme }) => scrollbar(theme).color};
+	scrollbar-width: ${({ theme }) => scrollbar(theme).width};
 
 	/* size of the shell, inherited by the commands and the input: the theme
 	   carries it, so one made for a screen read from far raises it */

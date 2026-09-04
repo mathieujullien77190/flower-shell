@@ -1,14 +1,13 @@
 import styled from "styled-components"
-import { colors, fonts } from "@theme"
 
 export const CustomInput = styled.input<{ $nbsLetters: number }>`
-	background-color: ${() => colors().background};
+	background-color: ${({ theme }) => theme.colors.background};
 	border: none;
 	outline: none;
-	color: ${() => colors().textColor};
+	color: ${({ theme }) => theme.colors.textColor};
 	padding: 0;
 	margin: 0;
-	font-family: ${() => fonts().shell};
+	font-family: ${({ theme }) => theme.fonts.shell};
 
 	/* An input field does not inherit the font of its parent: without this
 	   line it falls back on the one of the browser, smaller than the size

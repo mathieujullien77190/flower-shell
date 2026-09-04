@@ -1,6 +1,7 @@
-import type { ReactNode } from "react"
+import type { CSSProperties, ReactNode } from "react"
 import { render } from "@testing-library/react"
 
+import { themes } from "@theme"
 import { flowersCommand, plantFlowers } from "./flowers"
 
 describe("plantFlowers", () => {
@@ -46,11 +47,27 @@ describe("the flowers command", () => {
 	})
 
 	it("measures the drawing on the width of the container", () => {
-		expect(flowersCommand.display!.stylePre!.fontSize).toBe("calc(100cqw/60)")
+		const style = flowersCommand.display!.stylePre as (
+			theme: typeof themes.flower
+		) => CSSProperties
+
+		expect(style(themes.flower).fontSize).toBe("calc(100cqw/60)")
+	})
+
+	it("takes the brand colour of the theme rendering it", () => {
+		const style = flowersCommand.display!.stylePre as (
+			theme: typeof themes.flower
+		) => CSSProperties
+
+		expect(style(themes.kiwi).color).toBe(themes.kiwi.colors.appColor)
+		expect(style(themes.maple).color).toBe(themes.maple.colors.appColor)
 	})
 
 	it("colors the field on its markers, at the size it drew it", () => {
-		const painted = flowersCommand.display!.highlight!("R@@@@R") as ReactNode[]
+		const painted = flowersCommand.display!.highlight!(
+			"R@@@@R",
+			themes.flower
+		) as ReactNode[]
 
 		expect(render(<div>{painted}</div>).container.textContent).toBe("@@@@")
 	})

@@ -1,5 +1,4 @@
 import { BaseCommand } from "@types"
-import { fonts } from "@theme"
 import { highlightFlower } from "../highlight"
 
 /**
@@ -25,7 +24,8 @@ export const titleCommand: BaseCommand = {
 	display: {
 		hideCmd: true,
 		style: { alignItems: "center" },
-		stylePre: { fontSize: fonts().logo },
-		highlight: text => highlightFlower(text, { fontSize: fonts().logo }),
+		stylePre: theme => ({ fontSize: theme.fonts.logo }),
+		highlight: (text, theme) =>
+			highlightFlower(text, { fontSize: theme.fonts.logo }, theme.colors),
 	},
 }

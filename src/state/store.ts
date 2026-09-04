@@ -2,7 +2,8 @@ import { createStore } from "zustand/vanilla"
 import type { StoreApi } from "zustand/vanilla"
 
 import { Command } from "@types"
-import { DEFAULT_THEME_NAME, fonts, setTheme, themeByName } from "@theme"
+import { DEFAULT_THEME_NAME } from "@theme"
+import type { ShellTheme } from "@theme"
 
 /** the name of a theme of the catalogue: what the visitor types */
 type ThemeName = string
@@ -54,6 +55,17 @@ export type ShellState = ShellData & ShellActions
 
 /** the store of one shell: every terminal on the page owns one */
 export type ShellStore = StoreApi<ShellState>
+
+/**
+ * What the actions need to know of the theme: the catalogue of this shell,
+ * to turn a name down, and what it wears, to step its font size from it.
+ * Handed in rather than looked up — the store belongs to one terminal, and
+ * so does the wardrobe.
+ */
+export type Wardrobe = {
+	byName: (name: string) => ShellTheme | undefined
+	worn: () => ShellTheme
+}
 
 /** the options a shell can be mounted on, the rest being the defaults */
 export type ShellOptions = {
@@ -107,7 +119,8 @@ const rendered = (list: Command[], id: string) =>
  */
 export const createActions = (
 	update: (change: (data: ShellData) => ShellData) => void,
-	start: ShellData
+	start: ShellData,
+	wardrobe: Wardrobe
 ): ShellActions => ({
 	reset: () => update(() => start),
 
@@ -116,14 +129,12 @@ export const createActions = (
 	setKeyboardOnFocus: keyboardOnFocus =>
 		update(data => ({ ...data, keyboardOnFocus })),
 
-	// sets the module theme (colors() will follow) then notes its name: the
-	// second triggers the render, the first provides the colors it will read
-	// back. An unknown name does nothing: the command does not let it through.
+	// only the name: what it stands for is read off the catalogue of this
+	// shell, so the two never fall out of step. An unknown name does nothing
+	// — the command does not let it through either.
 	setThemeName: name => {
-		const next = themeByName(name)
-		if (!next) return
+		if (!wardrobe.byName(name)) return
 
-		setTheme(next)
 		update(data => ({ ...data, themeName: name }))
 	},
 
@@ -134,7 +145,7 @@ export const createActions = (
 	 */
 	zoomFont: direction =>
 		update(data => {
-			const current = data.fontSize ?? fonts().size
+			const current = data.fontSize ?? wardrobe.worn().fonts.size
 			const next = Math.min(
 				FONT_MAX,
 				Math.max(FONT_MIN, current + direction * FONT_STEP)
@@ -235,14 +246,21 @@ export const createActions = (
  * must wake nobody: the equality is checked here rather than in each of
  * them.
  */
-export const createShellStore = (options: ShellOptions = {}): ShellStore => {
+export const createShellStore = (
+	wardrobe: Wardrobe,
+	options: ShellOptions = {}
+): ShellStore => {
 	const start = initialData(options)
 
 	return createStore<ShellState>((set, get) => ({
 		...start,
-		...createActions(change => {
-			const next = change(get())
-			if (next !== get()) set(next)
-		}, start),
+		...createActions(
+			change => {
+				const next = change(get())
+				if (next !== get()) set(next)
+			},
+			start,
+			wardrobe
+		),
 	}))
 }

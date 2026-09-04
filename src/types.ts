@@ -1,5 +1,7 @@
 import { CSSProperties } from "react"
 
+import type { ShellTheme } from "./theme/types"
+
 /** a nested dictionary of texts: `t("help.desc")` reads the path in it */
 export type Dict = { [key: string]: string | Dict }
 
@@ -47,6 +49,12 @@ export type Args = {
 	empty: boolean
 }
 
+/**
+ * A style of a command: the object itself, or a function of the theme of the
+ * terminal that renders it.
+ */
+export type Styled = CSSProperties | ((theme: ShellTheme) => CSSProperties)
+
 export type BaseCommand = {
 	restricted: boolean
 	action: Action
@@ -57,10 +65,22 @@ export type BaseCommand = {
 	testArgs?: Args
 	display?: {
 		hideCmd?: boolean
-		style?: CSSProperties
-		stylePre?: CSSProperties
-		/** colored rendering of the result; an untouched string is a valid one */
-		highlight?: (txt: string) => import("react").ReactNode
+		/**
+		 * The style of the block, and the style of the answer inside it. A
+		 * function of the theme rather than a plain object whenever it reads
+		 * a color or a size: the object is built once, when the command is
+		 * written, and would freeze the theme of that moment — the function
+		 * is called at every render, with the theme of the terminal doing the
+		 * rendering.
+		 */
+		style?: Styled
+		stylePre?: Styled
+		/**
+		 * Colored rendering of the result; an untouched string is a valid
+		 * one. It takes the theme of the terminal rendering it, for the same
+		 * reason.
+		 */
+		highlight?: (txt: string, theme: ShellTheme) => import("react").ReactNode
 		reverse?: boolean
 		stepTime?: number
 		stepSize?: number

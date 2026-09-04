@@ -1,13 +1,18 @@
 import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
+import { ThemeProvider } from "styled-components"
 
 import { baseCommands } from "@commands/base"
 import { createInstance } from "@state/instance"
-import { flowerTheme, setTheme } from "@theme"
+import { flowerTheme } from "@theme"
 import Input from "./index"
 
-// the input reads the theme at render: this one paints a prompt
-beforeAll(() => setTheme(flowerTheme))
+/**
+ * The input paints with the theme of its terminal, read off the provider
+ * that terminal puts up: on its own it needs one too.
+ */
+const dressed = (ui: React.ReactNode) =>
+	render(<ThemeProvider theme={flowerTheme}>{ui}</ThemeProvider>)
 
 const options = { lang: "en", animation: false, keyboardOnFocus: true }
 
@@ -15,7 +20,7 @@ const options = { lang: "en", animation: false, keyboardOnFocus: true }
 const instance = createInstance()
 
 const show = (over: Partial<React.ComponentProps<typeof Input>> = {}) =>
-	render(
+	dressed(
 		<Input
 			instance={instance}
 			known={baseCommands}
@@ -48,7 +53,9 @@ describe("what is typed", () => {
 	})
 
 	it("plays a line with nobody listening: the callbacks are all optional", async () => {
-		render(<Input instance={instance} known={baseCommands} options={options} />)
+		dressed(
+			<Input instance={instance} known={baseCommands} options={options} />
+		)
 
 		await userEvent.type(line(), "hello{Enter}{ArrowUp}{ArrowDown}")
 
@@ -59,13 +66,15 @@ describe("what is typed", () => {
 		const { rerender } = show({ value: "" })
 
 		rerender(
-			<Input
-				instance={instance}
-				known={baseCommands}
-				options={options}
-				onValidate={() => {}}
-				value="flowers"
-			/>
+			<ThemeProvider theme={flowerTheme}>
+				<Input
+					instance={instance}
+					known={baseCommands}
+					options={options}
+					onValidate={() => {}}
+					value="flowers"
+				/>
+			</ThemeProvider>
 		)
 
 		expect(line()).toHaveValue("flowers")
@@ -209,13 +218,15 @@ describe("the focus", () => {
 		expect(line()).not.toHaveFocus()
 
 		rerender(
-			<Input
-				instance={instance}
-				known={baseCommands}
-				options={{ ...options, keyboardOnFocus: false }}
-				onValidate={() => {}}
-				forceFocus={1}
-			/>
+			<ThemeProvider theme={flowerTheme}>
+				<Input
+					instance={instance}
+					known={baseCommands}
+					options={{ ...options, keyboardOnFocus: false }}
+					onValidate={() => {}}
+					forceFocus={1}
+				/>
+			</ThemeProvider>
 		)
 
 		expect(line()).toHaveFocus()

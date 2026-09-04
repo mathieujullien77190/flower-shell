@@ -1,6 +1,5 @@
 import { BaseCommand } from "@types"
 import { t } from "@i18n/lang"
-import { colors } from "@theme"
 
 export const welcomeCommand: BaseCommand = {
 	restricted: true,
@@ -10,6 +9,6 @@ export const welcomeCommand: BaseCommand = {
 	help: { description: "common.restricted", patterns: [] },
 	display: {
 		hideCmd: true,
-		style: { color: colors().importantColor },
+		style: theme => ({ color: theme.colors.importantColor }),
 	},
 }

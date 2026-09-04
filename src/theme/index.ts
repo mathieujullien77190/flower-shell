@@ -1,5 +1,7 @@
 import { CSSProperties } from "react"
 
+import { playingInstance } from "@state/instance"
+import { defaultTheme, lay, prepareThemes, worn } from "./catalogue"
 import { flowerTheme } from "./flower"
 import { hibiscusTheme } from "./hibiscus"
 import { kiwiTheme } from "./kiwi"
@@ -22,6 +24,7 @@ export type {
 	ShellThemeInput,
 } from "./types"
 
+export { bareTheme, defaultTheme } from "./catalogue"
 export { themeTone } from "./tone"
 export type { ShellTone } from "./tone"
 
@@ -54,63 +57,25 @@ export const themes: Record<string, ShellTheme> = {
 export const DEFAULT_THEME_NAME = "flower"
 
 /**
- * The theme of whoever gives none: nothing is set, everything is inherited.
- * The shell then takes the colors and the font of the page holding it, and
- * the markup stops coloring — a marker only cuts the text up any more.
- *
- * `transparent` and not a color: a background that is set, even white,
- * would cover the consumer's. What is not given must paint nothing.
+ * The theme of whoever is not a shell. Every terminal wears its own — its
+ * `themes` catalogue and the name it wears out of it, both held by its
+ * instance — and this one only answers a read made outside of any command:
+ * `highlight()` played on a text of yours, in a component of yours.
  */
-export const bareTheme: ShellTheme = {
-	colors: {
-		background: "transparent",
-		textColor: "inherit",
-		importantColor: "inherit",
-		cmdColor: "inherit",
-		restrictedColor: "inherit",
-		infoColor: "inherit",
-		appColor: "inherit",
-		invisible: "transparent",
-		// `auto` and not a color: the scrollbar of the browser, untouched,
-		// the way the rest of the bare theme paints nothing
-		scrollbarThumb: "auto",
-		scrollbarTrack: "auto",
-	},
-	prompt: ">",
-	fonts: { shell: "inherit", size: 16, logo: "calc(100cqw / 90)" },
-	container: {},
-}
+let outside: ShellTheme = defaultTheme
+
+/** the theme in play: the one the shell playing wears, else the page's */
+const current = (): ShellTheme => playingInstance()?.theme() || outside
 
 /**
- * The default theme of the package: the flower it is named after. The
- * catalogue turns around it — four dark themes, three light ones, each one
- * named after a thing that grows and wearing its emoji for a prompt, plus
- * `contrast`, which is there to be read and not to be looked at.
+ * What a read outside of a shell answers. It does not reach into the
+ * terminals of the page: a `<Shell>` takes its own through `themes`, and two
+ * of them side by side no longer repaint each other.
  */
-export const defaultTheme: ShellTheme = flowerTheme
-
-/**
- * The theme lives at module level: the markup is rendered by a function, not
- * by a component, and a ThemeProvider would not reach it.
- *
- * It is therefore the one thing several terminals on the same page share.
- * Their history, their cursor and their options belong to each; the palette
- * does not, and switching it in one repaints the others.
- */
-let current: ShellTheme = defaultTheme
-
-/** a partial theme laid on a full one: what it leaves out is kept */
-const lay = (base: ShellTheme, input: ShellThemeInput): ShellTheme => ({
-	colors: { ...base.colors, ...input.colors },
-	prompt: input.prompt || base.prompt,
-	fonts: { ...base.fonts, ...input.fonts },
-	container: { ...base.container, ...input.container },
-})
-
 export const setTheme = (theme?: ShellThemeInput) => {
 	if (!theme) return
 
-	current = lay(current, theme)
+	outside = lay(outside, theme)
 }
 
 /**
@@ -133,10 +98,7 @@ let mounted: Record<string, ShellTheme> = {}
  * is on purpose. What is not given does not exist.
  */
 export const setThemes = (custom?: Record<string, ShellThemeInput>) => {
-	mounted = Object.keys(custom || {}).reduce(
-		(all, name) => ({ ...all, [name]: lay(defaultTheme, custom![name]) }),
-		{} as Record<string, ShellTheme>
-	)
+	mounted = prepareThemes(custom)
 }
 
 /**
@@ -153,7 +115,7 @@ export const setThemes = (custom?: Record<string, ShellThemeInput>) => {
  * To be called after `setThemes`, whose result it reads.
  */
 export const wearTheme = (name?: string) => {
-	current = (name && mounted[name]) || Object.values(mounted)[0] || bareTheme
+	outside = worn(mounted, name)
 }
 
 /**
@@ -161,21 +123,22 @@ export const wearTheme = (name?: string) => {
  * function, and not a constant: the consumer sets theirs long after the
  * commands have been written.
  */
-export const themeNames = (): string[] => Object.keys(mounted)
+export const themeNames = (): string[] =>
+	Object.keys(playingInstance()?.themes() || mounted)
 
 /** the theme mounted under that name, if it exists */
 export const themeByName = (name: string): ShellTheme | undefined =>
-	mounted[name]
+	(playingInstance()?.themes() || mounted)[name]
 
-export const theme = () => current
+export const theme = () => current()
 
 /** reading shortcut, the most frequent one in the styles */
-export const colors = (): ShellColors => current.colors
+export const colors = (): ShellColors => current().colors
 
-export const fonts = (): ShellFonts => current.fonts
+export const fonts = (): ShellFonts => current().fonts
 
 /** the style laid on the general container of the terminal */
-export const container = (): CSSProperties => current.container
+export const container = (): CSSProperties => current().container
 
 /**
  * The scrollbar of the terminal, ready for CSS: the pair `scrollbar-color`
@@ -185,9 +148,14 @@ export const container = (): CSSProperties => current.container
  * one — gets the scrollbar of the browser, whole: `scrollbar-color` refuses
  * a pair with `auto` in it, and a themed width on a browser scrollbar would
  * be the one thing painted on a shell that paints nothing.
+ *
+ * It takes the theme it dresses: the styled-component that calls it reads it
+ * off the provider of its own terminal. Given none, the theme in play.
  */
-export const scrollbar = (): { color: string; width: string } => {
-	const { scrollbarThumb, scrollbarTrack } = current.colors
+export const scrollbar = (
+	worn: ShellTheme = current()
+): { color: string; width: string } => {
+	const { scrollbarThumb, scrollbarTrack } = worn.colors
 	const bare = scrollbarThumb === "auto" || scrollbarTrack === "auto"
 
 	return bare

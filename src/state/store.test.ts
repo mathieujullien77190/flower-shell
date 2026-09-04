@@ -1,5 +1,6 @@
 import type { Command } from "@types"
-import { setThemes, themes } from "@theme"
+import { defaultTheme, themes } from "@theme"
+import type { ShellTheme } from "@theme"
 import { createActions, initialData, type ShellData } from "./store"
 
 const command = (over: Partial<Command> = {}): Command => ({
@@ -14,13 +15,23 @@ const command = (over: Partial<Command> = {}): Command => ({
 	...over,
 })
 
+/** the catalogue of one shell, the way an instance hands it to its store */
+const wardrobe = (catalogue: Record<string, ShellTheme> = themes) => ({
+	byName: (name: string) => catalogue[name],
+	worn: () => catalogue.flower || defaultTheme,
+})
+
 /** the actions written against a store held here, the way an instance does */
-const store = (start: ShellData = initialData()) => {
+const store = (start: ShellData = initialData(), dressed = wardrobe()) => {
 	let data = start
 
-	const actions = createActions(change => {
-		data = change(data)
-	}, start)
+	const actions = createActions(
+		change => {
+			data = change(data)
+		},
+		start,
+		dressed
+	)
 
 	return { actions, read: () => data }
 }
@@ -260,7 +271,6 @@ describe("the size of the text", () => {
 
 describe("setThemeName", () => {
 	it("takes the name of a mounted theme", () => {
-		setThemes(themes)
 		const { actions, read } = store()
 
 		actions.setThemeName("lavender")
@@ -268,9 +278,11 @@ describe("setThemeName", () => {
 		expect(read().themeName).toBe("lavender")
 	})
 
-	it("does nothing on a theme that is not mounted", () => {
-		setThemes({ lavender: themes.lavender })
-		const { actions, read } = store()
+	it("does nothing on a theme this shell does not carry", () => {
+		const { actions, read } = store(
+			initialData(),
+			wardrobe({ lavender: themes.lavender })
+		)
 		const before = read().themeName
 
 		actions.setThemeName("hibiscus")

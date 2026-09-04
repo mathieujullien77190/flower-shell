@@ -8,5 +8,10 @@
 		"noEmit": false,
 		"types": ["jest", "node", "@testing-library/jest-dom"]
 	},
-	"include": ["src/**/*.test.ts", "src/**/*.test.tsx", "jest.setup.ts"]
+	"include": [
+		"src/**/*.test.ts",
+		"src/**/*.test.tsx",
+		"src/**/*.d.ts",
+		"jest.setup.ts"
+	]
 }

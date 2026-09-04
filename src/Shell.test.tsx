@@ -215,6 +215,80 @@ describe("the options, given as props", () => {
 		expect(await screen.findByText("🪻")).toBeInTheDocument()
 	})
 
+	it("keeps its theme to itself", async () => {
+		// two terminals side by side, two catalogues: switching one paints
+		// only itself, and neither knows what the other carries
+		await act(async () => {
+			render(
+				<>
+					<div data-testid="left">
+						<Shell
+							commands={baseCommands}
+							themes={themes}
+							theme="flower"
+							animation={false}
+						/>
+					</div>
+					<div data-testid="right">
+						<Shell
+							commands={baseCommands}
+							themes={{ kiwi: themes.kiwi }}
+							theme="kiwi"
+							animation={false}
+						/>
+					</div>
+				</>
+			)
+		})
+
+		const box = (id: string) =>
+			screen.getByTestId(id).querySelector("[data-theme]")!
+
+		expect(box("left")).toHaveAttribute("data-theme", "flower")
+		expect(box("right")).toHaveAttribute("data-theme", "kiwi")
+
+		const left = within(screen.getByTestId("left"))
+		await userEvent.type(left.getByRole("textbox"), "theme maple{Enter}")
+
+		expect(box("left")).toHaveAttribute("data-theme", "maple")
+		expect(box("right")).toHaveAttribute("data-theme", "kiwi")
+
+		// and maple is not one the right one carries
+		const right = within(screen.getByTestId("right"))
+		await userEvent.type(right.getByRole("textbox"), "theme maple{Enter}")
+
+		expect(right.getByRole("log")).toHaveTextContent("unrecognised argument")
+	})
+
+	it("paints two terminals with two palettes", async () => {
+		await act(async () => {
+			render(
+				<>
+					<div data-testid="dark">
+						<Shell
+							commands={baseCommands}
+							themes={{ kiwi: themes.kiwi }}
+							animation={false}
+						/>
+					</div>
+					<div data-testid="light">
+						<Shell
+							commands={baseCommands}
+							themes={{ rice: themes.rice }}
+							animation={false}
+						/>
+					</div>
+				</>
+			)
+		})
+
+		const ground = (id: string) =>
+			getComputedStyle(screen.getByTestId(id).querySelector("[data-theme]")!)
+				.background
+
+		expect(ground("dark")).not.toBe(ground("light"))
+	})
+
 	it("switches theme when the visitor asks for another", async () => {
 		const { container } = render(
 			<Shell

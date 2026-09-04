@@ -2,6 +2,7 @@ import React, { ReactNode } from "react"
 import reactStringReplace from "react-string-replace"
 
 import { colors } from "@theme"
+import type { ShellColors } from "@theme"
 import uniqid from "uniqid"
 
 /**
@@ -40,25 +41,31 @@ const readableOn = (hex: string) => {
 
 export const highlight = (
 	text: string,
-	onClick: (name: string, arg: string[]) => void
+	onClick: (name: string, arg: string[]) => void,
+	/**
+	 * The palette it paints with. The component that calls it reads it off
+	 * the provider of its own terminal, so two shells colour their markup
+	 * apart. Given none — a text of yours coloured outside of a shell — the
+	 * theme in play, which is the one of the page.
+	 */
+	palette: ShellColors = colors()
 ) => {
 	let result: string | ReactNode[] = text
 
-	// colors read on every render: they follow the current theme
 	const list: {
 		separator: string
 		color: string
 		command?: string
 	}[] = [
-		{ separator: "§", color: colors().importantColor },
-		{ separator: "+", color: colors().infoColor },
-		{ separator: "`", color: colors().cmdColor },
-		{ separator: "!", color: colors().restrictedColor },
-		{ separator: "$", color: colors().appColor },
+		{ separator: "§", color: palette.importantColor },
+		{ separator: "+", color: palette.infoColor },
+		{ separator: "`", color: palette.cmdColor },
+		{ separator: "!", color: palette.restrictedColor },
+		{ separator: "$", color: palette.appColor },
 		// color of the background: the text blends in, revealed by selecting it
-		{ separator: "_", color: colors().invisible },
+		{ separator: "_", color: palette.invisible },
 		// clickable: the click plays the `actionmap` command
-		{ separator: "#", color: colors().importantColor, command: "actionmap" },
+		{ separator: "#", color: palette.importantColor, command: "actionmap" },
 	]
 
 	// the label on screen, and the arguments passed to the click after a `~`

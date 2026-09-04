@@ -1,8 +1,8 @@
-import type { ReactNode } from "react"
+import type { CSSProperties, ReactNode } from "react"
 import { render } from "@testing-library/react"
 
 import { title, titleCommand } from "./title"
-import { fonts } from "@theme"
+import { themes } from "@theme"
 
 describe("the logo", () => {
 	it("carries the color markers of highlightFlower", () => {
@@ -22,12 +22,20 @@ describe("the title command", () => {
 		)
 	})
 
-	it("measures it on the logo size of the theme", () => {
-		expect(titleCommand.display!.stylePre!.fontSize).toBe(fonts().logo)
+	it("measures it on the logo size of the theme rendering it", () => {
+		const style = titleCommand.display!.stylePre as (
+			theme: typeof themes.flower
+		) => CSSProperties
+
+		expect(style(themes.flower).fontSize).toBe(themes.flower.fonts.logo)
+		expect(style(themes.contrast).fontSize).toBe(themes.contrast.fonts.logo)
 	})
 
 	it("colors the logo on the markers written into it", () => {
-		const painted = titleCommand.display!.highlight!("IlitI") as ReactNode[]
+		const painted = titleCommand.display!.highlight!(
+			"IlitI",
+			themes.flower
+		) as ReactNode[]
 
 		expect(render(<div>{painted}</div>).container.textContent).toBe("lit")
 	})

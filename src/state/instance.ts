@@ -1,5 +1,7 @@
 import { BaseCommands, Dictionaries } from "@types"
 import { prepareDict } from "@i18n/dict"
+import { prepareThemes, worn } from "../theme/catalogue"
+import type { ShellTheme, ShellThemeInput } from "../theme/types"
 import type { CommandErrorListener, CommandListener } from "@engine/send"
 import { createShellStore, type ShellOptions, type ShellStore } from "./store"
 
@@ -32,10 +34,9 @@ export type ShellListeners = {
  * off the shell in play. Two terminals side by side therefore speak two
  * languages out of two dictionaries, and neither writes into the other.
  *
- * The theme stays in its module, shared by every shell: `highlight()` is a
- * function and the styled-components read `colors()` outside of any render,
- * so nothing scoped could reach them. Two terminals therefore wear the same
- * theme, and switching it in one repaints the other.
+ * The themes belong to it for the same reason: the catalogue the visitor can
+ * take, and the one worn out of it. Two terminals side by side therefore
+ * wear two themes, and switching one repaints only itself.
  */
 export type ShellInstance = {
 	/** the values and the actions of this shell: `store.getState()` is both */
@@ -46,6 +47,13 @@ export type ShellInstance = {
 	 */
 	dict: () => Dictionaries
 	setDict: (custom?: Dictionaries) => void
+	/** the themes this shell can take, its `themes` prop laid on the default */
+	themes: () => Record<string, ShellTheme>
+	setThemes: (custom?: Record<string, ShellThemeInput>) => void
+	/** the one it wears out of them, read off the name in its store */
+	theme: () => ShellTheme
+	/** the name it opens on: ignored when the catalogue does not carry it */
+	wearTheme: (name?: string) => void
 	/** the commands this shell knows, its `commands` prop as it stands */
 	commands: () => BaseCommands
 	setCommands: (commands: BaseCommands) => void
@@ -57,12 +65,40 @@ export const createInstance = (options?: ShellOptions): ShellInstance => {
 	let commands: BaseCommands = {}
 	let listeners: ShellListeners = {}
 	let dict = prepareDict()
+	let themes = prepareThemes()
+	/**
+	 * What it wears: the name held by its store, read against its catalogue.
+	 * The two are never out of step — the store turns down a name the
+	 * catalogue does not carry.
+	 */
+	const theme = () => worn(themes, store.getState().themeName)
+
+	const store = createShellStore(
+		{ byName: name => themes[name], worn: theme },
+		options
+	)
 
 	return {
-		store: createShellStore(options),
+		store,
 		dict: () => dict,
 		setDict: custom => {
 			dict = prepareDict(custom)
+		},
+		themes: () => themes,
+		setThemes: custom => {
+			themes = prepareThemes(custom)
+		},
+		theme,
+		/**
+		 * The name it opens on: the theme of its catalogue carrying it, else
+		 * the first of the catalogue. A name the catalogue does not carry is
+		 * ignored rather than quietly mounted — it cannot open on a theme the
+		 * visitor would have no way of finding again.
+		 */
+		wearTheme: name => {
+			const first = Object.keys(themes)[0]
+
+			store.getState().setThemeName(name && themes[name] ? name : first || "")
 		},
 		commands: () => commands,
 		setCommands: next => {
