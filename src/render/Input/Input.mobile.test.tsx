@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { baseCommands } from "@commands/base"
+import { createInstance } from "@state/instance"
 import { flowerTheme, setTheme } from "@theme"
 import Input from "./index"
 
@@ -16,9 +17,16 @@ beforeAll(() => setTheme(flowerTheme))
 
 const options = { lang: "en", animation: false, keyboardOnFocus: true }
 
+const instance = createInstance()
+
 const show = (onValidate = () => {}) =>
 	render(
-		<Input known={baseCommands} options={options} onValidate={onValidate} />
+		<Input
+			instance={instance}
+			known={baseCommands}
+			options={options}
+			onValidate={onValidate}
+		/>
 	)
 
 const line = () => screen.getByRole("textbox")

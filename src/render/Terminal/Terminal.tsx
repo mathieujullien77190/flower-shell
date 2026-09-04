@@ -7,6 +7,7 @@ import Command from "@render/Command"
 
 import { useCommands, useFontSize, useThemeName } from "@state/hooks"
 import { t } from "@i18n/lang"
+import { withInstance } from "@state/instance"
 import { container, fonts } from "@theme"
 import { findCommand } from "@engine/terminalEngine"
 
@@ -60,7 +61,9 @@ export const Terminal = ({
 				role="log"
 				aria-live="polite"
 				aria-relevant="additions text"
-				aria-label={t("terminal.output", undefined, options.lang)}
+				aria-label={withInstance(instance, () =>
+					t("terminal.output", undefined, options.lang)
+				)}
 			>
 				{commands
 					.filter(command => command.visible)
@@ -90,6 +93,7 @@ export const Terminal = ({
 			</S.History>
 
 			<Input
+				instance={instance}
 				known={known}
 				forceFocus={forceFocus}
 				options={options}

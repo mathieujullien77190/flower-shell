@@ -1,9 +1,8 @@
 import { Dict, Dictionaries } from "@types"
 import { playingInstance } from "@state/instance"
-import { dictEn } from "./en"
+import { BASE_LANG, DEFAULT_DICT, prepareDict } from "./dict"
 
-/** fallback language, when the key is missing from the current one */
-export const BASE_LANG = "en"
+export { BASE_LANG } from "./dict"
 
 /**
  * Starting language, read off the browser: the one the visitor put first, if
@@ -24,54 +23,32 @@ export const browserLang = (): string => {
 	return langs().find(lang => preferred.startsWith(lang)) || BASE_LANG
 }
 
-const merge = (base: Dict, custom: Dict): Dict => {
-	const result: Dict = { ...base }
-
-	Object.entries(custom).forEach(([key, value]) => {
-		const previous = result[key]
-
-		result[key] =
-			typeof value === "object" && typeof previous === "object"
-				? merge(previous, value)
-				: value
-	})
-
-	return result
-}
-
-/** English alone: the shell speaks one language until it is given more */
-const DEFAULT_DICT: Dictionaries = { [BASE_LANG]: dictEn }
-
-let dict: Dictionaries = DEFAULT_DICT
+/**
+ * The dictionaries of whoever is not a shell. Every terminal carries its own
+ * — its `dict` prop, held by its instance — and this one only answers `t()`
+ * called outside of any command: a text of yours translated in a component
+ * of yours, where no shell is in play.
+ */
+let outside: Dictionaries = DEFAULT_DICT
 
 /**
- * The languages of the shell are the keys of what is given here — nothing
- * more. `dict={{ en: dictEn, fr: dictFr }}` mounts English and French;
- * without the prop, English alone.
- *
- * Each language is laid on the English of the package: a key the given
- * dictionary does not cover comes out in English rather than as a bare key,
- * and `{ en: { welcome: { text } } }` covers a single text without losing
- * the others.
+ * The languages `t()` speaks outside of a shell. It does not reach into the
+ * terminals of the page: a `<Shell>` takes its own through `dict`, and two
+ * of them side by side no longer write into each other.
  */
 export const setDict = (custom?: Dictionaries) => {
-	if (!custom) {
-		dict = DEFAULT_DICT
-		return
-	}
-
-	dict = Object.keys(custom).reduce(
-		(all, lang) => ({ ...all, [lang]: merge(dictEn, custom[lang] || {}) }),
-		{} as Dictionaries
-	)
+	outside = prepareDict(custom)
 }
 
+/** the dictionaries in play: those of the shell playing, else the page's */
+const mounted = (): Dictionaries => playingInstance()?.dict() || outside
+
 /**
- * The languages the `lang` command accepts: those of the mounted
- * dictionary. A function, and not a constant: the consumer sets their
- * dictionary long after the commands have been written.
+ * The languages the `lang` command accepts: those of the shell in play. A
+ * function, and not a constant: the consumer sets their dictionary long
+ * after the commands have been written.
  */
-export const langs = (): string[] => Object.keys(dict)
+export const langs = (): string[] => Object.keys(mounted())
 
 /** walks a dotted path down a dictionary */
 const read = (source: Dict, key: string): string | null => {
@@ -87,9 +64,9 @@ const read = (source: Dict, key: string): string | null => {
 
 /**
  * The text of a key, in the language of the shell the command is playing
- * for. The dictionaries are shared by every terminal on the page; the
- * language is not, so it is read off the shell in play — outside of a
- * command there is none, and the fallback language answers.
+ * for. Both the dictionaries and the language are read off that shell —
+ * outside of a command there is none, and the dictionaries of the page
+ * answer in the fallback language.
  *
  * A key that is missing shows up as it is — that is what allows a raw text
  * to be passed anywhere a key is expected.
@@ -103,6 +80,7 @@ export const t = (
 	vars?: Record<string, string | number>,
 	force?: string
 ) => {
+	const dict = mounted()
 	const current = force || playingInstance()?.store.getState().lang || BASE_LANG
 
 	const text =

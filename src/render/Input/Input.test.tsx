@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { baseCommands } from "@commands/base"
+import { createInstance } from "@state/instance"
 import { flowerTheme, setTheme } from "@theme"
 import Input from "./index"
 
@@ -10,9 +11,13 @@ beforeAll(() => setTheme(flowerTheme))
 
 const options = { lang: "en", animation: false, keyboardOnFocus: true }
 
+// the shell it types into: it answers the label and the hint of the input
+const instance = createInstance()
+
 const show = (over: Partial<React.ComponentProps<typeof Input>> = {}) =>
 	render(
 		<Input
+			instance={instance}
 			known={baseCommands}
 			options={options}
 			onValidate={() => {}}
@@ -43,7 +48,7 @@ describe("what is typed", () => {
 	})
 
 	it("plays a line with nobody listening: the callbacks are all optional", async () => {
-		render(<Input known={baseCommands} options={options} />)
+		render(<Input instance={instance} known={baseCommands} options={options} />)
 
 		await userEvent.type(line(), "hello{Enter}{ArrowUp}{ArrowDown}")
 
@@ -55,6 +60,7 @@ describe("what is typed", () => {
 
 		rerender(
 			<Input
+				instance={instance}
 				known={baseCommands}
 				options={options}
 				onValidate={() => {}}
@@ -204,6 +210,7 @@ describe("the focus", () => {
 
 		rerender(
 			<Input
+				instance={instance}
 				known={baseCommands}
 				options={{ ...options, keyboardOnFocus: false }}
 				onValidate={() => {}}

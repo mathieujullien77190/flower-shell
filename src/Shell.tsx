@@ -4,7 +4,6 @@ import Terminal from "./render/Terminal"
 
 import { createRunners } from "./engine/send"
 import type { CommandErrorListener, CommandListener } from "./engine/send"
-import { setDict } from "./i18n/lang"
 import { createInstance } from "./state/instance"
 import {
 	useAnimation,
@@ -165,7 +164,7 @@ export const Shell = ({
 		const created = createInstance({ lang, animation, keyboardOnFocus })
 
 		// the dictionary first: a command played translates as it executes
-		setDict(dict)
+		created.setDict(dict)
 		created.setCommands(commands)
 		// the catalogue before the starting theme: `help theme` and `theme
 		// <name>` read the first, and the second need not be part of it
@@ -257,8 +256,8 @@ const Screen = ({
 	}
 
 	useEffect(() => {
-		setDict(dict)
-	}, [dict])
+		instance.setDict(dict)
+	}, [instance, dict])
 
 	useEffect(() => {
 		instance.setCommands(commands)

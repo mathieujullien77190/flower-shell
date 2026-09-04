@@ -1,4 +1,5 @@
-import { BaseCommands } from "@types"
+import { BaseCommands, Dictionaries } from "@types"
+import { prepareDict } from "@i18n/dict"
 import type { CommandErrorListener, CommandListener } from "@engine/send"
 import { createShellStore, type ShellOptions, type ShellStore } from "./store"
 
@@ -26,15 +27,25 @@ export type ShellListeners = {
  * fields: the component that renders the shell takes the instance as a prop,
  * and a prop object is not something a render may write into.
  *
- * The theme and the dictionaries stay in their modules, shared by every
- * shell: `highlight()` is a function and the styled-components read
- * `colors()` outside of any render, so a provider could not reach them
- * either. Two terminals therefore wear the same theme, and switching it in
- * one repaints the other.
+ * The dictionaries belong to the instance for the same reason as the store:
+ * `t()` is called from an `action`, outside of any render, and reads them
+ * off the shell in play. Two terminals side by side therefore speak two
+ * languages out of two dictionaries, and neither writes into the other.
+ *
+ * The theme stays in its module, shared by every shell: `highlight()` is a
+ * function and the styled-components read `colors()` outside of any render,
+ * so nothing scoped could reach them. Two terminals therefore wear the same
+ * theme, and switching it in one repaints the other.
  */
 export type ShellInstance = {
 	/** the values and the actions of this shell: `store.getState()` is both */
 	store: ShellStore
+	/**
+	 * The dictionaries of this shell, ready to be read: its `dict` prop laid
+	 * on the English of the package. Without one, English alone.
+	 */
+	dict: () => Dictionaries
+	setDict: (custom?: Dictionaries) => void
 	/** the commands this shell knows, its `commands` prop as it stands */
 	commands: () => BaseCommands
 	setCommands: (commands: BaseCommands) => void
@@ -45,9 +56,14 @@ export type ShellInstance = {
 export const createInstance = (options?: ShellOptions): ShellInstance => {
 	let commands: BaseCommands = {}
 	let listeners: ShellListeners = {}
+	let dict = prepareDict()
 
 	return {
 		store: createShellStore(options),
+		dict: () => dict,
+		setDict: custom => {
+			dict = prepareDict(custom)
+		},
 		commands: () => commands,
 		setCommands: next => {
 			commands = next

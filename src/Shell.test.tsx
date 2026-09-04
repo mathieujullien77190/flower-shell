@@ -1,5 +1,5 @@
 import { StrictMode } from "react"
-import { act, render, screen, waitFor } from "@testing-library/react"
+import { act, render, screen, waitFor, within } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 
 import { Shell } from "./Shell"
@@ -174,6 +174,38 @@ describe("the options, given as props", () => {
 		await mount({ keyboardOnFocus: false })
 
 		expect(line()).not.toHaveFocus()
+	})
+
+	it("keeps its dictionary to itself", async () => {
+		// two terminals side by side: one speaks two languages, the other one.
+		// Neither writes into the other, whichever order they mount in.
+		await act(async () => {
+			render(
+				<>
+					<div data-testid="bare">
+						<Shell commands={baseCommands} animation={false} />
+					</div>
+					<div data-testid="bilingual">
+						<Shell
+							commands={baseCommands}
+							animation={false}
+							dict={{ en: dictEn, fr: dictFr }}
+						/>
+					</div>
+				</>
+			)
+		})
+
+		const bare = within(screen.getByTestId("bare"))
+		await userEvent.type(bare.getByRole("textbox"), "lang fr{Enter}")
+
+		// French is not one of its languages: the argument does not pass
+		expect(bare.getByRole("log")).toHaveTextContent("unrecognised argument")
+
+		const bilingual = within(screen.getByTestId("bilingual"))
+		await userEvent.type(bilingual.getByRole("textbox"), "lang fr{Enter}")
+
+		expect(bilingual.getByRole("log")).toHaveTextContent("langage : fr")
 	})
 
 	it("wears the theme it is told to start on", async () => {

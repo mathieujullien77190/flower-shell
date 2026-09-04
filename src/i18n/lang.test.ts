@@ -32,44 +32,81 @@ describe("the dictionaries of the package", () => {
 	})
 })
 
-describe("setDict", () => {
+describe("the dictionaries of a shell", () => {
 	it("speaks English alone until it is given more", () => {
-		expect(langs()).toEqual([BASE_LANG])
+		const instance = createInstance()
+
+		withInstance(instance, () => expect(langs()).toEqual([BASE_LANG]))
 	})
 
 	it("mounts exactly the languages it is given", () => {
-		setDict({ en: {}, fr: dictFr })
+		const instance = createInstance()
+		instance.setDict({ en: {}, fr: dictFr })
 
-		expect(langs()).toEqual(["en", "fr"])
+		withInstance(instance, () => expect(langs()).toEqual(["en", "fr"]))
 	})
 
 	it("mounts a language given nothing of its own", () => {
 		// the key is there, its dictionary is not: English answers for it
-		setDict({ en: dictEn, de: undefined as unknown as Dict })
-
-		expect(langs()).toEqual(["en", "de"])
-
 		const instance = createInstance({ lang: "de" })
-		withInstance(instance, () => expect(t("hello.world")).toBe("Hello world"))
+		instance.setDict({ en: dictEn, de: undefined as unknown as Dict })
+
+		withInstance(instance, () => {
+			expect(langs()).toEqual(["en", "de"])
+			expect(t("hello.world")).toBe("Hello world")
+		})
 	})
 
 	it("answers the key itself once every dictionary is emptied", () => {
-		setDict({})
+		const instance = createInstance()
+		instance.setDict({})
 
-		expect(langs()).toEqual([])
-		expect(t("hello.world")).toBe("hello.world")
+		withInstance(instance, () => {
+			expect(langs()).toEqual([])
+			expect(t("hello.world")).toBe("hello.world")
+		})
 	})
 
 	it("lays each language on the English of the package", () => {
-		setDict({ de: { error: { args: "falsches Argument" } } })
-
 		const instance = createInstance({ lang: "de" })
+		instance.setDict({ de: { error: { args: "falsches Argument" } } })
 
 		withInstance(instance, () => {
 			expect(t("error.args")).toBe("falsches Argument")
 			// a key the given dictionary does not cover comes out in English
 			expect(t("error.unknown", { name: "x" })).toContain("not recognised")
 		})
+	})
+
+	it("keeps two shells out of each other", () => {
+		const french = createInstance({ lang: "fr" })
+		french.setDict({ en: dictEn, fr: dictFr })
+		const bare = createInstance()
+
+		withInstance(french, () => expect(langs()).toEqual(["en", "fr"]))
+		// the neighbour speaks two languages: this one still speaks one
+		withInstance(bare, () => expect(langs()).toEqual([BASE_LANG]))
+	})
+})
+
+describe("setDict", () => {
+	it("answers t() played outside of any shell", () => {
+		setDict({ en: { error: { args: "outside" } } })
+
+		expect(t("error.args")).toBe("outside")
+
+		setDict()
+	})
+
+	it("does not reach into the shells of the page", () => {
+		setDict({ en: { error: { args: "outside" } } })
+		const instance = createInstance()
+
+		withInstance(instance, () =>
+			expect(t("error.args")).toBe("unrecognised argument(s)")
+		)
+
+		setDict()
 	})
 })
 
@@ -95,8 +132,8 @@ describe("t", () => {
 	})
 
 	it("answers in the language of the shell in play", () => {
-		setDict({ en: {}, fr: dictFr })
 		const instance = createInstance({ lang: "fr" })
+		instance.setDict({ en: {}, fr: dictFr })
 
 		withInstance(instance, () => {
 			expect(t("error.args")).toBe("argument(s) non reconnu")
@@ -104,14 +141,12 @@ describe("t", () => {
 	})
 
 	it("answers in the fallback language outside of a command", () => {
-		setDict({ en: {}, fr: dictFr })
-
 		expect(t("error.args")).toBe("unrecognised argument(s)")
 	})
 
 	it("takes a forced language over the one of the shell", () => {
-		setDict({ en: {}, fr: dictFr })
 		const instance = createInstance({ lang: "en" })
+		instance.setDict({ en: {}, fr: dictFr })
 
 		withInstance(instance, () => {
 			expect(t("error.args", undefined, "fr")).toBe("argument(s) non reconnu")

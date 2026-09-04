@@ -11,6 +11,7 @@ import { isMobile } from "react-device-detect"
 
 import { theme } from "@theme"
 import { t } from "@i18n/lang"
+import { withInstance } from "@state/instance"
 
 import { autocompleteCommand } from "@engine/terminalEngine"
 
@@ -18,6 +19,7 @@ import * as S from "./UI"
 import { cleanCommand, hasSelection } from "./helpers"
 
 export const Input = ({
+	instance,
 	known,
 	value = "",
 	// a click count, so the zero of a shell nobody has clicked yet is a
@@ -161,10 +163,12 @@ export const Input = ({
 	 * finds one while a command runs, and this is a render. The input holds
 	 * its options, the language among them, so it says which one it speaks.
 	 */
-	const predictDisplay = t(
-		"input.predict",
-		{ word: predict, key: isMobile ? "ENTER" : "TAB" },
-		options.lang
+	const predictDisplay = withInstance(instance, () =>
+		t(
+			"input.predict",
+			{ word: predict, key: isMobile ? "ENTER" : "TAB" },
+			options.lang
+		)
 	)
 
 	// an id of its own, and not a constant: two terminals on the same page
@@ -181,7 +185,9 @@ export const Input = ({
 				ref={ref}
 				value={inputValue}
 				// the prompt names nothing for whoever does not see it
-				aria-label={t("input.label", undefined, options.lang)}
+				aria-label={withInstance(instance, () =>
+					t("input.label", undefined, options.lang)
+				)}
 				// the hint of the completion, read after the field
 				aria-describedby={predict !== "" ? hintId : undefined}
 				spellCheck="false"
