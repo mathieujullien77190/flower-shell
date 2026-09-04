@@ -7,7 +7,6 @@ import { testCommand as test } from "../../../commands/common/test"
 import { themes } from "../../../theme"
 import type { BaseCommand } from "../../../types"
 import type { CommandErrorEvent, CommandEvent } from "../../../engine/send"
-import { fresh } from "../../decorators"
 import { prose, useLocale, type Labels } from "../../i18n"
 import { source } from "../../source"
 import en from "./Events.en.md?raw"
@@ -224,7 +223,6 @@ const Row = ({ row }: { row: Watched }) => (
 const meta: Meta<typeof Shell> = {
 	title: "Shell/Events",
 	component: Shell,
-	decorators: [fresh],
 	parameters: prose({ en, fr }),
 }
 

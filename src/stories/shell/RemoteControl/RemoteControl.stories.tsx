@@ -8,7 +8,6 @@ import { testCommand as test } from "../../../commands/common/test"
 import { themes } from "../../../theme"
 import { dictEn } from "../../../i18n/en"
 import { dictFr } from "../../../i18n/fr"
-import { fresh } from "../../decorators"
 import { prose, useLocale, type Labels } from "../../i18n"
 import { source } from "../../source"
 import en from "./RemoteControl.en.md?raw"
@@ -169,7 +168,6 @@ const Group = ({
 const meta: Meta<typeof Shell> = {
 	title: "Shell/Remote control",
 	component: Shell,
-	decorators: [fresh],
 	parameters: prose({ en, fr }),
 }
 

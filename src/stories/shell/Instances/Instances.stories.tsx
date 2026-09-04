@@ -6,7 +6,6 @@ import { baseCommands } from "../../../commands/base"
 import { flowerTheme } from "../../../theme"
 import { dictEn } from "../../../i18n/en"
 import { dictFr } from "../../../i18n/fr"
-import { fresh } from "../../decorators"
 import { prose } from "../../i18n"
 import { source } from "../../source"
 import en from "./Instances.en.md?raw"
@@ -40,7 +39,6 @@ const Box = ({ children }: { children: React.ReactNode }) => (
 const meta: Meta<typeof Shell> = {
 	title: "Shell/Several terminals",
 	component: Shell,
-	decorators: [fresh],
 	parameters: prose({ en, fr }),
 }
 
