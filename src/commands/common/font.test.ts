@@ -11,7 +11,7 @@ const play = (args: string[]) => {
 		withInstance(instance, () => fontCommand.effect!({ args: [arg] }))
 	)
 
-	return instance.data().fontSize
+	return instance.store.getState().fontSize
 }
 
 describe("font", () => {

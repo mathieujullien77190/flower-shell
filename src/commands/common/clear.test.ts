@@ -22,11 +22,11 @@ describe("clear", () => {
 
 	it("hides what is on screen without losing the history", () => {
 		const instance = createInstance()
-		instance.actions.addCommand(line())
+		instance.store.getState().addCommand(line())
 
 		withInstance(instance, () => clearCommand.effect!({ args: [] }))
 
-		expect(instance.data().commands).toHaveLength(1)
-		expect(instance.data().commands[0].visible).toBe(false)
+		expect(instance.store.getState().commands).toHaveLength(1)
+		expect(instance.store.getState().commands[0].visible).toBe(false)
 	})
 })

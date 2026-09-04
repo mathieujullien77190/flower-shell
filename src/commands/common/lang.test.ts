@@ -26,7 +26,7 @@ describe("lang", () => {
 
 		withInstance(instance, () => langCommand.effect!({ args: ["fr"] }))
 
-		expect(instance.data().lang).toBe("fr")
+		expect(instance.store.getState().lang).toBe("fr")
 	})
 
 	it("lists the languages actually mounted", () => {

@@ -25,7 +25,7 @@ describe("theme", () => {
 
 		withInstance(instance, () => themeCommand.effect!({ args: ["kiwi"] }))
 
-		expect(instance.data().themeName).toBe("kiwi")
+		expect(instance.store.getState().themeName).toBe("kiwi")
 	})
 
 	it("lists the catalogue as it stands, each theme behind its tone", () => {

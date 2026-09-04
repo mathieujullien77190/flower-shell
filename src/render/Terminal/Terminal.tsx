@@ -5,7 +5,7 @@ import { TerminalProps } from "./types"
 import Input, { hasSelection } from "@render/Input"
 import Command from "@render/Command"
 
-import { useCommands, useFontSize, useThemeName } from "@state/context"
+import { useCommands, useFontSize, useThemeName } from "@state/hooks"
 import { t } from "@i18n/lang"
 import { container, fonts } from "@theme"
 import { findCommand } from "@engine/terminalEngine"
@@ -13,6 +13,7 @@ import { findCommand } from "@engine/terminalEngine"
 import * as S from "./UI"
 
 export const Terminal = ({
+	instance,
 	boxRef,
 	commands,
 	currentCommand,
@@ -27,12 +28,12 @@ export const Terminal = ({
 	const [forceFocus, setForceFocus] = useState<number>(0)
 
 	// subscription to the theme: on a change, the container reads colors() again
-	const themeName = useThemeName()
-	const known = useCommands()
+	const themeName = useThemeName(instance)
+	const known = useCommands(instance)
 
 	// the size of the theme as long as nobody has zoomed, the one the
 	// visitor set afterwards
-	const fontSize = useFontSize()
+	const fontSize = useFontSize(instance)
 
 	return (
 		<S.TerminalContainer
@@ -89,6 +90,7 @@ export const Terminal = ({
 			</S.History>
 
 			<Input
+				known={known}
 				forceFocus={forceFocus}
 				options={options}
 				value={currentCommand?.pattern}

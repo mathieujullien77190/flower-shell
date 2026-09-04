@@ -7,13 +7,12 @@ import type { CommandErrorListener, CommandListener } from "./engine/send"
 import { setDict } from "./i18n/lang"
 import { createInstance } from "./state/instance"
 import {
-	ShellScreenState,
 	useAnimation,
 	useGetCommands,
 	useGetCurrentCommand,
 	useKeyboardOnFocus,
 	useLang,
-} from "./state/context"
+} from "./state/hooks"
 import { useRegistry } from "./state/registry"
 import { setThemes, ShellThemeInput, wearTheme } from "./theme"
 import { BaseCommands, Dictionaries } from "./types"
@@ -192,24 +191,22 @@ export const Shell = ({
 	}, [registry, id, instance])
 
 	return (
-		<ShellScreenState instance={instance}>
-			<Screen
-				commands={commands}
-				theme={theme}
-				themes={themes}
-				dict={dict}
-				lang={lang}
-				animation={animation}
-				keyboardOnFocus={keyboardOnFocus}
-				initialCommands={initialCommands}
-				onCommandStart={onCommandStart}
-				onCommandDone={onCommandDone}
-				onCommandRendered={onCommandRendered}
-				onCommandError={onCommandError}
-				instance={instance}
-				runners={runners}
-			/>
-		</ShellScreenState>
+		<Screen
+			commands={commands}
+			theme={theme}
+			themes={themes}
+			dict={dict}
+			lang={lang}
+			animation={animation}
+			keyboardOnFocus={keyboardOnFocus}
+			initialCommands={initialCommands}
+			onCommandStart={onCommandStart}
+			onCommandDone={onCommandDone}
+			onCommandRendered={onCommandRendered}
+			onCommandError={onCommandError}
+			instance={instance}
+			runners={runners}
+		/>
 	)
 }
 
@@ -219,8 +216,10 @@ type ScreenProps = Omit<ShellProps, "id"> & {
 }
 
 /**
- * The terminal itself, inside the state it renders: the hooks below read the
- * values of the instance above, which is why this is a component of its own.
+ * The terminal itself. The instance is built above and handed down here: the
+ * hooks below subscribe to its store, each to the slice it reads, so a line
+ * landing in the history does not repaint a component that only watches the
+ * language.
  */
 const Screen = ({
 	commands = {},
@@ -240,13 +239,13 @@ const Screen = ({
 }: ScreenProps) => {
 	const { run, runRestricted } = runners
 
-	const history = useGetCommands()
-	const currentCommand = useGetCurrentCommand()
+	const history = useGetCommands(instance)
+	const currentCommand = useGetCurrentCommand(instance)
 
 	const options = {
-		lang: useLang(),
-		animation: useAnimation(),
-		keyboardOnFocus: useKeyboardOnFocus(),
+		lang: useLang(instance),
+		animation: useAnimation(instance),
+		keyboardOnFocus: useKeyboardOnFocus(instance),
 	}
 
 	useEffect(() => {
@@ -282,16 +281,17 @@ const Screen = ({
 	// does not exist at prerender, and applying it earlier would make the HTML
 	// diverge
 	useEffect(() => {
-		if (lang) instance.actions.setLang(lang)
+		if (lang) instance.store.getState().setLang(lang)
 	}, [instance, lang])
 
 	useEffect(() => {
-		if (animation !== undefined) instance.actions.setAnimation(animation)
+		if (animation !== undefined)
+			instance.store.getState().setAnimation(animation)
 	}, [instance, animation])
 
 	useEffect(() => {
 		if (keyboardOnFocus !== undefined)
-			instance.actions.setKeyboardOnFocus(keyboardOnFocus)
+			instance.store.getState().setKeyboardOnFocus(keyboardOnFocus)
 	}, [instance, keyboardOnFocus])
 
 	/**
@@ -301,7 +301,7 @@ const Screen = ({
 	 * playing the opening again would show the title twice.
 	 */
 	useEffect(() => {
-		const { commands: played, restrictedCommands } = instance.data()
+		const { commands: played, restrictedCommands } = instance.store.getState()
 		const onScreen = [...played, ...restrictedCommands].some(
 			command => command.visible
 		)
@@ -339,13 +339,13 @@ const Screen = ({
 	 */
 	const handleRendered = useCallback(
 		(id: string) => {
-			const { commands: played, restrictedCommands } = instance.data()
+			const { commands: played, restrictedCommands } = instance.store.getState()
 			const done = [...played, ...restrictedCommands].find(
 				command => command.id === id
 			)
 			const first = !!done && !done.isRendered
 
-			instance.actions.setIsRendered(id)
+			instance.store.getState().setIsRendered(id)
 			scrollDown()
 
 			if (first && done.canExecute) {
@@ -361,13 +361,14 @@ const Screen = ({
 
 	const moveCursor = useCallback(
 		(direction: number) => {
-			instance.actions.moveCursor(direction)
+			instance.store.getState().moveCursor(direction)
 		},
 		[instance]
 	)
 
 	return (
 		<Terminal
+			instance={instance}
 			boxRef={box}
 			options={options}
 			commands={history}

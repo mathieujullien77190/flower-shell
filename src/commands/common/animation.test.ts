@@ -8,7 +8,7 @@ const play = (args: string[], animation: boolean) => {
 	const instance = createInstance({ animation })
 	withInstance(instance, () => animationCommand.effect!({ args }))
 
-	return instance.data().animation
+	return instance.store.getState().animation
 }
 
 describe("animation", () => {

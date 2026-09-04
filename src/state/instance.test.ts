@@ -7,23 +7,23 @@ import {
 
 describe("createInstance", () => {
 	it("opens on the options it is given", () => {
-		expect(createInstance({ lang: "fr" }).data().lang).toBe("fr")
+		expect(createInstance({ lang: "fr" }).store.getState().lang).toBe("fr")
 	})
 
 	it("reads a change back before any render", () => {
 		const instance = createInstance()
 
-		instance.actions.setLang("fr")
+		instance.store.getState().setLang("fr")
 
-		expect(instance.data().lang).toBe("fr")
+		expect(instance.store.getState().lang).toBe("fr")
 	})
 
-	it("tells the watcher what the values became", () => {
+	it("tells the subscribers what the values became", () => {
 		const instance = createInstance()
 		const watch = jest.fn()
 
-		instance.onChange(watch)
-		instance.actions.setLang("fr")
+		instance.store.subscribe(watch)
+		instance.store.getState().setLang("fr")
 
 		expect(watch).toHaveBeenCalledTimes(1)
 		expect(watch.mock.calls[0][0].lang).toBe("fr")
@@ -33,9 +33,9 @@ describe("createInstance", () => {
 		const instance = createInstance()
 		const watch = jest.fn()
 
-		instance.onChange(watch)
+		instance.store.subscribe(watch)
 		// an unmounted theme: the action answers the same values
-		instance.actions.setThemeName("nothing-mounted")
+		instance.store.getState().setThemeName("nothing-mounted")
 
 		expect(watch).not.toHaveBeenCalled()
 	})
@@ -56,9 +56,9 @@ describe("createInstance", () => {
 		const one = createInstance()
 		const two = createInstance()
 
-		one.actions.setLang("fr")
+		one.store.getState().setLang("fr")
 
-		expect(two.data().lang).toBe("en")
+		expect(two.store.getState().lang).toBe("en")
 	})
 })
 
@@ -111,7 +111,7 @@ describe("shellActions", () => {
 			state.setAnimation(false)
 		})
 
-		expect(instance.data().animation).toBe(false)
+		expect(instance.store.getState().animation).toBe(false)
 	})
 
 	it("refuses outside of a command", () => {

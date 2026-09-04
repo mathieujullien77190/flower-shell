@@ -13,7 +13,7 @@ const click = (args: string[]) => {
 
 	withInstance(instance, () => actionmapCommand.effect!({ args }))
 
-	return instance.data().commands
+	return instance.store.getState().commands
 }
 
 describe("actionmap", () => {

@@ -59,11 +59,7 @@ const createRegistry = (): ShellRegistry => {
 			run: (id, commandPattern) => createRunners(find(id)).run(commandPattern),
 			runRestricted: (id, commandPattern) =>
 				createRunners(find(id)).runRestricted(commandPattern),
-			actions: id => {
-				const instance = find(id)
-
-				return { ...instance.data(), ...instance.actions }
-			},
+			actions: id => find(id).store.getState(),
 		},
 	}
 }

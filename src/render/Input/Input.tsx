@@ -12,13 +12,13 @@ import { isMobile } from "react-device-detect"
 import { theme } from "@theme"
 import { t } from "@i18n/lang"
 
-import { useCommands } from "@state/context"
 import { autocompleteCommand } from "@engine/terminalEngine"
 
 import * as S from "./UI"
 import { cleanCommand, hasSelection } from "./helpers"
 
 export const Input = ({
+	known,
 	value = "",
 	// a click count, so the zero of a shell nobody has clicked yet is a
 	// number and not an absence
@@ -33,9 +33,6 @@ export const Input = ({
 	const [nbsLetters, setNbsLetters] = useState<number>(0)
 	const [prevValue, setPrevValue] = useState<string>(value)
 	const ref = useRef<HTMLInputElement>(null)
-
-	// the commands of this shell, for the autocompletion alone
-	const known = useCommands()
 
 	// a mouse button held down may well be a selection under way
 	const pressed = useRef<boolean>(false)

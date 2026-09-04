@@ -86,7 +86,7 @@ const send = (
 			}
 		}
 
-		instance.actions.addCommand(cmd)
+		instance.store.getState().addCommand(cmd)
 
 		if (cmd.canExecute) {
 			// the action returned its text and the effect played: the command is

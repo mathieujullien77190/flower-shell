@@ -31,6 +31,8 @@ export default defineConfig({
 				"react-device-detect",
 				"react-string-replace",
 				"uniqid",
+				// the sub-paths too: the store comes from `zustand/vanilla`
+				/^zustand($|\/)/,
 			],
 		},
 	},

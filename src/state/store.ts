@@ -1,3 +1,6 @@
+import { createStore } from "zustand/vanilla"
+import type { StoreApi } from "zustand/vanilla"
+
 import { Command } from "@types"
 import { DEFAULT_THEME_NAME, fonts, setTheme, themeByName } from "@theme"
 
@@ -48,6 +51,9 @@ export type ShellActions = {
 
 /** what the handle of a shell hands back: its values and its actions */
 export type ShellState = ShellData & ShellActions
+
+/** the store of one shell: every terminal on the page owns one */
+export type ShellStore = StoreApi<ShellState>
 
 /** the options a shell can be mounted on, the rest being the defaults */
 export type ShellOptions = {
@@ -215,3 +221,28 @@ export const createActions = (
 			return data
 		}),
 })
+
+/**
+ * One store per shell, and not one for the module: two terminals on the same
+ * page keep their own history, their own cursor and their own options.
+ *
+ * The values and the actions live in the same store — `getState()` hands
+ * back the pair a handle is made of — and the actions stay written against
+ * an `update`, which is what lets them be read and tested without a store
+ * at all.
+ *
+ * An action that answers the values it was given has changed nothing, and
+ * must wake nobody: the equality is checked here rather than in each of
+ * them.
+ */
+export const createShellStore = (options: ShellOptions = {}): ShellStore => {
+	const start = initialData(options)
+
+	return createStore<ShellState>((set, get) => ({
+		...start,
+		...createActions(change => {
+			const next = change(get())
+			if (next !== get()) set(next)
+		}, start),
+	}))
+}

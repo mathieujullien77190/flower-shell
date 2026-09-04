@@ -27,8 +27,8 @@ describe("run", () => {
 
 		createRunners(instance).run("hello world")
 
-		expect(instance.data().commands).toHaveLength(1)
-		expect(instance.data().commands[0].pattern).toBe("hello world")
+		expect(instance.store.getState().commands).toHaveLength(1)
+		expect(instance.store.getState().commands[0].pattern).toBe("hello world")
 	})
 
 	it("keeps a restricted line out of the visible history", () => {
@@ -36,8 +36,8 @@ describe("run", () => {
 
 		createRunners(instance).runRestricted("welcome")
 
-		expect(instance.data().commands).toHaveLength(0)
-		expect(instance.data().restrictedCommands).toHaveLength(1)
+		expect(instance.store.getState().commands).toHaveLength(0)
+		expect(instance.store.getState().restrictedCommands).toHaveLength(1)
 	})
 
 	it("plays the effect of the command", () => {
@@ -69,8 +69,8 @@ describe("run", () => {
 
 		createRunners(one).run("hello")
 
-		expect(one.data().commands).toHaveLength(1)
-		expect(two.data().commands).toHaveLength(0)
+		expect(one.store.getState().commands).toHaveLength(1)
+		expect(two.store.getState().commands).toHaveLength(0)
 	})
 })
 
@@ -147,7 +147,7 @@ describe("the listeners", () => {
 		expect(heard.error).toHaveBeenCalledWith(
 			expect.objectContaining({ reason: "thrown", error: boom })
 		)
-		expect(instance.data().commands).toHaveLength(0)
+		expect(instance.store.getState().commands).toHaveLength(0)
 	})
 
 	it("keeps the line when the effect alone threw", () => {
@@ -166,7 +166,7 @@ describe("the listeners", () => {
 		expect(heard.error).toHaveBeenCalledWith(
 			expect.objectContaining({ reason: "thrown" })
 		)
-		expect(instance.data().commands).toHaveLength(1)
+		expect(instance.store.getState().commands).toHaveLength(1)
 	})
 
 	it("objects to nothing on a shell with no command", () => {
@@ -177,7 +177,7 @@ describe("the listeners", () => {
 		createRunners(instance).run("whatever")
 
 		expect(heard.error).not.toHaveBeenCalled()
-		expect(instance.data().commands).toHaveLength(1)
+		expect(instance.store.getState().commands).toHaveLength(1)
 	})
 })
 
@@ -191,7 +191,7 @@ describe("runHere", () => {
 
 		createRunners(instance).run("go")
 
-		expect(instance.data().commands.map(item => item.name)).toEqual([
+		expect(instance.store.getState().commands.map(item => item.name)).toEqual([
 			"hello",
 			"go",
 		])

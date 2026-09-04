@@ -47,7 +47,8 @@
 	"dependencies": {
 		"react-device-detect": "2.2.3",
 		"react-string-replace": "^2.0.1",
-		"uniqid": "5.4.0"
+		"uniqid": "5.4.0",
+		"zustand": "^5.0.15"
 	},
 	"scripts": {
 		"storybook": "storybook dev -p 6006",
