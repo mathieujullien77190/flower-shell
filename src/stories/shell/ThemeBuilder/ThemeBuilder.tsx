@@ -4,13 +4,13 @@ import { Shell } from "../../../Shell"
 import { baseCommands } from "../../../commands/base"
 import { testCommand as test } from "../../../commands/common/test"
 import { themes } from "../../../theme"
-import { useLocale, type Labels } from "../../i18n"
 import type { ShellColors, ShellTheme } from "../../../theme"
 
 /**
- * The preview: a real shell, wearing the draft. It opens on `test`, which
- * prints every color of the theme — the palette being edited, rendered by
- * the code that will render it for real.
+ * The preview: a real shell, wearing the draft. It opens on `title`, the
+ * logo the font size above is written for, then on `test`, which prints
+ * every color of the theme — the palette being edited, rendered by the code
+ * that will render it for real.
  *
  * It remounts on every touch of a picker, through the `key` its parent
  * gives it. A remounted shell is a new shell — the store comes with the
@@ -34,7 +34,7 @@ const Preview = ({ draft }: { draft: ShellTheme }) => (
 		// the draft is the only reachable theme: the preview shows what is
 		// being written, not the catalogue of the package
 		themes={{ draft }}
-		initialCommands={["test"]}
+		initialCommands={["title", "test"]}
 		animation={false}
 		keyboardOnFocus={false}
 	/>
@@ -152,6 +152,9 @@ const asCode = (draft: ShellTheme) =>
 		`    invisible: "${draft.colors.background}",`,
 		"  },",
 		`  prompt: "${draft.prompt}",`,
+		"  fonts: {",
+		`    logo: "${draft.fonts.logo}",`,
+		"  },",
 		"}",
 		"",
 		"<Shell",
@@ -169,36 +172,20 @@ const asCode = (draft: ShellTheme) =>
 const CUSTOM = "custom"
 
 /**
- * The titles of the panel, in the language of the page. The pickers keep
- * the names of the colors they edit — they are the keys of the theme, read
- * again in the code block below.
+ * The titles of the panel. English whatever the language of the page: they
+ * sit next to the keys of the theme, which are written in it — `prompt`,
+ * `shell`, `logo` are read again in the code block below.
  */
-const LABELS: Labels<{
-	base: string
-	prompt: string
-	shell: string
-	preview: string
-	code: string
-}> = {
-	en: {
-		base: "start from",
-		prompt: "prompt",
-		shell: "shell",
-		preview: "preview",
-		code: "your theme",
-	},
-	fr: {
-		base: "partir de",
-		prompt: "invite",
-		shell: "shell",
-		preview: "aperçu",
-		code: "votre thème",
-	},
+const LABEL = {
+	base: "start from",
+	prompt: "prompt",
+	shell: "shell",
+	logo: "logo font size",
+	preview: "preview",
+	code: "your theme",
 }
 
 export const ThemeBuilder = () => {
-	const label = LABELS[useLocale()]
-
 	const [base, setBase] = useState("flower")
 	const [draft, setDraft] = useState<ShellTheme>(themes.flower)
 
@@ -246,7 +233,7 @@ export const ThemeBuilder = () => {
 			}}
 		>
 			<div style={{ display: "grid", gap: 20 }}>
-				<Group title={label.base}>
+				<Group title={LABEL.base}>
 					<select
 						value={base}
 						onChange={event => pickBase(event.target.value)}
@@ -267,7 +254,7 @@ export const ThemeBuilder = () => {
 					</select>
 				</Group>
 
-				<Group title={label.prompt}>
+				<Group title={LABEL.prompt}>
 					<input
 						value={draft.prompt}
 						onChange={event =>
@@ -283,7 +270,7 @@ export const ThemeBuilder = () => {
 					/>
 				</Group>
 
-				<Group title={label.shell}>
+				<Group title={LABEL.shell}>
 					{SHELL_FIELDS.map(({ key, label }) => (
 						<Picker
 							key={key}
@@ -293,10 +280,30 @@ export const ThemeBuilder = () => {
 						/>
 					))}
 				</Group>
+
+				{/* a CSS length and not a number: the logo is written on the width
+				    of the container, `calc(100cqw / 90)` by default */}
+				<Group title={LABEL.logo}>
+					<input
+						value={draft.fonts.logo}
+						onChange={event =>
+							edit(current => ({
+								...current,
+								fonts: { ...current.fonts, logo: event.target.value },
+							}))
+						}
+						style={{
+							font: "13px/1.5 ui-monospace, monospace",
+							padding: "6px 8px",
+							border: "1px solid #000000",
+							borderRadius: 4,
+						}}
+					/>
+				</Group>
 			</div>
 
 			<div style={{ display: "grid", gap: 20 }}>
-				<Group title={label.preview}>
+				<Group title={LABEL.preview}>
 					{/* The shell takes this whole box: it needs a height, and the
 					    package imposes none. It scrolls inside it on its own — the
 					    scrollbar being edited two pickers above is the one showing
@@ -306,7 +313,7 @@ export const ThemeBuilder = () => {
 					</div>
 				</Group>
 
-				<Group title={label.code}>
+				<Group title={LABEL.code}>
 					<pre
 						style={{
 							margin: 0,
